@@ -6,24 +6,34 @@
 #include "zlgcan_ctrl.h"
 #include "singleton.h"
 
-namespace CommJ1939
+#define J1939_SRC_ADDR  0x7E // 默认源地址
+#define PGN_REG_NUM     100  // 注册的PGN数（单帧），只接收
+#define SESSION_REG_NUM 200  // 注册的会话数（多帧），包含发送和接收
+
+class CommJ1939 : public QObject
 {
+public:
+    void init();
 
-void init();
+    void poll(void);
+    void set_src_addr(uint8_t addr);
+    int  msg_send(uint32_t pgn, uint8_t priority, uint8_t dst, uint8_t *data, uint16_t len, uint32_t timeout);
+    int  pgn_register(const uint32_t pgn, uint8_t code, pgn_callback_t cb);
+    int  tp_rx_register(uint8_t              src,
+                        uint8_t              dst,
+                        session_get_data_fun get_data,
+                        session_recv_fun     rec_finish,
+                        session_err_fun      err_handle);
 
-void j1939_poll(void);
-void j1939_set_src_addr(uint8_t addr);
-int  j1939_boot_msg_send(uint32_t pgn, uint8_t priority, uint8_t dst, uint8_t *data, uint16_t len, uint32_t timeout);
-int  j1939_boot_pgn_register(const uint32_t pgn, uint8_t code, pgn_callback_t cb);
-int  j1939_boot_tp_rx_register(uint8_t              src,
-                               uint8_t              dst,
-                               session_get_data_fun get_data,
-                               session_recv_fun     rec_finish,
-                               session_err_fun      err_handle);
+    int  can_write(uint32_t id, uint8_t *data, uint8_t len);
+    void can_recv(uint32_t id, uint flag, uint8_t *data, uint16_t len);
 
-int  j1939_can_write(uint32_t id, uint8_t *data, uint8_t len);
-void j1939_recv(uint32_t id, uint flag, uint8_t *data, uint16_t len);
+private:
+    j1939_t j1939_ins;
+    ZlgCan  zlgcan_ins;
+    QTimer  j1939_poll_timer;
+};
 
-}; // namespace CommJ1939
+#define J1939Ins Singleton<CommJ1939>::getInstance()
 
 #endif

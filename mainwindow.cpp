@@ -2,7 +2,7 @@
 #include "ui_mainwindow.h"
 #include "QDebug"
 #include "comm/comm_j1939.h"
-#include "comm/boot_port.h"
+#include "boot_update/boot_port.h"
 #include "boot_update/frmbootloader.h"
 void MainWindow::slot_test_send()
 {
@@ -14,7 +14,7 @@ void MainWindow::slot_test_send()
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    CommJ1939::init();
+    J1939Ins->init();
     boot_port_init();
     connect(&test_timer, &QTimer::timeout, this, &MainWindow::slot_test_send);
     test_timer.start(1000);

@@ -4,7 +4,6 @@
 #include "comm_j1939.h"
 #include "QDebug"
 #include "middle_signal.h"
-using namespace CommJ1939;
 
 #define BOOT_PORT_DBG(x...) MiddleSignalIns->dbg_info(x)
 
@@ -14,7 +13,7 @@ uint8_t dest_addr = ADDRESS_GLOBAL;
 
 void boot_send(uint32_t msg_id, uint8_t *data, uint16_t len)
 {
-    j1939_boot_msg_send(msg_id, J1939_DEF_PRIORITY, dest_addr, data, len, J1939_SEND_TIME_OUT);
+    J1939Ins->msg_send(msg_id, J1939_DEF_PRIORITY, dest_addr, data, len, J1939_SEND_TIME_OUT);
 }
 
 void boot_update_failed(void)
@@ -55,14 +54,18 @@ j1939_ret_e boot_check_crc_respond_cb(j1939_t *handle, j1939_message_t *msg)
     BOOT_PORT_DBG("src %d check crc respond %d", msg->src, msg->data[0]);
     return J1939_OK;
 }
+#define ADDR_NUM_MAX        128
+#define J1939_GET_DATA_SIZE 512
+static uint8_t temp_data[ADDR_NUM_MAX][J1939_GET_DATA_SIZE];
 
 int j1939_update_cmd_get_data(uint32_t pgn, uint8_t src, uint8_t **data, uint16_t *len)
 {
     (void)pgn;
-    (void)src;
-    static uint8_t temp_data[512];
-    *data = temp_data;
-    *len  = sizeof(temp_data);
+    if (src < ADDR_NUM_MAX)
+    {
+        *data = temp_data[src];
+    }
+    *len = J1939_GET_DATA_SIZE;
     return *len;
 }
 
@@ -204,9 +207,12 @@ void j1939_update_cmd_recv_cb(uint32_t pgn, uint8_t src, uint8_t *data, uint16_t
 
 void boot_port_init(void)
 {
-    j1939_boot_tp_rx_register(0x20, 0x40, j1939_update_cmd_get_data, j1939_update_cmd_recv_cb, NULL);
-    j1939_boot_pgn_register(BOOT_MSG_ID_UPDATE_CMD_RESPONE, 0, boot_cmd_respond_cb);
-    j1939_boot_pgn_register(BOOT_MSG_ID_FILE_INFO_RESPONE, 0, boot_file_info_respond_cb);
-    j1939_boot_pgn_register(BOOT_MSG_ID_FILE_DATA_RESPONE, 0, boot_file_data_respond_cb);
-    j1939_boot_pgn_register(BOOT_MSG_ID_CHECK_CRC_RESPONE, 0, boot_check_crc_respond_cb);
+    for (int i = 0; i < ADDR_NUM_MAX; i++)
+    {
+        J1939Ins->tp_rx_register(i, J1939_SRC_ADDR, j1939_update_cmd_get_data, j1939_update_cmd_recv_cb, NULL);
+    }
+    J1939Ins->pgn_register(BOOT_MSG_ID_UPDATE_CMD_RESPONE, 0, boot_cmd_respond_cb);
+    J1939Ins->pgn_register(BOOT_MSG_ID_FILE_INFO_RESPONE, 0, boot_file_info_respond_cb);
+    J1939Ins->pgn_register(BOOT_MSG_ID_FILE_DATA_RESPONE, 0, boot_file_data_respond_cb);
+    J1939Ins->pgn_register(BOOT_MSG_ID_CHECK_CRC_RESPONE, 0, boot_check_crc_respond_cb);
 }

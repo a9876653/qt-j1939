@@ -31,6 +31,7 @@ FORMS += \
 
 include($$PWD/comm/comm.pri)
 include($$PWD/bytes/bytes.pri)
+include($$PWD/boot_update/boot_update.pri)
 
 
 # Default rules for deployment.
