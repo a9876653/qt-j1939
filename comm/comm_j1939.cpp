@@ -14,7 +14,7 @@ void CommJ1939::can_recv(uint32_t id, uint flag, uint8_t *data, uint16_t len)
 
 int CommJ1939::can_write(uint32_t id, uint8_t *data, uint8_t len)
 {
-    if (zlgcan_ins.transmit(id, MSG_FLAG_EXT, data, len) == 1)
+    if (transmit(id, MSG_FLAG_EXT, data, len) == 1)
     {
         return len;
     }
@@ -28,12 +28,11 @@ void CommJ1939::poll(void)
 
 void CommJ1939::init()
 {
-    zlgcan_ins.open_device(0, CAN_BAUDRATE_500K);
     memset(&j1939_ins, 0, sizeof(j1939_ins));
     j1939_init(&j1939_ins, J1939_SRC_ADDR, PGN_REG_NUM, SESSION_REG_NUM, j1939_can_write);
     j1939_poll_timer.start(5);
     j1939_poll_timer.connect(&j1939_poll_timer, &QTimer::timeout, this, &CommJ1939::poll);
-    zlgcan_ins.connect(&zlgcan_ins, &ZlgCan::sig_receive, this, &CommJ1939::can_recv);
+    connect(this, &ZlgCan::sig_receive, this, &CommJ1939::can_recv);
 }
 
 int CommJ1939::msg_send(uint32_t pgn, uint8_t priority, uint8_t dst, uint8_t *data, uint16_t len, uint32_t timeout)

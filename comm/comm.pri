@@ -8,10 +8,12 @@ INCLUDEPATH += $$PWD/zlgcan
 
 HEADERS += \
     $$PWD/comm_j1939.h \
+    $$PWD/comm_j1939_port.h \
     $$PWD/j1939_config.h
 
 SOURCES += \
-    $$PWD/comm_j1939.cpp
+    $$PWD/comm_j1939.cpp \
+    $$PWD/comm_j1939_port.cpp
 
 
 

@@ -42,9 +42,26 @@ bool ZlgCan::set_baudrate(uint16_t channel_index, baudrate_e baudrate)
     return true;
 }
 
-bool ZlgCan::open_device(uint8_t channel_index, baudrate_e baudrate)
+bool ZlgCan::set_baudrate(uint16_t channel_index, uint baudrate)
 {
-    device_handle = ZCAN_OpenDevice(ZCAN_USBCAN1, 0, 0);
+    char path[50]  = {0};
+    char value[50] = {0};
+
+    sprintf_s(path, "%d/baud_rate", channel_index);
+    sprintf(value, "%d", baudrate);
+    if (ZCAN_SetValue(device_handle, path, value) != 1)
+    {
+        ZLGCAN_DBG("CAN SET BAUDRATE FAILED!");
+        return false;
+    }
+    return true;
+}
+
+bool ZlgCan::open_device(uint8_t channel_index, uint32_t baudrate)
+{
+    device_index  = channel_index;
+    u32_baudrate  = baudrate;
+    device_handle = ZCAN_OpenDevice(ZCAN_USBCAN2, 0, 0);
     if (device_handle == INVALID_DEVICE_HANDLE)
     {
         ZLGCAN_DBG("CAN OPEN DEVICE FAILED!");
@@ -73,9 +90,52 @@ bool ZlgCan::open_device(uint8_t channel_index, baudrate_e baudrate)
         return false;
     }
     receive_timer.start(5);
-    ZLGCAN_DBG("CAN INIT SUCCESSFUL BAUDRATE:%s", baudrate_map[baudrate]);
+    ZLGCAN_DBG("CAN INIT SUCCESSFUL BAUDRATE:%d", baudrate);
 
     return true;
+}
+
+bool ZlgCan::open_device(uint8_t channel_index, baudrate_e baud)
+{
+    device_index  = channel_index;
+    baudrate_enum = baud;
+    device_handle = ZCAN_OpenDevice(ZCAN_USBCAN2, 0, 0);
+    if (device_handle == INVALID_DEVICE_HANDLE)
+    {
+        ZLGCAN_DBG("CAN OPEN DEVICE FAILED!");
+        return false;
+    }
+
+    set_baudrate(channel_index, baudrate_enum);
+
+    ZCAN_CHANNEL_INIT_CONFIG config;
+    memset(&config, 0, sizeof(config));
+    config.can_type     = TYPE_CAN;
+    config.can.mode     = 0;
+    config.can.filter   = 0;
+    config.can.acc_code = 0;
+    config.can.acc_mask = 0xFFFFFFFF;
+    channel_handle      = ZCAN_InitCAN(device_handle, channel_index, &config);
+    if (channel_handle == INVALID_DEVICE_HANDLE)
+    {
+        ZLGCAN_DBG("CAN OPEN CAHNNEL FAILED!");
+        return false;
+    }
+
+    if (ZCAN_StartCAN(channel_handle) != STATUS_OK)
+    {
+        ZLGCAN_DBG("CAN START FAILED!");
+        return false;
+    }
+    receive_timer.start(5);
+    ZLGCAN_DBG("CAN INIT SUCCESSFUL BAUDRATE:%s", baudrate_map[baudrate_enum]);
+
+    return true;
+}
+
+void ZlgCan::close_device()
+{
+    ZCAN_CloseDevice(device_handle);
 }
 
 uint ZlgCan::transmit(uint32_t id, uint flag, uint8_t *data, uint16_t len)
@@ -90,7 +150,17 @@ uint ZlgCan::transmit(uint32_t id, uint flag, uint8_t *data, uint16_t len)
     transmit_data.frame.can_id  = MAKE_CAN_ID(id, is_ext_frame, 0, 0);
     transmit_data.frame.can_dlc = len;
     memcpy(transmit_data.frame.data, data, len);
-    return ZCAN_Transmit(channel_handle, &transmit_data, 1);
+    uint ret = ZCAN_Transmit(channel_handle, &transmit_data, 1);
+    if (ret < 1)
+    {
+        ZLGCAN_DBG("CAN TRANSMIT FAILED ret %d, len %d!", ret, len);
+
+        if (!open_device(device_index, u32_baudrate))
+        {
+            ZLGCAN_DBG("CAN RESTART FAILED!");
+        }
+    }
+    return ret;
 }
 
 void ZlgCan::receive()

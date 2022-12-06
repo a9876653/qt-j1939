@@ -10,7 +10,7 @@
 #define PGN_REG_NUM     100  // 注册的PGN数（单帧），只接收
 #define SESSION_REG_NUM 200  // 注册的会话数（多帧），包含发送和接收
 
-class CommJ1939 : public QObject
+class CommJ1939 : public ZlgCan
 {
 public:
     void init();
@@ -27,10 +27,11 @@ public:
 
     int  can_write(uint32_t id, uint8_t *data, uint8_t len);
     void can_recv(uint32_t id, uint flag, uint8_t *data, uint16_t len);
+signals:
+    void sig_recv_pgn(uint32_t pgn, uint8_t src, uint8_t *data, uint16_t data_size);
 
 private:
     j1939_t j1939_ins;
-    ZlgCan  zlgcan_ins;
     QTimer  j1939_poll_timer;
 };
 

@@ -4,6 +4,9 @@
 #include <QMainWindow>
 #include <QTimer>
 
+#include "msg_signals.h"
+#include "pagemsgdisplay.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui
 {
@@ -19,10 +22,17 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+    void on_openDevicePushButton_clicked();
+
 private:
     Ui::MainWindow *ui;
 
     QTimer test_timer;
+
+    bool device_status = false;
+
+    MsgSignals msgs;
 
     void slot_test_send();
 };

@@ -4,7 +4,7 @@ TARGET = ../bin/can_tool
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-CONFIG += c++11
+CONFIG += c++17
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
@@ -31,7 +31,16 @@ FORMS += \
 
 include($$PWD/comm/comm.pri)
 include($$PWD/bytes/bytes.pri)
-include($$PWD/boot_update/boot_update.pri)
+include($$PWD/page/page.pri)
+include($$PWD/widget/widget.pri)
+include($$PWD/msg_signals/msg_signals.pri)
+# include($$PWD/boot_update/boot_update.pri)
+
+INCLUDEPATH += $$PWD/bytes
+INCLUDEPATH += $$PWD/widget
+INCLUDEPATH += $$PWD/msg_signals
+INCLUDEPATH += $$PWD/comm
+INCLUDEPATH += $$PWD/page
 
 
 # Default rules for deployment.

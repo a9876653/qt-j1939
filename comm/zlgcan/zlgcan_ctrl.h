@@ -31,7 +31,10 @@ public:
     explicit ZlgCan();
     ~ZlgCan();
     bool open_device(uint8_t device_index, baudrate_e baudrate);
+    bool open_device(uint8_t device_index, uint32_t baudrate);
     uint transmit(uint32_t id, uint flag, uint8_t *data, uint16_t len);
+
+    void close_device();
 
 signals:
     void sig_receive(uint32_t id, uint flag, uint8_t *data, uint16_t len);
@@ -41,10 +44,15 @@ private:
     CHANNEL_HANDLE channel_handle;
     QTimer         receive_timer;
 
+    uint8_t    device_index  = 0;
+    uint32_t   u32_baudrate  = 500000;
+    baudrate_e baudrate_enum = CAN_BAUDRATE_500K;
+
     ZCAN_Receive_Data  recv_data[CAN_RECV_DATA_SIZE];
     ZCAN_Transmit_Data transmit_data;
 
     bool set_baudrate(uint16_t channel_index, baudrate_e baudrate);
+    bool set_baudrate(uint16_t channel_index, uint baudrate);
     void receive();
 };
 

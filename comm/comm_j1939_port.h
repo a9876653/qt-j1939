@@ -1,0 +1,4 @@
+#ifndef COMM_J1939_PORT_H
+#define COMM_J1939_PORT_H
+
+#endif // COMM_J1939_PORT_H
