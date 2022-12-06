@@ -5,6 +5,7 @@
 typedef int (*session_get_data_fun)(uint32_t pgn, uint8_t src, uint8_t **data, uint16_t *len);
 typedef void (*session_err_fun)(uint32_t pgn, uint8_t src);
 typedef void (*session_recv_fun)(uint32_t pgn, uint8_t src, uint8_t *data, uint16_t len);
+
 int j1939_get_data(uint32_t pgn, uint8_t src, uint8_t **data, uint16_t *len)
 {
     (void)pgn;
