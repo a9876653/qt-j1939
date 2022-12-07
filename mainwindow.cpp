@@ -18,13 +18,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     // boot_port_init();
     connect(&test_timer, &QTimer::timeout, this, &MainWindow::slot_test_send);
     test_timer.start(1000);
-    comm_j1939_port_init(msgs.msgs_map);
-    ui->tabWidget->addTab(new PageMsgDisplay(msgs.msgs_map), " 主机");
+    msgs = new MsgSignals(true);
+    comm_j1939_port_init(msgs->msgs_map);
+    ui->tabWidget->addTab(new PageMsgDisplay(msgs->msgs_map), " 主机");
     connect(J1939Ins, &CommJ1939::sig_recv_pgn_handle, this, &MainWindow::slot_recv_pgn_handle);
 }
 
 MainWindow::~MainWindow()
 {
+    delete msgs;
     delete ui;
 }
 

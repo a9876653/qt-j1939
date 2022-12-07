@@ -38,7 +38,7 @@ private:
 
     bool device_status = false;
 
-    MsgSignals msgs;
+    MsgSignals *msgs = nullptr;
 
     QMap<uint, PageMsgDisplay *> src_page_map;
 

@@ -20,7 +20,7 @@ QFileInfoList GetFileList(QString path)
     return file_list;
 }
 
-MsgSignals::MsgSignals()
+MsgSignals::MsgSignals(bool is_master) : is_master(is_master)
 {
     QString       dir      = "./cfg/";
     QFileInfoList fileList = GetFileList(dir); //获取目录下所有的文件
@@ -32,6 +32,17 @@ MsgSignals::MsgSignals()
             load_json(info.filePath());
         }
     }
+
+    if (is_master)
+    {
+        load_temp_file("./temp/temp.json");
+    }
+}
+
+MsgSignals::~MsgSignals()
+{
+    save_msg_send_data("./temp/temp.json");
+    MSG_SIGNAL_DBG() << "msg signals save send data";
 }
 
 bool MsgSignals::load_json(QString path)
@@ -85,6 +96,10 @@ void MsgSignals::json_items_handle(QJsonDocument *jdoc)
             msg_bit_len += msg_sig->bit_length;
 
             connect(&msg_sig->send_widget, &CustomTextWidget::sig_enter_event, msg_data, &MsgData::slot_encode_send);
+            if (is_master)
+            {
+                connect(&msg_sig->send_widget, &CustomTextWidget::sig_enter_event, this, &MsgSignals::slot_msg_send);
+            }
 
             msg_data->signals_list.append(msg_sig);
         }
@@ -98,4 +113,89 @@ void MsgSignals::json_items_handle(QJsonDocument *jdoc)
         msgs_map.insert(msg_data->pgn, msg_data);
     }
     MSG_SIGNAL_DBG("json_items_handle finish");
+}
+
+void write_json_file(QString path, QJsonDocument *jdoc)
+{
+    QFile file_write(path);
+    if (!file_write.open(QIODevice::WriteOnly | QIODevice::Truncate))
+    {
+        qDebug() << "read json file failed";
+        return;
+    }
+    QByteArray read_array = jdoc->toJson();
+    file_write.write(read_array);
+    file_write.close();
+}
+
+bool MsgSignals::load_temp_file(QString path)
+{
+    QJsonDocument jsonCfgDoc;
+    QFile         file_read(path);
+    if (!file_read.open(QIODevice::ReadOnly))
+    {
+        MSG_SIGNAL_DBG("read json file failed");
+        return false;
+    }
+    QByteArray read_array = file_read.readAll();
+    file_read.close();
+
+    QJsonParseError e;
+    jsonCfgDoc = QJsonDocument::fromJson(read_array, &e);
+
+    if (e.error != QJsonParseError::NoError && !jsonCfgDoc.isNull())
+    {
+        MSG_SIGNAL_DBG("read json file error %d", e.error);
+        return false;
+    }
+    QJsonObject root = jsonCfgDoc.toVariant().toJsonObject();
+    for (auto root_item : root)
+    {
+        QJsonObject msg_obj = root_item.toObject();
+        uint32_t    pgn     = msg_obj.value("pgn").toString().toInt();
+        if (msgs_map.contains(pgn))
+        {
+            MsgData *msg_data = msgs_map.value(pgn);
+            if (msg_obj.contains("signals"))
+            {
+                QJsonObject signals_obj = msg_obj.value("signals").toObject();
+                for (Signal *sig : msg_data->signals_list)
+                {
+                    if (signals_obj.contains(sig->name))
+                    {
+                        QJsonObject sig_obj = signals_obj.value(sig->name).toObject();
+                        sig->send_widget.text->setText(sig_obj.value("value").toString());
+                    }
+                }
+            }
+        }
+    }
+    return true;
+}
+
+void MsgSignals::save_msg_send_data(QString path)
+{
+    QJsonObject root;
+    for (MsgData *msg_data : msgs_map)
+    {
+        QJsonObject msg_obj;
+        msg_obj.insert("name", msg_data->name);
+        msg_obj.insert("id", QString("%1").arg(msg_data->id));
+        msg_obj.insert("pgn", QString("%1").arg(msg_data->pgn));
+        QJsonObject signals_obj;
+        for (Signal *sig : msg_data->signals_list)
+        {
+            QJsonObject sig_obj;
+            sig_obj.insert("value", sig->send_widget.text->toPlainText());
+            signals_obj.insert(sig->name, sig_obj);
+        }
+        msg_obj.insert("signals", signals_obj);
+        root.insert(QString("%1").arg(msg_data->pgn), msg_obj);
+    }
+    QJsonDocument tempJdoc(root);
+    write_json_file(path, &tempJdoc);
+}
+
+void MsgSignals::slot_msg_send()
+{
 }

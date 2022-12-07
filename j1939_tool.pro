@@ -1,6 +1,6 @@
 QT       += core gui
 
-TARGET = ../bin/can_tool
+TARGET = ../bin/j1939_tool
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
