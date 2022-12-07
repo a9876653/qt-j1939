@@ -12,6 +12,8 @@ frmBootloader::frmBootloader(QWidget *parent) : QWidget(parent), ui(new Ui::frmB
     {
         file_path = tempFile.read(1024);
     }
+    boot_port_init();
+
     ui->pathTextEdit->setText(file_path);
     file_data_info = set_file_data_info(file_path);
     slotAppInfoUpdata(file_data_info->app_info);

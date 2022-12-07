@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>J1939 Tool</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="resource/res.qrc">
+    <normaloff>:/battery.png</normaloff>:/battery.png</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0" columnstretch="0,0,0,0">
     <property name="leftMargin">
@@ -93,6 +97,8 @@
    </property>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="resource/res.qrc"/>
+ </resources>
  <connections/>
 </ui>

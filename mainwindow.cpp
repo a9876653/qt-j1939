@@ -3,6 +3,7 @@
 #include "QDebug"
 #include "comm/comm_j1939.h"
 #include "comm_j1939_port.h"
+#include "frmbootloader.h"
 
 void MainWindow::slot_test_send()
 {
@@ -20,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     test_timer.start(1000);
     msgs = new MsgSignals(true);
     comm_j1939_port_init(msgs->msgs_map);
+    ui->tabWidget->addTab(new frmBootloader, "固件升级");
     ui->tabWidget->addTab(new PageMsgDisplay(msgs->msgs_map), " 主机");
     connect(J1939Ins, &CommJ1939::sig_recv_pgn_handle, this, &MainWindow::slot_recv_pgn_handle);
 }

@@ -201,16 +201,13 @@ void j1939_update_cmd_recv_cb(uint32_t pgn, uint8_t src, uint8_t *data, uint16_t
     {
         app_info_str_t str = get_app_info_str((app_info_t *)data);
         MiddleSignalIns->app_info_update(str);
+        BOOT_PORT_DBG("boot recv pgn 0x%04x, src: %d, len %d", pgn, src, len);
     }
-    BOOT_PORT_DBG("boot recv pgn 0x%04x, src: %d, len %d", pgn, src, len);
 }
 
 void boot_port_init(void)
 {
-    for (int i = 0; i < ADDR_NUM_MAX; i++)
-    {
-        J1939Ins->tp_rx_register(i, J1939_SRC_ADDR, j1939_update_cmd_get_data, j1939_update_cmd_recv_cb, NULL);
-    }
+    J1939Ins->connect(J1939Ins, &CommJ1939::sig_recv_pgn_handle, j1939_update_cmd_recv_cb);
     J1939Ins->pgn_register(BOOT_MSG_ID_UPDATE_CMD_RESPONE, 0, boot_cmd_respond_cb);
     J1939Ins->pgn_register(BOOT_MSG_ID_FILE_INFO_RESPONE, 0, boot_file_info_respond_cb);
     J1939Ins->pgn_register(BOOT_MSG_ID_FILE_DATA_RESPONE, 0, boot_file_data_respond_cb);

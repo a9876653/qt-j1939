@@ -2,6 +2,8 @@ QT       += core gui
 
 TARGET = ../bin/j1939_tool
 
+RC_ICONS = battery.ico
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++17
@@ -34,19 +36,23 @@ include($$PWD/bytes/bytes.pri)
 include($$PWD/page/page.pri)
 include($$PWD/widget/widget.pri)
 include($$PWD/msg_signals/msg_signals.pri)
-# include($$PWD/boot_update/boot_update.pri)
+include($$PWD/boot_update/boot_update.pri)
 
 INCLUDEPATH += $$PWD/bytes
 INCLUDEPATH += $$PWD/widget
 INCLUDEPATH += $$PWD/msg_signals
 INCLUDEPATH += $$PWD/comm
 INCLUDEPATH += $$PWD/page
+INCLUDEPATH += $$PWD/boot_update
 
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    resource/res.qrc
 
 
 
