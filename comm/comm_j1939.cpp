@@ -62,6 +62,16 @@ int CommJ1939::msg_send(uint32_t pgn, uint8_t priority, uint8_t dst, uint8_t *da
 
 void CommJ1939::set_src_addr(uint8_t addr)
 {
+    // 改变源地址的订阅哈希值
+    for (int i = 0; i < J1939_NODE_ADDR_MAX; i++)
+    {
+        j1939_sessions_t *handle = &j1939_ins.sessions;
+        j1939_session_t  *sess   = j1939_session_search_addr(handle, i, j1939_ins.node_addr);
+        uint16_t          key    = (i << 8) | j1939_ins.node_addr;
+        hasht_delete(&handle->sessions, key);
+        uint16_t new_key = (i << 8) | addr;
+        hasht_insert(&handle->sessions, new_key, sess);
+    }
     j1939_ins.node_addr = addr;
 }
 
