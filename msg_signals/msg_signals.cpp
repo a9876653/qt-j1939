@@ -4,14 +4,40 @@
 
 #define MSG_SIGNAL_DBG(x...) qDebug(x)
 
-MsgSignals::MsgSignals()
+QFileInfoList GetFileList(QString path)
 {
+    QDir          dir(path);
+    QFileInfoList file_list   = dir.entryInfoList(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
+    QFileInfoList folder_list = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
+
+    for (int i = 0; i != folder_list.size(); i++)
+    {
+        QString       name            = folder_list.at(i).absoluteFilePath();
+        QFileInfoList child_file_list = GetFileList(name);
+        file_list.append(child_file_list);
+    }
+
+    return file_list;
 }
 
-bool MsgSignals::load_json(QString path, QString name)
+MsgSignals::MsgSignals()
+{
+    QString       dir      = "./cfg/";
+    QFileInfoList fileList = GetFileList(dir); //获取目录下所有的文件
+    for (QFileInfo info : fileList)
+    {
+        MSG_SIGNAL_DBG() << "file path:" << info.filePath() << "   file name:" << info.fileName();
+        if (info.filePath().contains(".json")) // 只处理JSON文件
+        {
+            load_json(info.filePath());
+        }
+    }
+}
+
+bool MsgSignals::load_json(QString path)
 {
     QJsonDocument jsonCfgDoc;
-    QFile         file_read(path + name);
+    QFile         file_read(path);
     if (!file_read.open(QIODevice::ReadOnly))
     {
         MSG_SIGNAL_DBG("read json file failed");
@@ -40,7 +66,7 @@ void MsgSignals::json_items_handle(QJsonDocument *jdoc)
     for (const auto &msg_obj : msg_array)
     {
         MsgData msg_data;
-        // qDebug() << msg;
+
         auto msg       = msg_obj.toVariant().toMap();
         msg_data.id    = msg.value("id").toUInt();
         msg_data.name  = msg.value("name").toString();
@@ -58,7 +84,7 @@ void MsgSignals::json_items_handle(QJsonDocument *jdoc)
             msg_sig->is_signed  = sig.value("is_signed").toBool();
             msg_data.signals_list.append(msg_sig);
         }
-        msgs_map.insert(msg_data.id, msg_data);
+        msgs_map.insert(msg_data.pgn, msg_data);
     }
     MSG_SIGNAL_DBG("json_items_handle finish");
 }

@@ -10,7 +10,7 @@ public:
     CustomTextWidget()
     {
         text = new QTextEdit;
-        // text->setFrameShape(QFrame::NoFrame);                     // 无边框
+        text->setFrameShape(QFrame::NoFrame);                     // 无边框
         text->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff); //无滚动条
         text->installEventFilter(this);                           // 设置事件过滤器
         text->setFixedHeight(25);                                 // 设置高度

@@ -25,6 +25,8 @@ public:
 private slots:
     void on_openDevicePushButton_clicked();
 
+    void slot_recv_pgn_handle(uint32_t pgn, uint8_t src, uint8_t *data, uint16_t data_size);
+
 private:
     Ui::MainWindow *ui;
 
@@ -33,6 +35,8 @@ private:
     bool device_status = false;
 
     MsgSignals msgs;
+
+    QMap<uint, PageMsgDisplay *> src_page_map;
 
     void slot_test_send();
 };

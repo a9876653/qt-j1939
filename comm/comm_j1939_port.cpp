@@ -1,22 +1,13 @@
 #include "comm_j1939.h"
+#include "comm_j1939_port.h"
 #include "QDebug"
 
 #define BOOT_PORT_DBG(x...) qDebug(x)
-typedef int (*session_get_data_fun)(uint32_t pgn, uint8_t src, uint8_t **data, uint16_t *len);
-typedef void (*session_err_fun)(uint32_t pgn, uint8_t src);
-typedef void (*session_recv_fun)(uint32_t pgn, uint8_t src, uint8_t *data, uint16_t len);
-
-int j1939_get_data(uint32_t pgn, uint8_t src, uint8_t **data, uint16_t *len)
-{
-    (void)pgn;
-    (void)src;
-    *data = new uint8_t[512];
-    *len  = 512;
-    return *len;
-}
 
 void j1939_err_handle(uint32_t pgn, uint8_t src)
 {
+    (void)pgn;
+    (void)src;
 }
 
 void j1939_recv_cb(uint32_t pgn, uint8_t src, uint8_t *data, uint16_t len)
@@ -24,29 +15,26 @@ void j1939_recv_cb(uint32_t pgn, uint8_t src, uint8_t *data, uint16_t len)
     (void)src;
     (void)len;
     (void)data;
-    if (pgn == BOOT_MSG_ID_READ_APP_INFO_RESPONE)
-    {
-        app_info_str_t str = get_app_info_str((app_info_t *)data);
-        MiddleSignalIns->app_info_update(str);
-    }
-    BOOT_PORT_DBG("boot recv pgn 0x%04x, src: %d, len %d", pgn, src, len);
+    J1939Ins->recv_pgn_handle(pgn, src, data, len);
 }
 
 j1939_ret_e comm_j1939_pgn_cb(j1939_t *handle, j1939_message_t *msg)
 {
     (void)handle;
-
+    J1939Ins->recv_pgn_handle(msg->pgn, msg->src, msg->data, msg->len);
     return J1939_OK;
 }
 
-void comm_j1939_port_init(void)
+uint8_t temp_buff[128][2][512];
+void    comm_j1939_port_init(QMap<uint, MsgData> &msgs_map)
 {
-    for (int i = 0; i < ADDR_NUM_MAX; i++)
+    for (int i = 0; i < 26; i++)
     {
-        J1939Ins->tp_rx_register(i, J1939_SRC_ADDR, j1939_get_data, j1939_recv_cb, NULL);
+        J1939Ins->tp_rx_data_register(i, J1939_SRC_ADDR, temp_buff[i][0], 512, j1939_recv_cb, NULL);
+        J1939Ins->tp_rx_data_register(i, ADDRESS_GLOBAL, temp_buff[i][1], 512, j1939_recv_cb, NULL);
     }
-    J1939Ins->pgn_register(BOOT_MSG_ID_UPDATE_CMD_RESPONE, 0, comm_j1939_pgn_cb);
-    J1939Ins->pgn_register(BOOT_MSG_ID_FILE_INFO_RESPONE, 0, comm_j1939_pgn_cb);
-    J1939Ins->pgn_register(BOOT_MSG_ID_FILE_DATA_RESPONE, 0, comm_j1939_pgn_cb);
-    J1939Ins->pgn_register(BOOT_MSG_ID_CHECK_CRC_RESPONE, 0, comm_j1939_pgn_cb);
+    for (MsgData msg_data : msgs_map)
+    {
+        J1939Ins->pgn_register(msg_data.pgn, 0, comm_j1939_pgn_cb);
+    }
 }

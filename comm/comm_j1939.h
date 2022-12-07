@@ -7,11 +7,12 @@
 #include "singleton.h"
 
 #define J1939_SRC_ADDR  0x7E // 默认源地址
-#define PGN_REG_NUM     100  // 注册的PGN数（单帧），只接收
-#define SESSION_REG_NUM 200  // 注册的会话数（多帧），包含发送和接收
+#define PGN_REG_NUM     4096 // 注册的PGN数（单帧），只接收
+#define SESSION_REG_NUM 2048 // 注册的会话数（多帧），包含发送和接收
 
 class CommJ1939 : public ZlgCan
 {
+    Q_OBJECT
 public:
     void init();
 
@@ -25,10 +26,20 @@ public:
                         session_recv_fun     rec_finish,
                         session_err_fun      err_handle);
 
+    int tp_rx_data_register(uint8_t          src,
+                            uint8_t          dst,
+                            uint8_t         *data,
+                            uint16_t         data_size,
+                            session_recv_fun rec_finish,
+                            session_err_fun  err_handle);
+
     int  can_write(uint32_t id, uint8_t *data, uint8_t len);
     void can_recv(uint32_t id, uint flag, uint8_t *data, uint16_t len);
+
+    void recv_pgn_handle(uint32_t pgn, uint8_t src, uint8_t *data, uint16_t data_size);
+
 signals:
-    void sig_recv_pgn(uint32_t pgn, uint8_t src, uint8_t *data, uint16_t data_size);
+    void sig_recv_pgn_handle(uint32_t pgn, uint8_t src, uint8_t *data, uint16_t data_size);
 
 private:
     j1939_t j1939_ins;

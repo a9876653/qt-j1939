@@ -60,6 +60,11 @@ int CommJ1939::msg_send(uint32_t pgn, uint8_t priority, uint8_t dst, uint8_t *da
     return 0;
 }
 
+void CommJ1939::recv_pgn_handle(uint32_t pgn, uint8_t src, uint8_t *data, uint16_t data_size)
+{
+    emit this->sig_recv_pgn_handle(pgn, src, data, data_size);
+}
+
 int CommJ1939::pgn_register(const uint32_t pgn, uint8_t code, pgn_callback_t cb)
 {
     return j1939_pgn_register(&j1939_ins, pgn, code, cb);
@@ -72,4 +77,14 @@ int CommJ1939::tp_rx_register(uint8_t              src,
                               session_err_fun      err_handle)
 {
     return j1939_tp_rx_register(&j1939_ins, src, dst, get_data, rec_finish, err_handle);
+}
+
+int CommJ1939::tp_rx_data_register(uint8_t          src,
+                                   uint8_t          dst,
+                                   uint8_t         *data,
+                                   uint16_t         data_size,
+                                   session_recv_fun rec_finish,
+                                   session_err_fun  err_handle)
+{
+    return j1939_tp_rx_data_register(&j1939_ins, src, dst, data, data_size, rec_finish, err_handle);
 }

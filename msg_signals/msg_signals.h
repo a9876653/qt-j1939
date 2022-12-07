@@ -9,11 +9,11 @@ class MsgSignals
 {
 public:
     MsgSignals();
-
-    bool load_json(QString path, QString name);
-    void json_items_handle(QJsonDocument *jdoc);
-
     QMap<uint, MsgData> msgs_map;
+
+private:
+    bool load_json(QString path);
+    void json_items_handle(QJsonDocument *jdoc);
 };
 
 #endif // MSG_SIGNALS_H

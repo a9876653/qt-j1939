@@ -1,14 +1,12 @@
 #include "pagemsgdisplay.h"
 #include "ui_pagemsgdisplay.h"
 
-PageMsgDisplay::PageMsgDisplay(QMap<uint, MsgData> msgs_map, QWidget *parent)
-    : msgs_map(msgs_map), QWidget(parent), ui(new Ui::PageMsgDisplay)
+PageMsgDisplay::PageMsgDisplay(QMap<uint, MsgData> msgs_map) : msgs_map(msgs_map), ui(new Ui::PageMsgDisplay)
 {
     ui->setupUi(this);
 
-    QString str;
-    int     cloumnIndex = 0;
-    int     rowIndex    = 0;
+    int cloumnIndex = 0;
+    int rowIndex    = 0;
     for (MsgData msg_data : msgs_map)
     {
         cloumnIndex               = 0;
