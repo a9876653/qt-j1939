@@ -5,11 +5,12 @@
 #include <QtCore>
 #include "msgdata.h"
 
-class MsgSignals
+class MsgSignals : public QObject
 {
+    Q_OBJECT
 public:
     MsgSignals();
-    QMap<uint, MsgData> msgs_map;
+    QMap<uint, MsgData *> msgs_map;
 
 private:
     bool load_json(QString path);

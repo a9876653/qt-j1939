@@ -14,10 +14,10 @@ class PageMsgDisplay : public QWidget
     Q_OBJECT
 
 public:
-    explicit PageMsgDisplay(QMap<uint, MsgData> msgs_map);
+    explicit PageMsgDisplay(QMap<uint, MsgData *> msgs_map);
     ~PageMsgDisplay();
 
-    QMap<uint, MsgData> msgs_map;
+    QMap<uint, MsgData *> msgs_map;
 
 private:
     Ui::PageMsgDisplay *ui;

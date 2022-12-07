@@ -56,13 +56,23 @@ void MainWindow::slot_recv_pgn_handle(uint32_t pgn, uint8_t src, uint8_t *data, 
     {
         MsgSignals     *msg  = new MsgSignals();
         PageMsgDisplay *page = new PageMsgDisplay(msg->msgs_map);
-        ui->tabWidget->addTab(page, QString("从机-%1").arg(src));
+        ui->tabWidget->addTab(page, QString("从机 - %1").arg(src));
         src_page_map.insert(src, page);
     }
     PageMsgDisplay *p = src_page_map.value(src);
     if (p->msgs_map.contains(pgn))
     {
-        MsgData msg_data = p->msgs_map.value(pgn);
-        msg_data.decode(data, data_size);
+        MsgData *msg_data = p->msgs_map.value(pgn);
+        msg_data->decode(data, data_size);
     }
+}
+
+void MainWindow::on_srcAddrSpinBox_valueChanged(int arg1)
+{
+    J1939Ins->set_src_addr(arg1);
+}
+
+void MainWindow::on_objAddrspinBox_valueChanged(int arg1)
+{
+    J1939Ins->set_dst_addr(arg1);
 }

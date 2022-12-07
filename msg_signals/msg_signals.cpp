@@ -65,16 +65,16 @@ void MsgSignals::json_items_handle(QJsonDocument *jdoc)
 
     for (const auto &msg_obj : msg_array)
     {
-        MsgData msg_data;
-
-        auto msg       = msg_obj.toVariant().toMap();
-        msg_data.id    = msg.value("id").toUInt();
-        msg_data.name  = msg.value("name").toString();
-        msg_data.pgn   = (msg_data.id & 0xFFFF00) >> 8;
-        auto sig_array = msg.value("signals").toJsonArray();
+        MsgData *msg_data    = new MsgData;
+        uint16_t msg_bit_len = 0;
+        auto     msg         = msg_obj.toVariant().toMap();
+        msg_data->id         = msg.value("id").toUInt();
+        msg_data->name       = msg.value("name").toString();
+        msg_data->pgn        = (msg_data->id & 0xFFFF00) >> 8;
+        auto sig_array       = msg.value("signals").toJsonArray();
         for (const auto &sig_obj : sig_array)
         {
-            MsgData::Signal *msg_sig = new MsgData::Signal();
+            Signal *msg_sig = new Signal();
 
             auto sig            = sig_obj.toVariant().toMap();
             msg_sig->name       = sig.value("name").toString();
@@ -82,9 +82,20 @@ void MsgSignals::json_items_handle(QJsonDocument *jdoc)
             msg_sig->bit_length = sig.value("bit_length").toUInt();
             msg_sig->is_float   = sig.value("is_float").toBool();
             msg_sig->is_signed  = sig.value("is_signed").toBool();
-            msg_data.signals_list.append(msg_sig);
+            msg_bit_len += msg_sig->bit_length;
+
+            connect(&msg_sig->send_widget, &CustomTextWidget::sig_enter_event, msg_data, &MsgData::slot_encode_send);
+
+            msg_data->signals_list.append(msg_sig);
         }
-        msgs_map.insert(msg_data.pgn, msg_data);
+        msg_data->msg_len = msg_bit_len / 8;
+        if (msg_bit_len % 8 != 0)
+        {
+            msg_data->msg_len++;
+        }
+        connect(msg_data, &MsgData::sig_msg_send, J1939Ins, &CommJ1939::slot_msg_send);
+
+        msgs_map.insert(msg_data->pgn, msg_data);
     }
     MSG_SIGNAL_DBG("json_items_handle finish");
 }

@@ -27,6 +27,10 @@ private slots:
 
     void slot_recv_pgn_handle(uint32_t pgn, uint8_t src, uint8_t *data, uint16_t data_size);
 
+    void on_srcAddrSpinBox_valueChanged(int arg1);
+
+    void on_objAddrspinBox_valueChanged(int arg1);
+
 private:
     Ui::MainWindow *ui;
 

@@ -26,15 +26,15 @@ j1939_ret_e comm_j1939_pgn_cb(j1939_t *handle, j1939_message_t *msg)
 }
 
 uint8_t temp_buff[128][2][512];
-void    comm_j1939_port_init(QMap<uint, MsgData> &msgs_map)
+void    comm_j1939_port_init(QMap<uint, MsgData *> &msgs_map)
 {
     for (int i = 0; i < 26; i++)
     {
         J1939Ins->tp_rx_data_register(i, J1939_SRC_ADDR, temp_buff[i][0], 512, j1939_recv_cb, NULL);
         J1939Ins->tp_rx_data_register(i, ADDRESS_GLOBAL, temp_buff[i][1], 512, j1939_recv_cb, NULL);
     }
-    for (MsgData msg_data : msgs_map)
+    for (MsgData *msg_data : msgs_map)
     {
-        J1939Ins->pgn_register(msg_data.pgn, 0, comm_j1939_pgn_cb);
+        J1939Ins->pgn_register(msg_data->pgn, 0, comm_j1939_pgn_cb);
     }
 }

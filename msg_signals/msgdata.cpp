@@ -1,6 +1,30 @@
 #include "msgdata.h"
 #include "canard_dsdl.h"
 
+void MsgData::slot_encode_send()
+{
+    for (Signal *sig : signals_list)
+    {
+        QString dec_s = sig->send_widget.text->toPlainText();
+        if (sig->is_float)
+        {
+            float value = dec_s.toFloat();
+            canardDSDLSetF32(encode_buff, sig->start_bit, value);
+        }
+        else if (sig->is_signed)
+        {
+            int value = dec_s.toInt();
+            canardDSDLSetIxx(encode_buff, sig->start_bit, value, sig->bit_length);
+        }
+        else
+        {
+            uint value = dec_s.toUInt();
+            canardDSDLSetUxx(encode_buff, sig->start_bit, value, sig->bit_length);
+        }
+    }
+    emit sig_msg_send(pgn, encode_buff, msg_len);
+}
+
 void MsgData::decode(uint8_t *data, uint16_t data_size)
 {
     for (Signal *sig : signals_list)
@@ -26,6 +50,6 @@ void MsgData::decode(uint8_t *data, uint16_t data_size)
         }
 
         sig->rec_dec_widget.text->setText(dec_s);
-        sig->rec_hex_widget.text->setText(dec_s);
+        sig->rec_hex_widget.text->setText(hex_s);
     }
 }

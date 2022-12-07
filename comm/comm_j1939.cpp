@@ -60,6 +60,21 @@ int CommJ1939::msg_send(uint32_t pgn, uint8_t priority, uint8_t dst, uint8_t *da
     return 0;
 }
 
+void CommJ1939::set_src_addr(uint8_t addr)
+{
+    j1939_ins.node_addr = addr;
+}
+
+void CommJ1939::set_dst_addr(uint8_t addr)
+{
+    dst_addr = addr;
+}
+
+void CommJ1939::slot_msg_send(uint32_t pgn, uint8_t *data, uint16_t len)
+{
+    msg_send(pgn, J1939_PRIORITY_DEFAULT, dst_addr, data, len, J1939_DEF_TIMEOUT);
+}
+
 void CommJ1939::recv_pgn_handle(uint32_t pgn, uint8_t src, uint8_t *data, uint16_t data_size)
 {
     emit this->sig_recv_pgn_handle(pgn, src, data, data_size);

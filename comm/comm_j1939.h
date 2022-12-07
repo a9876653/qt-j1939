@@ -18,6 +18,7 @@ public:
 
     void poll(void);
     void set_src_addr(uint8_t addr);
+    void set_dst_addr(uint8_t addr);
     int  msg_send(uint32_t pgn, uint8_t priority, uint8_t dst, uint8_t *data, uint16_t len, uint32_t timeout);
     int  pgn_register(const uint32_t pgn, uint8_t code, pgn_callback_t cb);
     int  tp_rx_register(uint8_t              src,
@@ -38,12 +39,16 @@ public:
 
     void recv_pgn_handle(uint32_t pgn, uint8_t src, uint8_t *data, uint16_t data_size);
 
+public slots:
+    void slot_msg_send(uint32_t pgn, uint8_t *data, uint16_t len);
+
 signals:
     void sig_recv_pgn_handle(uint32_t pgn, uint8_t src, uint8_t *data, uint16_t data_size);
 
 private:
     j1939_t j1939_ins;
     QTimer  j1939_poll_timer;
+    uint8_t dst_addr = ADDRESS_GLOBAL;
 };
 
 #define J1939Ins Singleton<CommJ1939>::getInstance()
