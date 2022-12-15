@@ -4,10 +4,12 @@
 #include "comm/comm_j1939.h"
 #include "comm_j1939_port.h"
 #include "frmbootloader.h"
+#include "json_file.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    load_cfg_data("./temp/cfg_temp.json");
     J1939Ins->init();
     msgs = new MsgSignals(true);
     comm_j1939_port_init(msgs->msgs_map);
@@ -20,8 +22,50 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
 MainWindow::~MainWindow()
 {
+    save_cfg_data("./temp/cfg_temp.json");
     delete msgs;
     delete ui;
+}
+
+void MainWindow::save_cfg_data(QString path)
+{
+    QJsonObject root;
+    root.insert(QString("%1").arg("can_index"), ui->canIndexSpinBox->value());
+    root.insert(QString("%1").arg("can_baudrate"), ui->baudrateSpinBox->value());
+    root.insert(QString("%1").arg("obj_addr"), ui->objAddrspinBox->value());
+    root.insert(QString("%1").arg("src_addr"), ui->srcAddrSpinBox->value());
+    QJsonDocument tempJdoc(root);
+    write_json_file(path, &tempJdoc);
+}
+
+void MainWindow::load_cfg_data(QString path)
+{
+    QJsonObject root;
+    int         value = 0;
+    if (load_json_file(path, &root))
+    {
+        QJsonObject root_obj = root;
+        if (root_obj.contains("can_index"))
+        {
+            value = root_obj.value("can_index").toInt();
+            ui->canIndexSpinBox->setValue(value);
+        }
+        else if (root_obj.contains("can_baudrate"))
+        {
+            value = root_obj.value("can_baudrate").toInt();
+            ui->baudrateSpinBox->setValue(value);
+        }
+        else if (root_obj.contains("obj_addr"))
+        {
+            value = root_obj.value("obj_addr").toInt();
+            ui->objAddrspinBox->setValue(value);
+        }
+        else if (root_obj.contains("src_addr"))
+        {
+            value = root_obj.value("src_addr").toInt();
+            ui->srcAddrSpinBox->setValue(value);
+        }
+    }
 }
 
 void MainWindow::on_openDevicePushButton_clicked()

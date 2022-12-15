@@ -39,5 +39,8 @@ private:
     MsgSignals *msgs = nullptr;
 
     QMap<uint, PageFileMsgDisplay *> src_page_map;
+
+    void save_cfg_data(QString path);
+    void load_cfg_data(QString path);
 };
 #endif // MAINWINDOW_H

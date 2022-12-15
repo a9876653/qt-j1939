@@ -1,6 +1,7 @@
 #include "msg_signals.h"
 #include "QDebug"
 #include "QFile"
+#include "json_file.h"
 
 #define MSG_SIGNAL_DBG(x...) qDebug(x)
 
@@ -117,19 +118,6 @@ void MsgSignals::json_items_handle(QJsonDocument *jdoc, QMap<uint, MsgData *> &o
         msgs_map.insert(msg_data->pgn, msg_data);
     }
     MSG_SIGNAL_DBG("json_items_handle finish");
-}
-
-void write_json_file(QString path, QJsonDocument *jdoc)
-{
-    QFile file_write(path);
-    if (!file_write.open(QIODevice::WriteOnly | QIODevice::Truncate))
-    {
-        qDebug() << "read json file failed";
-        return;
-    }
-    QByteArray read_array = jdoc->toJson();
-    file_write.write(read_array);
-    file_write.close();
 }
 
 bool MsgSignals::load_temp_file(QString path)

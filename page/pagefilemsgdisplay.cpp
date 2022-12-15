@@ -26,7 +26,7 @@ void PageFileMsgDisplay::parse(uint32_t pgn, uint8_t *data, uint16_t len)
         {
             MsgData *msg_data = p->msgs_map.value(pgn);
             msg_data->decode(data, len);
-            break;
+            // break;
         }
     }
 }
