@@ -19,6 +19,11 @@ public:
 
     QMap<uint, MsgData *> msgs_map;
 
+private slots:
+    void on_expandPushButton_clicked();
+
+    void on_collapsPpushButton_clicked();
+
 private:
     Ui::PageMsgDisplay *ui;
 };

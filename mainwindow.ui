@@ -18,14 +18,14 @@
     <normaloff>:/battery.png</normaloff>:/battery.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0" columnstretch="0,0,0,0">
+   <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0" columnstretch="0,0,0,0,0,0">
     <property name="leftMargin">
      <number>9</number>
     </property>
     <property name="rightMargin">
      <number>9</number>
     </property>
-    <item row="2" column="0" colspan="4">
+    <item row="2" column="0" colspan="6">
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
        <widget class="QTabWidget" name="tabWidget"/>
@@ -45,7 +45,30 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="3">
+    <item row="1" column="1">
+     <widget class="QSpinBox" name="canIndexSpinBox">
+      <property name="prefix">
+       <string>CAN索引号: </string>
+      </property>
+      <property name="maximum">
+       <number>16</number>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="4">
+     <widget class="QSpinBox" name="objAddrspinBox">
+      <property name="prefix">
+       <string>目标地址: </string>
+      </property>
+      <property name="maximum">
+       <number>255</number>
+      </property>
+      <property name="value">
+       <number>32</number>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="5">
      <spacer name="horizontalSpacer">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -58,7 +81,7 @@
       </property>
      </spacer>
     </item>
-    <item row="1" column="1">
+    <item row="1" column="3">
      <widget class="QSpinBox" name="srcAddrSpinBox">
       <property name="prefix">
        <string>本机地址: </string>
@@ -72,15 +95,18 @@
      </widget>
     </item>
     <item row="1" column="2">
-     <widget class="QSpinBox" name="objAddrspinBox">
+     <widget class="QSpinBox" name="baudrateSpinBox">
       <property name="prefix">
-       <string>目标地址: </string>
+       <string>波特率(KBps): </string>
+      </property>
+      <property name="minimum">
+       <number>125</number>
       </property>
       <property name="maximum">
-       <number>255</number>
+       <number>1000</number>
       </property>
       <property name="value">
-       <number>32</number>
+       <number>500</number>
       </property>
      </widget>
     </item>

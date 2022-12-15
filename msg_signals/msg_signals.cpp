@@ -49,6 +49,7 @@ bool MsgSignals::load_json(QString path)
 {
     QJsonDocument jsonCfgDoc;
     QFile         file_read(path);
+    QFileInfo     fileInfo = QFileInfo(path);
     if (!file_read.open(QIODevice::ReadOnly))
     {
         MSG_SIGNAL_DBG("read json file failed");
@@ -65,11 +66,13 @@ bool MsgSignals::load_json(QString path)
         MSG_SIGNAL_DBG("read json file error %d", e.error);
         return false;
     }
-    json_items_handle(&jsonCfgDoc);
+    QMap<uint, MsgData *> obj_map;
+    json_items_handle(&jsonCfgDoc, obj_map);
+    file_msg_map.insert(fileInfo.fileName(), obj_map);
     return true;
 }
 
-void MsgSignals::json_items_handle(QJsonDocument *jdoc)
+void MsgSignals::json_items_handle(QJsonDocument *jdoc, QMap<uint, MsgData *> &obj_map)
 {
     auto       msg_map   = jdoc->object().toVariantMap();
     QJsonArray msg_array = msg_map.value("messages").toJsonArray();
@@ -110,6 +113,7 @@ void MsgSignals::json_items_handle(QJsonDocument *jdoc)
         }
         connect(msg_data, &MsgData::sig_msg_send, J1939Ins, &CommJ1939::slot_msg_send);
 
+        obj_map.insert(msg_data->pgn, msg_data);
         msgs_map.insert(msg_data->pgn, msg_data);
     }
     MSG_SIGNAL_DBG("json_items_handle finish");

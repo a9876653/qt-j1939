@@ -5,7 +5,7 @@
 #include <QTimer>
 
 #include "msg_signals.h"
-#include "pagemsgdisplay.h"
+#include "pagefilemsgdisplay.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -34,14 +34,10 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
-    QTimer test_timer;
-
     bool device_status = false;
 
     MsgSignals *msgs = nullptr;
 
-    QMap<uint, PageMsgDisplay *> src_page_map;
-
-    void slot_test_send();
+    QMap<uint, PageFileMsgDisplay *> src_page_map;
 };
 #endif // MAINWINDOW_H

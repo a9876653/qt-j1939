@@ -42,3 +42,13 @@ PageMsgDisplay::~PageMsgDisplay()
 {
     delete ui;
 }
+
+void PageMsgDisplay::on_expandPushButton_clicked()
+{
+    ui->treeWidget->expandAll();
+}
+
+void PageMsgDisplay::on_collapsPpushButton_clicked()
+{
+    ui->treeWidget->collapseAll();
+}
