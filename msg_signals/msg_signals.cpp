@@ -1,29 +1,14 @@
 #include "msg_signals.h"
 #include "QDebug"
 #include "QFile"
+#include "filehandle.h"
 #include "json_file.h"
 
 #define MSG_SIGNAL_DBG(x...) qDebug(x)
 
-QFileInfoList GetFileList(QString path)
-{
-    QDir          dir(path);
-    QFileInfoList file_list   = dir.entryInfoList(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
-    QFileInfoList folder_list = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
-
-    for (int i = 0; i != folder_list.size(); i++)
-    {
-        QString       name            = folder_list.at(i).absoluteFilePath();
-        QFileInfoList child_file_list = GetFileList(name);
-        file_list.append(child_file_list);
-    }
-
-    return file_list;
-}
-
 MsgSignals::MsgSignals(bool is_master) : is_master(is_master)
 {
-    QString       dir      = "./cfg/";
+    QString       dir      = "./cfg/msg";
     QFileInfoList fileList = GetFileList(dir); //获取目录下所有的文件
     for (QFileInfo info : fileList)
     {
@@ -36,13 +21,13 @@ MsgSignals::MsgSignals(bool is_master) : is_master(is_master)
 
     if (is_master)
     {
-        load_temp_file("./temp/temp.json");
+        load_temp_file("./temp/msg_temp.json");
     }
 }
 
 MsgSignals::~MsgSignals()
 {
-    save_msg_send_data("./temp/temp.json");
+    save_msg_send_data("./temp/msg_temp.json");
     MSG_SIGNAL_DBG() << "msg signals save send data";
 }
 
@@ -113,6 +98,7 @@ void MsgSignals::json_items_handle(QJsonDocument *jdoc, QMap<uint, MsgData *> &o
             msg_data->msg_len++;
         }
         connect(msg_data, &MsgData::sig_msg_send, J1939Ins, &CommJ1939::slot_msg_send);
+        connect(msg_data, &MsgData::sig_request_pgn, J1939Ins, &CommJ1939::slot_request_pgn);
 
         obj_map.insert(msg_data->pgn, msg_data);
         msgs_map.insert(msg_data->pgn, msg_data);
@@ -165,6 +151,10 @@ bool MsgSignals::load_temp_file(QString path)
     return true;
 }
 
+void MsgSignals::slot_msg_send()
+{
+}
+
 void MsgSignals::save_msg_send_data(QString path)
 {
     QJsonObject root;
@@ -186,8 +176,4 @@ void MsgSignals::save_msg_send_data(QString path)
     }
     QJsonDocument tempJdoc(root);
     write_json_file(path, &tempJdoc);
-}
-
-void MsgSignals::slot_msg_send()
-{
 }

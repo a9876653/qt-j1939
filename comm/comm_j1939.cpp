@@ -1,5 +1,6 @@
 #include "comm_j1939.h"
 #include "QDateTime"
+#include "pgn.h"
 
 int j1939_can_write(uint32_t id, uint8_t *data, uint8_t len)
 {
@@ -112,4 +113,16 @@ int CommJ1939::tp_rx_data_register(uint8_t          src,
                                    session_err_fun  err_handle)
 {
     return j1939_tp_rx_data_register(&j1939_ins, src, dst, data, data_size, rec_finish, err_handle);
+}
+
+void CommJ1939::slot_request_pgn(uint32_t pgn, uint16_t len)
+{
+    uint8_t data[5] = {
+        PGN_SPECIFIC(pgn),
+        PGN_FORMAT(pgn),
+        PGN_DATA_PAGE(pgn),
+        (len & 0xFF),
+        (len & 0xFF00) >> 8,
+    };
+    j1939_send_msg(&j1939_ins, RAC, J1939_PRIORITY_DEFAULT, dst_addr, data, sizeof(data), J1939_DEF_TIMEOUT);
 }

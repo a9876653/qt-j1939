@@ -41,6 +41,7 @@ public:
 
 public slots:
     void slot_msg_send(uint32_t pgn, uint8_t *data, uint16_t len);
+    void slot_request_pgn(uint32_t pgn, uint16_t len);
 
 signals:
     void sig_recv_pgn_handle(uint32_t pgn, uint8_t src, uint8_t *data, uint16_t data_size);

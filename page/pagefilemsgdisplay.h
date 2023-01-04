@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "pagemsgdisplay.h"
+#include "pageparams.h"
 
 namespace Ui
 {
@@ -24,6 +25,7 @@ private:
 
     Ui::PageFileMsgDisplay         *ui;
     QMap<QString, PageMsgDisplay *> msg_page_map;
+    PageParams                      page_params;
 };
 
 #endif // PAGEFILEMSGDISPLAY_H

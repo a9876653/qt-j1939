@@ -1,11 +1,17 @@
 #include "msgdata.h"
 #include "canard_dsdl.h"
 
+#include "QDebug"
+
+#define MSGDATA_DBG(x...) qDebug(x)
+
 void MsgData::slot_encode_send()
 {
+    MSGDATA_DBG("消息发送, Name:%s, Pgn: 0x%04x,%d\n\tSignals:", name.toLatin1().data(), pgn, pgn & 0xFFF);
     for (Signal *sig : signals_list)
     {
         QString dec_s = sig->send_widget.text->toPlainText();
+        MSGDATA_DBG("\t\t%s: %s", sig->name.toLatin1().data(), dec_s.toLatin1().data());
         if (sig->is_float)
         {
             float value = dec_s.toFloat();
@@ -22,7 +28,14 @@ void MsgData::slot_encode_send()
             canardDSDLSetUxx(encode_buff, sig->start_bit, value, sig->bit_length);
         }
     }
+
     emit sig_msg_send(pgn, encode_buff, msg_len);
+}
+
+void MsgData::slot_request_pgn()
+{
+    MSGDATA_DBG("请求PGN:0x%04x, len:%d", pgn, msg_len);
+    emit sig_request_pgn(pgn, msg_len);
 }
 
 void MsgData::decode(uint8_t *data, uint16_t data_size)

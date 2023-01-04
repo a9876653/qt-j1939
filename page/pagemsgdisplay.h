@@ -2,6 +2,7 @@
 #define PAGEMSGDISPLAY_H
 
 #include <QWidget>
+#include <QTreeWidget>
 #include "msg_signals.h"
 
 namespace Ui
@@ -23,6 +24,8 @@ private slots:
     void on_expandPushButton_clicked();
 
     void on_collapsPpushButton_clicked();
+
+    void on_treeWidget_itemClicked(QTreeWidgetItem *item, int column);
 
 private:
     Ui::PageMsgDisplay *ui;

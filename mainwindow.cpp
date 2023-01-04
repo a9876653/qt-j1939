@@ -5,6 +5,7 @@
 #include "comm_j1939_port.h"
 #include "frmbootloader.h"
 #include "json_file.h"
+#include "paramshandle.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {

@@ -11,6 +11,7 @@ PageFileMsgDisplay::PageFileMsgDisplay(uint8_t src) : src(src), ui(new Ui::PageF
         msg_page_map.insert(msg_key, page);
         ui->tabWidget->addTab(page, msg_key);
     }
+    ui->tabWidget->addTab(&page_params, QString("param"));
 }
 
 PageFileMsgDisplay::~PageFileMsgDisplay()
@@ -20,13 +21,20 @@ PageFileMsgDisplay::~PageFileMsgDisplay()
 
 void PageFileMsgDisplay::parse(uint32_t pgn, uint8_t *data, uint16_t len)
 {
-    for (PageMsgDisplay *p : msg_page_map)
+    if (pgn == 0xF002 || pgn == 0xF004)
     {
-        if (p->msgs_map.contains(pgn))
+        page_params.params.decode(data, len);
+    }
+    else
+    {
+        for (PageMsgDisplay *p : msg_page_map)
         {
-            MsgData *msg_data = p->msgs_map.value(pgn);
-            msg_data->decode(data, len);
-            // break;
+            if (p->msgs_map.contains(pgn))
+            {
+                MsgData *msg_data = p->msgs_map.value(pgn);
+                msg_data->decode(data, len);
+                // break;
+            }
         }
     }
 }

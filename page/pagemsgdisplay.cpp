@@ -12,6 +12,7 @@ PageMsgDisplay::PageMsgDisplay(QMap<uint, MsgData *> msgs_map) : msgs_map(msgs_m
         cloumnIndex               = 0;
         QTreeWidgetItem *treeItem = new QTreeWidgetItem;
         ui->treeWidget->addTopLevelItem(treeItem);
+        treeItem->setData(0, Qt::UserRole + 1, QVariant::fromValue(msg_data));
         QTreeWidgetItem *treeChildItem = nullptr;
 
         treeItem->setText(cloumnIndex++, msg_data->name);
@@ -51,4 +52,19 @@ void PageMsgDisplay::on_expandPushButton_clicked()
 void PageMsgDisplay::on_collapsPpushButton_clicked()
 {
     ui->treeWidget->collapseAll();
+}
+
+void PageMsgDisplay::on_treeWidget_itemClicked(QTreeWidgetItem *item, int column)
+{
+    (void)column;
+    MsgData *data = item->data(0, Qt::UserRole + 1).value<MsgData *>();
+    if (data == nullptr && item->parent() != nullptr) // 找不到用户数据,往父对象再找一遍
+    {
+        item = item->parent();
+        data = item->data(0, Qt::UserRole + 1).value<MsgData *>();
+    }
+    if (data != nullptr)
+    {
+        data->slot_request_pgn();
+    }
 }

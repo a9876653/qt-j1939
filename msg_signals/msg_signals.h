@@ -14,6 +14,10 @@ public:
     QMap<uint, MsgData *> msgs_map;
 
     QMap<QString, QMap<uint, MsgData *>> file_msg_map;
+
+signals:
+    void sig_msg_send(uint32_t pgn, uint8_t *data, uint16_t len);
+
 public slots:
     void slot_msg_send();
 
