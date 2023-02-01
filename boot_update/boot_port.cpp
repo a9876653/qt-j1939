@@ -171,6 +171,19 @@ void boot_port_start(uint8_t *obj_addr, uint8_t obj_num, file_data_info_t *data_
     BOOT_PORT_DBG("boot update start");
 }
 
+void boot_port_reset(uint8_t *obj_addr, uint8_t obj_num)
+{
+    cmd_update_t cmd_update;
+    cmd_update.update_cmd = 0;
+    cmd_update.obj_num    = obj_num;
+    for (int i = 0; i < cmd_update.obj_num; i++)
+    {
+        cmd_update.obj_addr[i] = obj_addr[i];
+    }
+    boot_send_update_cmd(&cmd_update);
+    BOOT_PORT_DBG("boot update reset");
+}
+
 uint32_t get_file_data(uint32_t offset, uint8_t *data, uint16_t len)
 {
     uint16_t ret_len     = 0;

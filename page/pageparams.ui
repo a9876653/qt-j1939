@@ -15,6 +15,42 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="1" column="0">
+    <widget class="QTableWidget" name="tableWidget">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="textElideMode">
+      <enum>Qt::ElideLeft</enum>
+     </property>
+     <property name="horizontalScrollMode">
+      <enum>QAbstractItemView::ScrollPerPixel</enum>
+     </property>
+     <column>
+      <property name="text">
+       <string>名称</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>接收值</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>发送值</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>状态</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item row="2" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QPushButton" name="requestPushButton">
@@ -46,34 +82,10 @@
     </layout>
    </item>
    <item row="0" column="0">
-    <widget class="QTableWidget" name="tableWidget">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+    <widget class="QCheckBox" name="autoCheckBox">
+     <property name="text">
+      <string>自动获取</string>
      </property>
-     <property name="textElideMode">
-      <enum>Qt::ElideLeft</enum>
-     </property>
-     <property name="horizontalScrollMode">
-      <enum>QAbstractItemView::ScrollPerPixel</enum>
-     </property>
-     <column>
-      <property name="text">
-       <string>名称</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>接收值</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>发送值</string>
-      </property>
-     </column>
     </widget>
    </item>
   </layout>

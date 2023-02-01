@@ -14,29 +14,32 @@ class PageParams : public QWidget
     Q_OBJECT
 
 public:
-    explicit PageParams();
+    explicit PageParams(int src_addr);
     ~PageParams();
-    ParamsHandle params;
+
+    void load_json(QString path);
 
 private slots:
     void on_tableWidget_cellClicked(int row, int column);
 
     void on_requestPushButton_clicked();
 
-    void slot_request_get_timeout();
-
-    void slot_request_set_timeout();
-
     void on_setButton_clicked();
 
+    void on_autoCheckBox_stateChanged(int arg1);
+
 private:
+    int src_addr = 0;
+
     Ui::PageParams *ui;
 
-    int request_get_index = 0;
-    int request_set_index = 0;
+    bool is_auto_get = false;
 
-    QTimer request_get_timer;
-    QTimer request_set_timer;
+    ParamsHandle *params;
+
+protected:
+    void showEvent(QShowEvent *event);
+    void hideEvent(QHideEvent *event);
 };
 
 #endif // PAGEPARAMS_H

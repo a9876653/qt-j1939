@@ -3,6 +3,7 @@
 #include "QDebug"
 #include "comm/comm_j1939.h"
 #include "comm_j1939_port.h"
+#include "j1939_modbus_master.h"
 #include "frmbootloader.h"
 #include "json_file.h"
 #include "paramshandle.h"
@@ -10,14 +11,16 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    load_cfg_data("./temp/cfg_temp.json");
+
     J1939Ins->init();
+    J1939DbIns->init();
     msgs = new MsgSignals(true);
     comm_j1939_port_init(msgs->msgs_map);
     ui->tabWidget->addTab(new frmBootloader, "固件升级");
-    ui->tabWidget->addTab(new PageMsgDisplay(msgs->msgs_map), " 主机");
+    ui->tabWidget->addTab(new PageMsgDisplay(msgs->msgs_map, false), " 主机");
     connect(J1939Ins, &CommJ1939::sig_recv_pgn_handle, this, &MainWindow::slot_recv_pgn_handle);
 
+    load_cfg_data("./temp/cfg_temp.json");
     on_openDevicePushButton_clicked();
 }
 
@@ -51,17 +54,17 @@ void MainWindow::load_cfg_data(QString path)
             value = root_obj.value("can_index").toInt();
             ui->canIndexSpinBox->setValue(value);
         }
-        else if (root_obj.contains("can_baudrate"))
+        if (root_obj.contains("can_baudrate"))
         {
             value = root_obj.value("can_baudrate").toInt();
             ui->baudrateSpinBox->setValue(value);
         }
-        else if (root_obj.contains("obj_addr"))
+        if (root_obj.contains("obj_addr"))
         {
             value = root_obj.value("obj_addr").toInt();
             ui->objAddrspinBox->setValue(value);
         }
-        else if (root_obj.contains("src_addr"))
+        if (root_obj.contains("src_addr"))
         {
             value = root_obj.value("src_addr").toInt();
             ui->srcAddrSpinBox->setValue(value);

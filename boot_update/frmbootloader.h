@@ -58,6 +58,8 @@ private slots:
 
     void on_cntSpinBox_valueChanged(int arg1);
 
+    void on_resetPushButton_clicked();
+
 private:
     Ui::frmBootloader *ui;
     QString            file_path;

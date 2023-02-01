@@ -16,16 +16,18 @@ class CommJ1939 : public ZlgCan
 public:
     void init();
 
-    void poll(void);
-    void set_src_addr(uint8_t addr);
-    void set_dst_addr(uint8_t addr);
-    int  msg_send(uint32_t pgn, uint8_t priority, uint8_t dst, uint8_t *data, uint16_t len, uint32_t timeout);
-    int  pgn_register(const uint32_t pgn, uint8_t code, pgn_callback_t cb);
-    int  tp_rx_register(uint8_t              src,
-                        uint8_t              dst,
-                        session_get_data_fun get_data,
-                        session_recv_fun     rec_finish,
-                        session_err_fun      err_handle);
+    void    poll(void);
+    void    set_src_addr(uint8_t addr);
+    void    set_dst_addr(uint8_t addr);
+    uint8_t get_src_addr();
+    uint8_t get_dst_addr();
+    int     msg_send(uint32_t pgn, uint8_t priority, uint8_t dst, uint8_t *data, uint16_t len, uint32_t timeout);
+    int     pgn_register(const uint32_t pgn, uint8_t code, pgn_callback_t cb);
+    int     tp_rx_register(uint8_t              src,
+                           uint8_t              dst,
+                           session_get_data_fun get_data,
+                           session_recv_fun     rec_finish,
+                           session_err_fun      err_handle);
 
     int tp_rx_data_register(uint8_t          src,
                             uint8_t          dst,
@@ -41,7 +43,7 @@ public:
 
 public slots:
     void slot_msg_send(uint32_t pgn, uint8_t *data, uint16_t len);
-    void slot_request_pgn(uint32_t pgn, uint16_t len);
+    void slot_request_pgn(uint32_t pgn, uint8_t dst, uint16_t len);
 
 signals:
     void sig_recv_pgn_handle(uint32_t pgn, uint8_t src, uint8_t *data, uint16_t data_size);

@@ -32,3 +32,5 @@ void boot_port_poll(void);
 file_data_info_t *set_file_data_info(QString file_path);
 
 void boot_port_start(uint8_t *obj_addr, uint8_t obj_num, file_data_info_t *data_info);
+
+void boot_port_reset(uint8_t *obj_addr, uint8_t obj_num);

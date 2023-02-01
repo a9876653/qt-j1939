@@ -87,7 +87,7 @@
        <string>本机地址: </string>
       </property>
       <property name="maximum">
-       <number>128</number>
+       <number>255</number>
       </property>
       <property name="value">
        <number>126</number>

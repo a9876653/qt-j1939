@@ -81,6 +81,16 @@ void CommJ1939::set_dst_addr(uint8_t addr)
     dst_addr = addr;
 }
 
+uint8_t CommJ1939::get_src_addr()
+{
+    return j1939_ins.node_addr;
+}
+
+uint8_t CommJ1939::get_dst_addr()
+{
+    return dst_addr;
+}
+
 void CommJ1939::slot_msg_send(uint32_t pgn, uint8_t *data, uint16_t len)
 {
     msg_send(pgn, J1939_PRIORITY_DEFAULT, dst_addr, data, len, J1939_DEF_TIMEOUT);
@@ -115,7 +125,7 @@ int CommJ1939::tp_rx_data_register(uint8_t          src,
     return j1939_tp_rx_data_register(&j1939_ins, src, dst, data, data_size, rec_finish, err_handle);
 }
 
-void CommJ1939::slot_request_pgn(uint32_t pgn, uint16_t len)
+void CommJ1939::slot_request_pgn(uint32_t pgn, uint8_t dst, uint16_t len)
 {
     uint8_t data[5] = {
         PGN_SPECIFIC(pgn),
@@ -124,5 +134,5 @@ void CommJ1939::slot_request_pgn(uint32_t pgn, uint16_t len)
         (len & 0xFF),
         (len & 0xFF00) >> 8,
     };
-    j1939_send_msg(&j1939_ins, RAC, J1939_PRIORITY_DEFAULT, dst_addr, data, sizeof(data), J1939_DEF_TIMEOUT);
+    j1939_send_msg(&j1939_ins, RAC, J1939_PRIORITY_DEFAULT, dst, data, sizeof(data), J1939_DEF_TIMEOUT);
 }

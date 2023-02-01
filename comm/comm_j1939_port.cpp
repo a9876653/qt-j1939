@@ -1,6 +1,7 @@
 #include "comm_j1939.h"
 #include "comm_j1939_port.h"
 #include "QDebug"
+#include "j1939_modbus_master.h"
 
 #define BOOT_PORT_DBG(x...) qDebug(x)
 
@@ -15,7 +16,15 @@ void j1939_recv_cb(uint32_t pgn, uint8_t src, uint8_t *data, uint16_t len)
     (void)src;
     (void)len;
     (void)data;
-    J1939Ins->recv_pgn_handle(pgn, src, data, len);
+    if (pgn == DB_FUNC_READ_HOLDING_REGISTER)
+    {
+        respond_read_reg_t *ptr = (respond_read_reg_t *)data;
+        J1939DbIns->recv_read_reg_handle(src, ptr);
+    }
+    else
+    {
+        J1939Ins->recv_pgn_handle(pgn, src, data, len);
+    }
 }
 
 j1939_ret_e comm_j1939_pgn_cb(j1939_t *handle, j1939_message_t *msg)

@@ -1,7 +1,8 @@
 #include "pagemsgdisplay.h"
 #include "ui_pagemsgdisplay.h"
 
-PageMsgDisplay::PageMsgDisplay(QMap<uint, MsgData *> msgs_map) : msgs_map(msgs_map), ui(new Ui::PageMsgDisplay)
+PageMsgDisplay::PageMsgDisplay(QMap<uint, MsgData *> msgs_map, bool request_pgn, uint8_t src)
+    : msgs_map(msgs_map), request_pgn(request_pgn), src(src), ui(new Ui::PageMsgDisplay)
 {
     ui->setupUi(this);
 
@@ -57,14 +58,17 @@ void PageMsgDisplay::on_collapsPpushButton_clicked()
 void PageMsgDisplay::on_treeWidget_itemClicked(QTreeWidgetItem *item, int column)
 {
     (void)column;
-    MsgData *data = item->data(0, Qt::UserRole + 1).value<MsgData *>();
-    if (data == nullptr && item->parent() != nullptr) // 找不到用户数据,往父对象再找一遍
+    if (request_pgn)
     {
-        item = item->parent();
-        data = item->data(0, Qt::UserRole + 1).value<MsgData *>();
-    }
-    if (data != nullptr)
-    {
-        data->slot_request_pgn();
+        MsgData *data = item->data(0, Qt::UserRole + 1).value<MsgData *>();
+        if (data == nullptr && item->parent() != nullptr) // 找不到用户数据,往父对象再找一遍
+        {
+            item = item->parent();
+            data = item->data(0, Qt::UserRole + 1).value<MsgData *>();
+        }
+        if (data != nullptr)
+        {
+            data->slot_request_pgn(src);
+        }
     }
 }

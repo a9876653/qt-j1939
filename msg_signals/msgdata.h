@@ -38,11 +38,11 @@ public:
 
 signals:
     void sig_msg_send(uint32_t pgn, uint8_t *data, uint16_t len);
-    void sig_request_pgn(uint32_t pgn, uint16_t len);
+    void sig_request_pgn(uint32_t pgn, uint8_t dst, uint16_t len);
 
 public slots:
     void slot_encode_send();
-    void slot_request_pgn();
+    void slot_request_pgn(uint8_t src);
 };
 
 #endif // MSGDATA_H

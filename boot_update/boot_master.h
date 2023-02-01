@@ -14,6 +14,8 @@ float get_update_process(void);
 
 void boot_master_poll();
 
+void boot_send_update_cmd(cmd_update_t *handle);
+
 void boot_master_update_satrt(cmd_update_t *cmd_update, app_info_t *app_info);
 void boot_recv_update_cmd_respond(uint8_t src_addr, uint8_t ret);
 void boot_recv_file_info_respond(uint8_t src_addr, uint8_t ret);

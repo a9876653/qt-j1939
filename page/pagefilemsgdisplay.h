@@ -25,7 +25,7 @@ private:
 
     Ui::PageFileMsgDisplay         *ui;
     QMap<QString, PageMsgDisplay *> msg_page_map;
-    PageParams                      page_params;
+    QMap<QString, PageParams *>     page_params_map;
 };
 
 #endif // PAGEFILEMSGDISPLAY_H

@@ -15,7 +15,7 @@ class PageMsgDisplay : public QWidget
     Q_OBJECT
 
 public:
-    explicit PageMsgDisplay(QMap<uint, MsgData *> msgs_map);
+    explicit PageMsgDisplay(QMap<uint, MsgData *> msgs_map, bool request_pgn = true, uint8_t src = 255);
     ~PageMsgDisplay();
 
     QMap<uint, MsgData *> msgs_map;
@@ -28,6 +28,9 @@ private slots:
     void on_treeWidget_itemClicked(QTreeWidgetItem *item, int column);
 
 private:
+    bool    request_pgn = true;
+    uint8_t src         = 255;
+
     Ui::PageMsgDisplay *ui;
 };
 

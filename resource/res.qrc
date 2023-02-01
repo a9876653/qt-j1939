@@ -1,5 +1,8 @@
 <RCC>
-    <qresource prefix="/icon"/>
+    <qresource prefix="/icons">
+        <file alias="false_icon">false.png</file>
+        <file alias="true_icon">true.png</file>
+    </qresource>
     <qresource prefix="/">
         <file>battery.png</file>
     </qresource>

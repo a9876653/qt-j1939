@@ -32,10 +32,10 @@ void MsgData::slot_encode_send()
     emit sig_msg_send(pgn, encode_buff, msg_len);
 }
 
-void MsgData::slot_request_pgn()
+void MsgData::slot_request_pgn(uint8_t src)
 {
-    MSGDATA_DBG("请求PGN:0x%04x, len:%d", pgn, msg_len);
-    emit sig_request_pgn(pgn, msg_len);
+    MSGDATA_DBG("请求PGN:0x%04x, dst:%d, len:%d", pgn, src, msg_len);
+    emit sig_request_pgn(pgn, src, msg_len);
 }
 
 void MsgData::decode(uint8_t *data, uint16_t data_size)

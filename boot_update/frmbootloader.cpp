@@ -111,6 +111,19 @@ void frmBootloader::on_startPushButton_clicked()
     }
 }
 
+void frmBootloader::on_resetPushButton_clicked()
+{
+    QVector<uint8_t> obj_addr = get_update_objs();
+    if (obj_addr.count() > 0)
+    {
+        boot_port_reset(obj_addr.data(), obj_addr.count());
+    }
+    else
+    {
+        slotUpdataInfo(QString("请选择需重启的节点"));
+    }
+}
+
 void frmBootloader::slotUpdataProgress(float value)
 {
     (void)value;
