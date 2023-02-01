@@ -163,18 +163,22 @@ void ParamsHandle::request_get_regs()
     uint16_t reg_len = 0;
     request_reg_addr = param_map.keys().at(request_get_index);
     int id           = request_reg_addr;
-    int id_back      = id;
+    int id_back      = id + 1;
     for (int i = request_get_index; i < param_map.count(); i++)
     {
         id = param_map.keys().at(i);
-        if (qAbs(id - request_reg_addr) > 64)
+
+        ParamData *param = param_map.value(id);
+        if (qAbs(id - request_reg_addr) >= 64)
         {
             break;
         }
+        param->slot_set_icon(false);
         request_get_index++;
-        id_back = id;
+        id_back = id + param->reg_len;
     }
-    reg_len = qMin(qAbs(id_back - request_reg_addr) + 1, 64);
+
+    reg_len = qMin(qAbs(id_back - request_reg_addr), 64);
     J1939DbIns->slot_request_read_reg(request_reg_addr, reg_len);
 }
 

@@ -26,6 +26,7 @@ signals:
     void sig_request_write_reg(uint16_t reg_addr, uint16_t *data, uint16_t reg_len);
 
 public slots:
+    void slot_set_icon(bool ok);
     void slot_request_write();
     void slot_request_read();
     void slot_write_finish();

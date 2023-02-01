@@ -21,6 +21,18 @@ ParamData::ParamData(int id, QString name, QString type, float def_v) : id(id), 
     }
 }
 
+void ParamData::slot_set_icon(bool ok)
+{
+    if (ok)
+    {
+        icon_widget->set_icon(QPixmap(":/icons/true_icon"));
+    }
+    else
+    {
+        icon_widget->set_icon(QPixmap(":/icons/false_icon"));
+    }
+}
+
 void ParamData::slot_request_write()
 {
     icon_widget->set_icon(QPixmap(":/icons/false_icon"));
