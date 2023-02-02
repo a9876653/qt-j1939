@@ -19,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->tabWidget->addTab(new frmBootloader, "固件升级");
     ui->tabWidget->addTab(new PageMsgDisplay(msgs->msgs_map, false), " 主机");
     connect(J1939Ins, &CommJ1939::sig_recv_pgn_handle, this, &MainWindow::slot_recv_pgn_handle);
+    connect(J1939Ins, &CommJ1939::sig_open_finish, this, &MainWindow::slot_recv_comm_status);
 
     load_cfg_data("./temp/cfg_temp.json");
     on_openDevicePushButton_clicked();
@@ -72,19 +73,25 @@ void MainWindow::load_cfg_data(QString path)
     }
 }
 
+void MainWindow::slot_recv_comm_status(int ret)
+{
+    if (ret == STATUS_OK)
+    {
+        ui->openDevicePushButton->setText("关闭设备");
+        device_status = true;
+    }
+    else
+    {
+        ui->openDevicePushButton->setText("打开失败");
+        device_status = false;
+    }
+}
+
 void MainWindow::on_openDevicePushButton_clicked()
 {
     if (!device_status)
     {
         device_status = J1939Ins->open_device(ui->canIndexSpinBox->value(), ui->baudrateSpinBox->value() * 1000);
-        if (device_status)
-        {
-            ui->openDevicePushButton->setText("关闭设备");
-        }
-        else
-        {
-            ui->openDevicePushButton->setText("打开失败");
-        }
     }
     else
     {

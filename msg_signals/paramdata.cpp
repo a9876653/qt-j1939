@@ -61,7 +61,14 @@ void ParamData::slot_write_finish()
 }
 void ParamData::slot_read_finish(uint32_t value)
 {
-    recv_widget.text->setText(QString(" %1 (0x%2)").arg(value).arg(value, reg_len * 4, 16, QLatin1Char('0')));
+    if (type.contains("int16_t"))
+    {
+        recv_widget.text->setText(QString(" %1 (0x%2)").arg(int16_t(value)).arg(value, reg_len * 4, 16, QLatin1Char('0')));
+    }
+    else
+    {
+        recv_widget.text->setText(QString(" %1 (0x%2)").arg(value).arg(value, reg_len * 4, 16, QLatin1Char('0')));
+    }
     icon_widget->set_icon(QPixmap(":/icons/true_icon"));
     PAGEDATA_DBG("%s", (QString("获取参数 %1 : id %2, value %3").arg(name).arg(id).arg(write_value)).toStdString().c_str());
 }

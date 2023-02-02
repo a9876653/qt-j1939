@@ -1,4 +1,5 @@
 HEADERS += \
+    $$PWD/blocking_queue.h \
     $$PWD/canard_dsdl.h \
     $$PWD/crc32.h \
     $$PWD/filehandle.h \
@@ -7,6 +8,7 @@ HEADERS += \
     $$PWD/utils.h
 
 SOURCES += \
+    $$PWD/blocking_queue.cpp \
     $$PWD/canard_dsdl.c \
     $$PWD/crc32.cpp \
     $$PWD/filehandle.cpp \

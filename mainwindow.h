@@ -31,6 +31,8 @@ private slots:
 
     void on_objAddrspinBox_valueChanged(int arg1);
 
+    void slot_recv_comm_status(int ret);
+
 private:
     Ui::MainWindow *ui;
 
