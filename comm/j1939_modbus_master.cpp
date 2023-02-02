@@ -152,7 +152,11 @@ void CommJ1939Db::recv_read_reg_handle(uint16_t src_addr, respond_read_reg_t *pt
             db->sig_read_finish(value);
         }
     }
-    J1939_MODBUS_MASTER_DBG("read addr %d start reg 0x%04x reg len %d successful", src_addr, reg_addr, ptr->data_len / 2);
+    J1939_MODBUS_MASTER_DBG("read addr %d start reg %d (0x%04x) reg len %d successful",
+                            src_addr,
+                            reg_addr,
+                            reg_addr,
+                            ptr->data_len / 2);
     emit sig_recv_read_reg(ptr->reg_addr, ptr->data_len, ptr->data);
 }
 void CommJ1939Db::recv_write_reg_handle(uint16_t src_addr, request_write_reg_t *ptr)
@@ -162,7 +166,11 @@ void CommJ1939Db::recv_write_reg_handle(uint16_t src_addr, request_write_reg_t *
     if (db_map.contains(map_key))
     {
         CommDbValue *db = db_map.value(map_key);
-        J1939_MODBUS_MASTER_DBG("write addr %d reg 0x%04x value %d successful", src_addr, reg_addr, ptr->reg_value);
+        J1939_MODBUS_MASTER_DBG("write addr %d reg %d (0x%04x) value %d successful",
+                                src_addr,
+                                reg_addr,
+                                reg_addr,
+                                ptr->reg_value);
         db->sig_write_finish();
     }
     emit sig_recv_write_reg(ptr->reg_addr, ptr->reg_value);

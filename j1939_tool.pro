@@ -32,18 +32,22 @@ HEADERS += \
 FORMS += \
     mainwindow.ui
 
-include($$PWD/comm/comm.pri)
 include($$PWD/bytes/bytes.pri)
-include($$PWD/page/page.pri)
-include($$PWD/widget/widget.pri)
-include($$PWD/msg_signals/msg_signals.pri)
-include($$PWD/boot_update/boot_update.pri)
-
 INCLUDEPATH += $$PWD/bytes
+
+include($$PWD/widget/widget.pri)
 INCLUDEPATH += $$PWD/widget
+
+include($$PWD/msg_signals/msg_signals.pri)
 INCLUDEPATH += $$PWD/msg_signals
+
+include($$PWD/comm/comm.pri)
 INCLUDEPATH += $$PWD/comm
+
+include($$PWD/page/page.pri)
 INCLUDEPATH += $$PWD/page
+
+include($$PWD/boot_update/boot_update.pri)
 INCLUDEPATH += $$PWD/boot_update
 
 

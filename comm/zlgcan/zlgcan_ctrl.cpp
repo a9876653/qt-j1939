@@ -6,8 +6,6 @@
 #include "utility"
 #include "QString"
 #include <QThread>
-#include <QApplication>
-#include <QtConcurrent>
 
 #define ZLGCAN_DBG(x...) qDebug(x)
 
@@ -19,7 +17,6 @@ ZlgCan::ZlgCan()
     ZLGCAN_DBG("Main Thread id %d", (int)QThread::currentThreadId());
     connect(this, &ZlgCan::sig_open_device, this, slot_open_device);
     connect(this, &ZlgCan::sig_close_device, this, slot_close_device);
-    transmit_queue.setCapacity(CAN_SEND_DATA_SIZE);
 
     QThread *t = new QThread;
     this->moveToThread(t);
@@ -135,7 +132,7 @@ void ZlgCan::slot_close_device()
 
 uint ZlgCan::transmit(uint32_t id, uint flag, uint8_t *data, uint16_t len)
 {
-    if (transmit_queue.isFull())
+    if (transmit_queue.count() > CAN_SEND_DATA_SIZE)
     {
         ZLGCAN_DBG("CAN Transmit Queue is full");
         return 0;
@@ -156,7 +153,7 @@ uint ZlgCan::transmit(uint32_t id, uint flag, uint8_t *data, uint16_t len)
     transmit_data.frame.can_id  = MAKE_CAN_ID(id, is_ext_frame, 0, 0);
     transmit_data.frame.can_dlc = len;
     memcpy(transmit_data.frame.data, data, len);
-    transmit_queue.put(transmit_data);
+    transmit_queue.enqueue(transmit_data);
 
     return 1;
 }
@@ -174,7 +171,7 @@ void ZlgCan::transmit_task()
     while (!transmit_queue.isEmpty())
     // while (transmit_thread_run)
     {
-        ZCAN_Transmit_Data transmit_data = transmit_queue.get();
+        ZCAN_Transmit_Data transmit_data = transmit_queue.dequeue();
 
         uint ret = ZCAN_Transmit(channel_handle, &transmit_data, 1);
         if (ret < 1)

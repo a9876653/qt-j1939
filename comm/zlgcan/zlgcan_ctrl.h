@@ -70,7 +70,7 @@ private:
 
     ZCAN_Receive_Data recv_data[CAN_RECV_DATA_SIZE];
 
-    BlockingQueue<ZCAN_Transmit_Data> transmit_queue;
+    QQueue<ZCAN_Transmit_Data> transmit_queue;
 
     bool set_baudrate(uint16_t channel_index, baudrate_e baudrate);
     bool set_baudrate(uint16_t channel_index, uint baudrate);
