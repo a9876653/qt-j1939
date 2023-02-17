@@ -39,11 +39,16 @@ void PageParams::load_json(QString path)
     int i = 0;
     for (ParamData *p : params->param_map)
     {
-        cloumnIndex = 0;
-        ui->tableWidget->setItem(i, cloumnIndex++, new QTableWidgetItem(p->name));
+        cloumnIndex            = 0;
+        QTableWidgetItem *item = new QTableWidgetItem(p->name);
+        QFont             font = item->font();
+        item->setFlags(item->flags() & (~Qt::ItemFlag::ItemIsEditable));
+        item->setFont(font);
+
+        ui->tableWidget->setItem(i, cloumnIndex++, item);
         // ui->tableWidget->setItem(i, cloumnIndex++, new QTableWidgetItem(p->id));
         ui->tableWidget->setCellWidget(i, cloumnIndex++, p->recv_widget.text);
-        ui->tableWidget->setCellWidget(i, cloumnIndex++, p->send_widget.text);
+        ui->tableWidget->setCellWidget(i, cloumnIndex++, p->send_widget.line_edit);
         ui->tableWidget->setCellWidget(i, cloumnIndex++, p->icon_widget);
         i++;
     }

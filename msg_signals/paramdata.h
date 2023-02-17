@@ -5,6 +5,7 @@
 #include "CustomTextWidget.h"
 #include "comm_j1939.h"
 #include "frmcentericon.h"
+#include "widgetnumlineedit.h"
 
 class ParamData : public QObject
 {
@@ -12,14 +13,14 @@ class ParamData : public QObject
 public:
     ParamData(int id, QString name, QString type, float def_v = 0);
 
-    int              id;
-    int8_t           reg_len;
-    QString          name;
-    QString          type;
-    CustomTextWidget send_widget;
-    CustomTextWidget recv_widget;
-    frmCenterIcon   *icon_widget;
-    int              write_value = 0;
+    int               id;
+    int8_t            reg_len;
+    QString           name;
+    QString           type;
+    WidgetNumLineEdit send_widget;
+    CustomTextWidget  recv_widget;
+    frmCenterIcon    *icon_widget;
+    int               write_value = 0;
 
 signals:
     void sig_request_read_reg(uint16_t reg_addr, uint16_t reg_len);

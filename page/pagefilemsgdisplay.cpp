@@ -14,7 +14,7 @@ PageFileMsgDisplay::PageFileMsgDisplay(uint8_t src) : src(src), ui(new Ui::PageF
         msg_page_map.insert(msg_key, page);
         ui->tabWidget->addTab(page, msg_key);
     }
-    QString       dir      = "./cfg/param";
+    QString       dir      = "./cfg/regs_json";
     QFileInfoList fileList = GetFileList(dir); //获取目录下所有的文件
     for (QFileInfo info : fileList)
     {

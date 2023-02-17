@@ -77,6 +77,7 @@ void ParamsHandle::json_items_handle(QJsonDocument *jdoc)
             }
             ParamData   *p = new ParamData(param_id, param_name, type, def_v);
             CommDbValue *v = J1939DbIns->db_reg_register(src_addr, param_id, inc_reg_num);
+
             connect(p, &ParamData::sig_request_read_reg, J1939DbIns, &CommJ1939Db::slot_request_read_reg);
             connect(v, &CommDbValue::sig_read_finish, p, &ParamData::slot_read_finish);
             if (is_write)
@@ -86,7 +87,7 @@ void ParamsHandle::json_items_handle(QJsonDocument *jdoc)
             }
             else
             {
-                p->send_widget.text->setDisabled(true);
+                p->send_widget.line_edit->setDisabled(true);
             }
 
             param_map.insert(param_id, p);

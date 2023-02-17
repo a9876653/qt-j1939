@@ -8,7 +8,7 @@
 
 MsgSignals::MsgSignals(bool is_master) : is_master(is_master)
 {
-    QString       dir      = "./cfg/msg";
+    QString       dir      = "./cfg/can_dbc";
     QFileInfoList fileList = GetFileList(dir); //获取目录下所有的文件
     for (QFileInfo info : fileList)
     {
