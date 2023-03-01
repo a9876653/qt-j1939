@@ -18,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     comm_j1939_port_init(msgs->msgs_map);
     ui->tabWidget->addTab(new frmBootloader, "固件升级");
     ui->tabWidget->addTab(new PageMsgDisplay(msgs->msgs_map, false), " 主机");
+    ui->tabWidget->addTab(new PageFileMsgDisplay(255), " 从机");
     connect(J1939Ins, &CommJ1939::sig_recv_pgn_handle, this, &MainWindow::slot_recv_pgn_handle);
     connect(J1939Ins, &CommJ1939::sig_open_finish, this, &MainWindow::slot_recv_comm_status);
 

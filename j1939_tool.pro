@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui network
 
 TARGET = ../bin/j1939_tool
 
