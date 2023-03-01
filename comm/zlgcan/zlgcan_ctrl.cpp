@@ -81,6 +81,8 @@ bool ZlgCan::open_device(uint8_t channel_index, uint32_t baudrate)
 
 void ZlgCan::slot_open_device(uint8_t channel_index, uint32_t baudrate)
 {
+    slot_close_device();
+
     int ret       = STATUS_OK;
     device_index  = channel_index;
     u32_baudrate  = baudrate;
