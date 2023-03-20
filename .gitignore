@@ -3,5 +3,4 @@
 tools
 *debug*
 *release*
-
-*.user
+*.pro.user
