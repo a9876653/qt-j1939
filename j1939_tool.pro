@@ -50,6 +50,9 @@ INCLUDEPATH += $$PWD/page
 include($$PWD/boot_update/boot_update.pri)
 INCLUDEPATH += $$PWD/boot_update
 
+include($$PWD/enet_config/enet_config/enet_config.pri)
+INCLUDEPATH += $$PWD/enet_config/enet_config
+
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

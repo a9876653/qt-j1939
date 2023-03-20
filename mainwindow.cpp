@@ -7,6 +7,7 @@
 #include "frmbootloader.h"
 #include "json_file.h"
 #include "paramshandle.h"
+#include "enetconfig.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
@@ -16,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     J1939DbIns->init();
     msgs = new MsgSignals(true);
     comm_j1939_port_init(msgs->msgs_map);
+    ui->tabWidget->addTab(new EnetConfig, "网卡配置");
     ui->tabWidget->addTab(new frmBootloader, "固件升级");
     ui->tabWidget->addTab(new PageMsgDisplay(msgs->msgs_map, false), " 主机");
     ui->tabWidget->addTab(new PageFileMsgDisplay(255), " 从机");

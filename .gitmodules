@@ -1,3 +1,6 @@
 [submodule "comm/j1939"]
 	path = comm/j1939
 	url = git@codeup.aliyun.com:634ca98f327f73640e96b6a2/libraries/j1939.git
+[submodule "enet_config"]
+	path = enet_config
+	url = git@codeup.aliyun.com:grxc/tools/enet_config_tool.git
