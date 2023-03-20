@@ -38,6 +38,7 @@ PageFileMsgDisplay::~PageFileMsgDisplay()
 void PageFileMsgDisplay::msg_data_polt_send(MsgData *msg_data)
 {
     QJsonObject root;
+    QJsonObject src_obj;
     QJsonObject node;
 
     for (Signal *s : msg_data->signals_list)
@@ -56,7 +57,8 @@ void PageFileMsgDisplay::msg_data_polt_send(MsgData *msg_data)
             node.insert(name, (int)s->value_u);
         }
     }
-
+    src_obj.insert(msg_data->name, node);
+    root.insert(QString("src %1").arg(src), src_obj);
     QJsonDocument tempJdoc(root);
     QByteArray    array = tempJdoc.toJson();
     //发送数据，参数1:要发送的数据char*类型，参数2:撒送数据的大小，参数3:ip地址,参数4:端口号
