@@ -19,7 +19,7 @@ MWriteReadTable::~MWriteReadTable()
 void MWriteReadTable::showEvent(QShowEvent *event)
 {
     (void)event;
-    on_readAllBtn_clicked();
+    // on_readAllBtn_clicked();
 }
 void MWriteReadTable::hideEvent(QHideEvent *event)
 {

@@ -27,10 +27,8 @@ PageWidgetsCollect::~PageWidgetsCollect()
 void PageWidgetsCollect::showEvent(QShowEvent *event)
 {
     (void)event;
-    if (is_auto_read)
-    {
-        auto_read_start();
-    }
+
+    auto_read_start();
 }
 void PageWidgetsCollect::hideEvent(QHideEvent *event)
 {
@@ -40,8 +38,7 @@ void PageWidgetsCollect::hideEvent(QHideEvent *event)
 
 void PageWidgetsCollect::auto_read_start()
 {
-    auto_read_index  = 0;
-    auto_read_offset = 0;
+    request_get_index = 0;
     auto_read_timer.start(100);
 }
 
@@ -52,34 +49,36 @@ void PageWidgetsCollect::auto_read_stop()
 
 void PageWidgetsCollect::slot_auto_read_timeout()
 {
-    if (auto_read_index < reg_info_list.count())
+    if (reg_map.count() < 1 || (request_get_index >= reg_map.count() && !is_auto_read))
     {
-        RegInfo reg = reg_info_list.at(auto_read_index);
-        if (reg.is_auto_read)
-        {
-            int  r_len = qMin(reg.reg_len - auto_read_offset, 64);
-            emit sig_request_read_reg(reg.reg_addr + auto_read_offset, r_len);
-            auto_read_offset += r_len;
-            if (auto_read_offset >= reg.reg_len)
-            {
-                auto_read_offset = 0;
-                auto_read_index++;
-            }
-        }
-        else
-        {
-            auto_read_offset = 0;
-            auto_read_index++;
-        }
+        auto_read_stop();
+        return;
     }
     else
     {
-        if (!is_auto_read)
+        if (request_get_index >= reg_map.count())
         {
-            auto_read_stop();
+            request_get_index = 0;
         }
-        auto_read_index = 0;
     }
+    uint16_t reg_len          = 0;
+    uint16_t request_reg_addr = reg_map.keys().at(request_get_index);
+    int      id               = request_reg_addr;
+    int      id_back          = id + 1;
+    for (int i = request_get_index; i < reg_map.count(); i++)
+    {
+        id         = reg_map.keys().at(i);
+        RegInfo *p = reg_map.value(id);
+        if (qAbs(id - request_reg_addr) >= 64)
+        {
+            break;
+        }
+        request_get_index++;
+        id_back = id + p->reg_len;
+    }
+
+    reg_len = qMin(qAbs(id_back - request_reg_addr), 64);
+    emit sig_request_read_reg(request_reg_addr + auto_read_offset, reg_len);
 }
 
 void PageWidgetsCollect::json_items_handle(QJsonDocument *jdoc)
@@ -97,9 +96,7 @@ void PageWidgetsCollect::json_items_handle(QJsonDocument *jdoc)
             int     column_cnt  = obj.value("column_cnt").toInt();
             int     start_index = obj.value("start_index").toInt();
             int     end_index   = obj.value("end_index").toInt();
-            // 自动读取功能，默认打开
-            bool is_auto_read = obj.value("is_auto_read").toBool(true);
-            reg_info_list.append(RegInfo(start_index, end_index - start_index, is_auto_read));
+
             MLabelTable *widget = new MLabelTable(node, column_cnt);
             for (int i = start_index; i <= end_index; i++)
             {
@@ -111,6 +108,8 @@ void PageWidgetsCollect::json_items_handle(QJsonDocument *jdoc)
                     MLabel *label = new MLabel(obj->name);                           // 创建带描述的只读控件
                     connect(obj, &DataObj::sig_update, label, &MLabel::slot_update); // 链接更新
                     widget->insert(label);
+
+                    reg_map.insert(i, new RegInfo(i, obj->reg_len));
                 }
             }
             layout->addWidget(widget);
@@ -124,8 +123,7 @@ void PageWidgetsCollect::json_items_handle(QJsonDocument *jdoc)
             QString row_header    = obj.value("row_header").toString();
             QString column_header = obj.value("column_header").toString();
             int     end_index     = start_index + row_cnt * column_cnt;
-            bool    is_auto_read  = obj.value("is_auto_read").toBool(true);
-            reg_info_list.append(RegInfo(start_index, end_index - start_index, is_auto_read));
+
             MValueLabelTable *widget = new MValueLabelTable(node, row_cnt, column_cnt, row_header, column_header);
             for (int i = 0; i < row_cnt; i++)
             {
@@ -139,6 +137,8 @@ void PageWidgetsCollect::json_items_handle(QJsonDocument *jdoc)
                         MValueLabel *label = new MValueLabel();                               // 创建一个只读控件
                         connect(obj, &DataObj::sig_update, label, &MValueLabel::slot_update); // 链接更新
                         widget->insert(i, j, label);                                          // 插入可视表
+
+                        reg_map.insert(index, new RegInfo(index, obj->reg_len));
                     }
                 }
             }
@@ -150,10 +150,6 @@ void PageWidgetsCollect::json_items_handle(QJsonDocument *jdoc)
             int     offset      = obj.value("offset").toInt(0);
             int     start_index = obj.value("start_index").toInt() + offset;
             int     end_index   = obj.value("end_index").toInt() + offset;
-
-            bool is_auto_read = obj.value("is_auto_read").toBool(true);
-
-            reg_info_list.append(RegInfo(start_index, end_index - start_index, is_auto_read));
 
             MWriteReadTable *widget = new MWriteReadTable(node);
             for (int i = start_index; i <= end_index; i++)
@@ -168,6 +164,8 @@ void PageWidgetsCollect::json_items_handle(QJsonDocument *jdoc)
                     connect(w, &MWriteReadWidget::sig_request_read, obj, &DataObj::slot_request_read_reg); // 链接请求读
                     connect(w, &MWriteReadWidget::sig_update, obj, &DataObj::slot_request_write_reg);      // 链接请求写
                     widget->insert(w);
+
+                    reg_map.insert(i, new RegInfo(i, obj->reg_len));
                 }
             }
             layout->addWidget(widget);

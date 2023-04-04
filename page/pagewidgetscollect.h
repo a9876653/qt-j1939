@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QTimer>
+#include <QMap>
 #include "dataobjmap.h"
 
 namespace Ui
@@ -44,11 +45,13 @@ private:
 
     int auto_read_index;
     int auto_read_offset;
-    int is_auto_read = true;
+    int is_auto_read      = true;
+    int request_get_index = 0;
 
     DataObjMap *data;
 
-    QList<RegInfo> reg_info_list;
+    QList<RegInfo>       reg_info_list;
+    QMap<int, RegInfo *> reg_map;
 
     QTimer auto_read_timer;
 
