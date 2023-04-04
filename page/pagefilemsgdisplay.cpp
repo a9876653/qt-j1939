@@ -15,19 +15,19 @@ PageFileMsgDisplay::PageFileMsgDisplay(uint8_t src) : src(src), ui(new Ui::PageF
         msg_page_map.insert(msg_key, page);
         ui->tabWidget->addTab(page, msg_key);
     }
-    QString       dir      = "./cfg/regs_json";
-    QFileInfoList fileList = GetFileList(dir); //获取目录下所有的文件
-    for (QFileInfo info : fileList)
-    {
-        PAGEFILE_DBG() << "file path:" << info.filePath() << "   file name:" << info.fileName();
-        if (info.filePath().contains(".json")) // 只处理JSON文件
-        {
-            PageParams *param_page = new PageParams(src);
-            param_page->load_json(info.filePath());
-            page_params_map.insert(info.filePath(), param_page);
-            ui->tabWidget->addTab(param_page, info.fileName());
-        }
-    }
+    //    QString       dir      = "./cfg/regs_json";
+    //    QFileInfoList fileList = GetFileList(dir); //获取目录下所有的文件
+    //    for (QFileInfo info : fileList)
+    //    {
+    //        PAGEFILE_DBG() << "file path:" << info.filePath() << "   file name:" << info.fileName();
+    //        if (info.filePath().contains(".json")) // 只处理JSON文件
+    //        {
+    //            PageParams *param_page = new PageParams(src);
+    //            param_page->load_json(info.filePath());
+    //            page_params_map.insert(info.filePath(), param_page);
+    //            ui->tabWidget->addTab(param_page, info.fileName());
+    //        }
+    //    }
 }
 
 PageFileMsgDisplay::~PageFileMsgDisplay()

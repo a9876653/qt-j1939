@@ -6,6 +6,7 @@
 
 #include "msg_signals.h"
 #include "pagefilemsgdisplay.h"
+#include "pageparse.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -40,7 +41,15 @@ private:
 
     MsgSignals *msgs = nullptr;
 
-    QMap<uint, PageFileMsgDisplay *> src_page_map;
+    PageParse *src_page_parse = nullptr;
+
+    class Pages
+    {
+    public:
+        PageFileMsgDisplay *can_dbc    = nullptr;
+        PageParse          *can_modbus = nullptr;
+    };
+    QMap<uint, Pages *> src_page_map;
 
     void save_cfg_data(QString path);
     void load_cfg_data(QString path);

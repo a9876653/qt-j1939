@@ -98,7 +98,14 @@ void CommJ1939Db::slot_request_dst_write_mul_reg(uint16_t dst, uint16_t reg_addr
 
 void CommJ1939Db::slot_request_read_reg(uint16_t reg_addr, uint16_t reg_len)
 {
-    slot_request_dst_read_reg(J1939Ins->get_dst_addr(), reg_addr, reg_len);
+    int r_index = 0;
+
+    while (r_index < reg_len)
+    {
+        int r_len = qMin(64, reg_len - r_index);
+        slot_request_dst_read_reg(J1939Ins->get_dst_addr(), reg_addr + r_index, r_len);
+        r_index += r_len;
+    }
 }
 void CommJ1939Db::slot_request_write_reg(uint16_t reg_addr, uint16_t *data, uint16_t reg_len)
 {
@@ -108,7 +115,14 @@ void CommJ1939Db::slot_request_write_reg(uint16_t reg_addr, uint16_t *data, uint
     }
     else
     {
-        slot_request_dst_write_mul_reg(J1939Ins->get_dst_addr(), reg_addr, data, reg_len);
+        int w_index = 0;
+
+        while (w_index < reg_len)
+        {
+            int w_len = qMin(64, reg_len - w_index);
+            slot_request_dst_write_mul_reg(J1939Ins->get_dst_addr(), reg_addr + w_index, data + w_index, w_len);
+            w_index += w_len;
+        }
     }
 }
 

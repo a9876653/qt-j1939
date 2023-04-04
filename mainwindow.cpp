@@ -8,6 +8,10 @@
 #include "json_file.h"
 #include "paramshandle.h"
 #include "enetconfig.h"
+#include "mtableview.h"
+#include "mwritereadwidget.h"
+#include "mwritereadtable.h"
+#include "pageparse.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
@@ -15,12 +19,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     J1939Ins->init();
     J1939DbIns->init();
+
     msgs = new MsgSignals(true);
+
     comm_j1939_port_init(msgs->msgs_map);
+
+    src_page_parse = new PageParse(255);
     ui->tabWidget->addTab(new EnetConfig, "网卡配置");
+
     ui->tabWidget->addTab(new frmBootloader, "固件升级");
-    ui->tabWidget->addTab(new PageMsgDisplay(msgs->msgs_map, false), " 主机");
-    ui->tabWidget->addTab(new PageFileMsgDisplay(255), " 从机");
+    // ui->tabWidget->addTab(new PageMsgDisplay(msgs->msgs_map, false), " CAN DB");
+    ui->tabWidget->addTab(src_page_parse, "本地读取服务");
     connect(J1939Ins, &CommJ1939::sig_recv_pgn_handle, this, &MainWindow::slot_recv_pgn_handle);
     connect(J1939Ins, &CommJ1939::sig_open_finish, this, &MainWindow::slot_recv_comm_status);
 
@@ -106,14 +115,29 @@ void MainWindow::on_openDevicePushButton_clicked()
 
 void MainWindow::slot_recv_pgn_handle(uint32_t pgn, uint8_t src, uint8_t *data, uint16_t data_size)
 {
+    (void)pgn;
+    (void)data;
+    (void)data_size;
+
     if (!src_page_map.contains(src))
     {
-        PageFileMsgDisplay *page = new PageFileMsgDisplay(src);
-        ui->tabWidget->addTab(page, QString("从机 - %1").arg(src));
+        Pages *page      = new Pages();
+        page->can_dbc    = new PageFileMsgDisplay(src);
+        page->can_modbus = new PageParse(src);
+        ui->tabWidget->addTab(page->can_dbc, QString("CANDBC解析 %1").arg(src));
+        ui->tabWidget->addTab(page->can_modbus, QString("MB协议解析 - %1").arg(src));
         src_page_map.insert(src, page);
     }
-    PageFileMsgDisplay *p = src_page_map.value(src);
-    p->parse(pgn, data, data_size);
+    Pages *p = src_page_map.value(src);
+    p->can_dbc->parse(pgn, data, data_size);
+    //    if (!src_page_map.contains(src))
+    //    {
+    //        PageFileMsgDisplay *page = new PageFileMsgDisplay(src);
+    //        ui->tabWidget->addTab(page, QString("从机 - %1").arg(src));
+    //        src_page_map.insert(src, page);
+    //    }
+    //    PageFileMsgDisplay *p = src_page_map.value(src);
+    //    p->parse(pgn, data, data_size);
 }
 
 void MainWindow::on_srcAddrSpinBox_valueChanged(int arg1)
@@ -124,4 +148,5 @@ void MainWindow::on_srcAddrSpinBox_valueChanged(int arg1)
 void MainWindow::on_objAddrspinBox_valueChanged(int arg1)
 {
     J1939Ins->set_dst_addr(arg1);
+    src_page_parse->set_src_addr(arg1);
 }
