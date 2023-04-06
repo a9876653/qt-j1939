@@ -25,6 +25,9 @@ public:
     ~MValueLabelTable();
 
     void insert(int row, int column, MValueLabel *label);
+
+    int get_row_cnt();
+
 public slots:
     void slot_update(QVariant value);
 
@@ -33,7 +36,7 @@ private:
     int                   row_cnt    = 0;
     int                   cloumn_cnt = 0;
     QVariant              max        = 0;
-    QVariant              min        = 0;
+    QVariant              min        = 999999;
     int                   max_index  = 0;
     int                   min_index  = 0;
     QBrush                normal_brush;

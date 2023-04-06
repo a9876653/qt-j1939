@@ -57,14 +57,14 @@ void MTableView::set_item_value(int index, QVariant value)
 
 void MTableView::slot_update(int index, QVariant value)
 {
-    if (value > max)
+    if (value >= max)
     {
         max = value;
         set_item_backcolor(max_index, normal_brush);
         max_index = index;
         set_item_backcolor(max_index, max_brush);
     }
-    else if (value < min)
+    else if (value <= min)
     {
         min = value;
         set_item_backcolor(min_index, normal_brush);

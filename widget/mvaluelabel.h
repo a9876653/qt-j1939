@@ -22,9 +22,11 @@ signals:
 public:
     void slot_update(QVariant value);
 
+public:
+    QVariant value;
+
 private:
     Ui::MValueLabel *ui;
-    QVariant         value;
 };
 
 #endif // MVALUELABEL_H

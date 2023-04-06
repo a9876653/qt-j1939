@@ -20,6 +20,8 @@ public:
 
     void insert(MWriteReadWidget *ins);
 
+    int get_row_cnt();
+
 private slots:
     void on_readAllBtn_clicked();
 

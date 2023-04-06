@@ -17,6 +17,7 @@ public:
     explicit MLabelTable(QString des, int column_count, QWidget *parent = nullptr);
     ~MLabelTable();
     void insert(MLabel *label);
+    int  get_row_cnt();
 
 private:
     Ui::MLabelTable *ui;

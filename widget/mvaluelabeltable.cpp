@@ -27,7 +27,8 @@ MValueLabelTable::MValueLabelTable(QString  des,
         QString s = QString("%1 %2").arg(row_header).arg(i + 1);
         ui->tableWidget->setItem(i, 0, new QTableWidgetItem(s));
     }
-    ui->tableWidget->resizeColumnsToContents();
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch); //先自适应宽度
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents); //然后设置要根据内容使用宽度的列
 }
 
 MValueLabelTable::~MValueLabelTable()
@@ -40,31 +41,28 @@ void MValueLabelTable::insert(int row, int column, MValueLabel *label)
     ui->tableWidget->setCellWidget(row, column + 1, label);
 
     connect(label, &MValueLabel::sig_update, this, &MValueLabelTable::slot_update);
+    max_item = min_item = label;
 }
 
 void MValueLabelTable::slot_update(QVariant value)
 {
+    (void)value;
     MValueLabel *item = qobject_cast<MValueLabel *>(sender());
-    if (value > max)
+    if (item->value >= max_item->value)
     {
-        if (max_item == nullptr)
-        {
-            max_item = item;
-        }
-        max = value;
         max_item->set_backcolor(normal_brush.color());
         max_item = item;
         max_item->set_backcolor(max_brush.color());
     }
-    else if (value < min)
+    else if (item->value <= min_item->value)
     {
-        if (min_item == nullptr)
-        {
-            min_item = item;
-        }
-        min = value;
         min_item->set_backcolor(normal_brush.color());
         min_item = item;
         min_item->set_backcolor(min_brush.color());
     }
+}
+
+int MValueLabelTable::get_row_cnt()
+{
+    return row_cnt;
 }

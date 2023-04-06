@@ -81,3 +81,8 @@ void MWriteReadTable::on_writeAllBtn_clicked()
     write_index = 0;
     write_timer.start(50);
 }
+
+int MWriteReadTable::get_row_cnt()
+{
+    return ui->tableWidget->rowCount();
+}

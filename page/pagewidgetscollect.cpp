@@ -83,8 +83,9 @@ void PageWidgetsCollect::slot_auto_read_timeout()
 
 void PageWidgetsCollect::json_items_handle(QJsonDocument *jdoc)
 {
-    auto     json_map = jdoc->toVariant().toJsonArray();
-    QLayout *layout   = ui->verticalLayout;
+    auto       json_map = jdoc->toVariant().toJsonArray();
+    QLayout   *layout   = ui->verticalLayout;
+    QList<int> widget_height_list;
     // 解析json文件，并生成相应的界面
     for (auto widget_attr : json_map)
     {
@@ -113,6 +114,7 @@ void PageWidgetsCollect::json_items_handle(QJsonDocument *jdoc)
                 }
             }
             layout->addWidget(widget);
+            widget_height_list.append(widget->get_row_cnt());
         }
         else if (page_type == "table_view")
         {
@@ -127,9 +129,10 @@ void PageWidgetsCollect::json_items_handle(QJsonDocument *jdoc)
             MValueLabelTable *widget = new MValueLabelTable(node, row_cnt, column_cnt, row_header, column_header);
             for (int i = 0; i < row_cnt; i++)
             {
+                int inc_len = 1;
                 for (int j = 0; j < column_cnt; j++)
                 {
-                    int index = start_index + i * column_cnt + j;
+                    int index = start_index + i * column_cnt + j * inc_len;
                     if (data->obj_map.contains(index))
                     {
                         // 获取数据实例，关联各种信号槽
@@ -137,12 +140,13 @@ void PageWidgetsCollect::json_items_handle(QJsonDocument *jdoc)
                         MValueLabel *label = new MValueLabel();                               // 创建一个只读控件
                         connect(obj, &DataObj::sig_update, label, &MValueLabel::slot_update); // 链接更新
                         widget->insert(i, j, label);                                          // 插入可视表
-
+                        inc_len = obj->reg_len;
                         reg_map.insert(index, new RegInfo(index, obj->reg_len));
                     }
                 }
             }
             layout->addWidget(widget);
+            widget_height_list.append(widget->get_row_cnt());
         }
         else if (page_type == "param_view")
         {
@@ -169,7 +173,12 @@ void PageWidgetsCollect::json_items_handle(QJsonDocument *jdoc)
                 }
             }
             layout->addWidget(widget);
+            widget_height_list.append(widget->get_row_cnt());
         }
+    }
+    for (int i = 0; i < widget_height_list.count(); i++)
+    {
+        ui->verticalLayout->setStretch(i, widget_height_list.at(i));
     }
 }
 

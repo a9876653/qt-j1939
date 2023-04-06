@@ -20,3 +20,8 @@ void MLabelTable::insert(MLabel *label)
     ui->gridLayout_4->addWidget(label, row, column);
     widget_count++;
 }
+
+int MLabelTable::get_row_cnt()
+{
+    return widget_count / column_count;
+}
