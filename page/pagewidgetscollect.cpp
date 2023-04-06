@@ -78,7 +78,7 @@ void PageWidgetsCollect::slot_auto_read_timeout()
     }
 
     reg_len = qMin(qAbs(id_back - request_reg_addr), 64);
-    emit sig_request_read_reg(request_reg_addr + auto_read_offset, reg_len);
+    emit sig_request_read_reg(request_reg_addr, reg_len);
 }
 
 void PageWidgetsCollect::json_items_handle(QJsonDocument *jdoc)

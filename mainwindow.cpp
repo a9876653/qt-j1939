@@ -121,11 +121,11 @@ void MainWindow::slot_recv_pgn_handle(uint32_t pgn, uint8_t src, uint8_t *data, 
 
     if (!src_page_map.contains(src))
     {
-        Pages *page      = new Pages();
-        page->can_dbc    = new PageFileMsgDisplay(src);
-        page->can_modbus = new PageParse(src);
+        Pages *page   = new Pages();
+        page->can_dbc = new PageFileMsgDisplay(src);
+        // page->can_modbus = new PageParse(src);
         ui->tabWidget->addTab(page->can_dbc, QString("CANDBC解析 %1").arg(src));
-        ui->tabWidget->addTab(page->can_modbus, QString("MB协议解析 - %1").arg(src));
+        // ui->tabWidget->addTab(page->can_modbus, QString("MB协议解析 - %1").arg(src));
         src_page_map.insert(src, page);
     }
     Pages *p = src_page_map.value(src);
