@@ -92,6 +92,11 @@ void MainWindow::slot_recv_comm_status(int ret)
         ui->openDevicePushButton->setText("关闭设备");
         device_status = true;
     }
+    else if (ret == STATUS_OFFLINE)
+    {
+        ui->openDevicePushButton->setText("打开设备");
+        device_status = false;
+    }
     else
     {
         ui->openDevicePushButton->setText("打开失败");

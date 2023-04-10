@@ -7,6 +7,27 @@ int j1939_can_write(uint32_t id, uint8_t *data, uint8_t len)
     return J1939Ins->can_write(id, data, len);
 }
 
+CommJ1939::CommJ1939()
+{
+    // can_dev = new ZlgCan();
+    can_dev = new CtrlCan();
+    connect(can_dev, &CanBase::sig_receive, this, &CommJ1939::can_recv);
+    connect(can_dev, &CanBase::sig_open_finish, this, &CommJ1939::sig_open_finish);
+
+    connect(&j1939_poll_timer, &QTimer::timeout, this, &CommJ1939::poll);
+    j1939_poll_timer.stop();
+}
+
+bool CommJ1939::open_device(uint8_t device_index, uint32_t baudrate)
+{
+    return can_dev->open_device(device_index, baudrate);
+}
+
+void CommJ1939::close_device()
+{
+    return can_dev->close_device();
+}
+
 void CommJ1939::can_recv(uint32_t id, uint flag, uint8_t *data, uint16_t len)
 {
     (void)flag;
@@ -15,7 +36,7 @@ void CommJ1939::can_recv(uint32_t id, uint flag, uint8_t *data, uint16_t len)
 
 int CommJ1939::can_write(uint32_t id, uint8_t *data, uint8_t len)
 {
-    if (transmit(id, MSG_FLAG_EXT, data, len) == 1)
+    if (can_dev->transmit(id, MSG_FLAG_EXT, data, len) == 1)
     {
         return len;
     }
@@ -32,8 +53,6 @@ void CommJ1939::init()
     memset(&j1939_ins, 0, sizeof(j1939_ins));
     j1939_init(&j1939_ins, J1939_SRC_ADDR, PGN_REG_NUM, SESSION_REG_NUM, j1939_can_write);
     j1939_poll_timer.start(5);
-    j1939_poll_timer.connect(&j1939_poll_timer, &QTimer::timeout, this, &CommJ1939::poll);
-    connect(this, &ZlgCan::sig_receive, this, &CommJ1939::can_recv);
 }
 
 int CommJ1939::msg_send(uint32_t pgn, uint8_t priority, uint8_t dst, uint8_t *data, uint16_t len, uint32_t timeout)
@@ -131,8 +150,8 @@ void CommJ1939::slot_request_pgn(uint32_t pgn, uint8_t dst, uint16_t len)
         PGN_SPECIFIC(pgn),
         PGN_FORMAT(pgn),
         PGN_DATA_PAGE(pgn),
-        (len & 0xFF),
-        (len & 0xFF00) >> 8,
+        (uint8_t)(len & 0xFF),
+        (uint8_t)((len & 0xFF00) >> 8),
     };
     j1939_send_msg(&j1939_ins, RAC, J1939_PRIORITY_DEFAULT, dst, data, sizeof(data), J1939_DEF_TIMEOUT);
 }

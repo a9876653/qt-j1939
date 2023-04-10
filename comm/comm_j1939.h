@@ -5,16 +5,22 @@
 #include "j1939_user_if.h"
 #include "zlgcan_ctrl.h"
 #include "singleton.h"
+#include "ctrlcan.h"
 
 #define J1939_SRC_ADDR  0x7E // 默认源地址
 #define PGN_REG_NUM     4096 // 注册的PGN数（单帧），只接收
 #define SESSION_REG_NUM 2048 // 注册的会话数（多帧），包含发送和接收
 
-class CommJ1939 : public ZlgCan
+class CommJ1939 : public QObject
 {
     Q_OBJECT
 public:
+    CommJ1939();
     void init();
+
+    bool open_device(uint8_t device_index, uint32_t baudrate);
+
+    void close_device();
 
     void    poll(void);
     void    set_src_addr(uint8_t addr);
@@ -47,11 +53,13 @@ public slots:
 
 signals:
     void sig_recv_pgn_handle(uint32_t pgn, uint8_t src, uint8_t *data, uint16_t data_size);
+    void sig_open_finish(int ret);
 
 private:
-    j1939_t j1939_ins;
-    QTimer  j1939_poll_timer;
-    uint8_t dst_addr = ADDRESS_GLOBAL;
+    CanBase *can_dev = nullptr;
+    j1939_t  j1939_ins;
+    QTimer   j1939_poll_timer;
+    uint8_t  dst_addr = ADDRESS_GLOBAL;
 };
 
 #define J1939Ins Singleton<CommJ1939>::getInstance()
