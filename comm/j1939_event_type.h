@@ -41,6 +41,4 @@ typedef struct
 {
     uint32_t    index;
     err_event_t err_event;
-    uint8_t     des_buf_len;
-    uint8_t     des_buf[READ_EVENT_DES_BUF_SIZE];
 } read_event_respond_t;
