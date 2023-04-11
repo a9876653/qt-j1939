@@ -10,7 +10,7 @@ PageReadEvent::PageReadEvent(int src, QWidget *parent) : QWidget(parent), ui(new
 {
     ui->setupUi(this);
     event = get_j1939_event_ins(src);
-    while(event == nullptr)
+    while (event == nullptr)
     {
         event = get_j1939_event_ins(src);
     }
@@ -73,26 +73,33 @@ QString timestamp_ms_to_qstring(uint64_t timestamp_ms)
 
 void PageReadEvent::slot_recv_read_event(read_event_respond_t respond)
 {
-    if(respond.index == (uint32_t)-1)
+    if (respond.index == (uint32_t)-1)
     {
         stop_read();
-        return ;
+        return;
     }
     int column = 0;
     int row    = ui->tableWidget->rowCount();
     ui->tableWidget->setRowCount(row + 1);
-    int event_id = ERR_EVENT_ID_DECODE(respond.err_event.id);
-    QString id         = QString("%1").arg(event_id);
-    QString start_time = timestamp_ms_to_qstring(respond.err_event.start_time);
-    QString end_time   = timestamp_ms_to_qstring(respond.err_event.end_time);
-    QString des = "              ";
-    if(DataObjMapIns->param_map.contains(event_id))
+    int     err_event_id = respond.err_event.id;
+    int     event_id     = ERR_EVENT_ID_DECODE(err_event_id);
+    int     id           = CELL_EVENT_ID_CONVER(event_id);
+    QString id_s         = QString("%1(0x%2)").arg(id).arg(err_event_id, 4, 16, QLatin1Char('0'));
+    QString start_time   = timestamp_ms_to_qstring(respond.err_event.start_time);
+    QString end_time     = timestamp_ms_to_qstring(respond.err_event.end_time);
+    QString des          = "None";
+    if (DataObjMapIns->param_map.contains(id))
     {
-        DataObj *obj = DataObjMapIns->param_map.value(event_id);
-        des = obj->name;
+        DataObj *obj = DataObjMapIns->param_map.value(id);
+        des          = "";
+        if (IS_CELL_EVENT(event_id))
+        {
+            des = QString("电芯 %1 触发故障:").arg(CELL_EVENT_INDEX_CONVER(event_id));
+        }
+        des += obj->name;
     }
 
-    insert_item(row, column++, id);
+    insert_item(row, column++, id_s);
     insert_item(row, column++, start_time);
     insert_item(row, column++, end_time);
     insert_item(row, column++, des);
@@ -103,7 +110,7 @@ void PageReadEvent::slot_recv_read_event(read_event_respond_t respond)
 
 void PageReadEvent::start_read(int start_index)
 {
-    read_index = start_index;
+    read_index  = start_index;
     timeout_cnt = 0;
     read_timer.start(read_timeout_ms);
     event->request_event(read_index);
@@ -119,7 +126,7 @@ void PageReadEvent::read_timeout()
 {
     event->request_event(read_index);
     timeout_cnt++;
-    if(timeout_cnt > 3)
+    if (timeout_cnt > 3)
     {
         stop_read();
     }
@@ -132,9 +139,10 @@ void PageReadEvent::on_readEventBtn_clicked()
 
 void PageReadEvent::on_readAllBtn_clicked()
 {
-    for(int i = 0;i<ui->tableWidget->rowCount();i++)
+    int row_cnt = ui->tableWidget->rowCount();
+    for (int i = 0; i < row_cnt; i++)
     {
-        ui->tableWidget->removeRow(i);
+        ui->tableWidget->removeRow(0);
     }
     start_read();
 }

@@ -81,7 +81,7 @@ void CommJ1939Db::slot_request_dst_write_mul_reg(uint16_t dst, uint16_t reg_addr
 {
     static uint8_t           request_buff[sizeof(request_write_mul_reg_t)];
     request_write_mul_reg_t *ptr      = (request_write_mul_reg_t *)request_buff;
-    uint8_t                 *put_data = ptr->data;
+    uint8_t *                put_data = ptr->data;
     ptr->reg_addr                     = reg_addr;
     ptr->reg_len                      = LW_MIN(reg_len, MB_REG_LEN_MAX);
     for (uint16_t i = 0; i < reg_len; i++)
@@ -111,7 +111,7 @@ void CommJ1939Db::slot_request_write_reg(uint16_t reg_addr, uint16_t *data, uint
 {
     if (reg_len == 1)
     {
-        slot_request_dst_write_reg(J1939Ins->get_dst_addr(), reg_addr, *data);
+        slot_request_dst_write_reg(J1939Ins->get_dst_addr(), reg_addr, L2B16(*data));
     }
     else
     {
@@ -148,7 +148,7 @@ void CommJ1939Db::recv_read_reg_handle(uint16_t src_addr, respond_read_reg_t *pt
             uint32_t     value = 0;
             if (db->reg_size == 1)
             {
-                value = canardDSDLGetU32(data, data_len, i * 16, 16);
+                value = canardDSDLGetU16(data, data_len, i * 16, 16);
                 value = L2B16(value);
             }
             else if (db->reg_size == 2)
@@ -166,11 +166,12 @@ void CommJ1939Db::recv_read_reg_handle(uint16_t src_addr, respond_read_reg_t *pt
             db->sig_read_finish(value);
         }
     }
-    J1939_MODBUS_MASTER_DBG("read addr %d start reg %d (0x%04x) reg len %d successful",
+    J1939_MODBUS_MASTER_DBG("read addr %d start reg %d (0x%04x) reg len %d v (0x%04x) successful",
                             src_addr,
                             reg_addr,
                             reg_addr,
-                            ptr->data_len / 2);
+                            ptr->data_len / 2,
+                            *(uint16_t *)ptr->data);
     emit sig_recv_read_reg(ptr->reg_addr, ptr->data_len, ptr->data);
 }
 void CommJ1939Db::recv_write_reg_handle(uint16_t src_addr, request_write_reg_t *ptr)
