@@ -57,10 +57,10 @@ void CtrlCan::slot_open_device(uint8_t ch_index, uint32_t baudrate)
 {
     slot_close_device();
     VCI_INIT_CONFIG config;
-    baudrate_map_t  baudrate_temp;
-    config.AccCode = 0;
-    config.AccMask = 0xFFFFFFFF;
-    channel_index  = ch_index;
+    baudrate_map_t  baudrate_temp = BAUDRATE_INIT(500000, 0x00, 0x1C);
+    config.AccCode                = 0;
+    config.AccMask                = 0xFFFFFFFF;
+    channel_index                 = ch_index;
     for (int i = 0; i < baudrate_map.count(); i++)
     {
         baudrate_temp = baudrate_map[i];
@@ -108,7 +108,7 @@ void CtrlCan::slot_close_device()
 
 void CtrlCan::transmit_task()
 {
-    if(!is_open())
+    if (!is_open())
     {
         return;
     }
@@ -141,7 +141,7 @@ void CtrlCan::receive_task()
 {
     uint         len;
     VCI_ERR_INFO errinfo; //错误结构体
-    if(!is_open())
+    if (!is_open())
     {
         return;
     }
