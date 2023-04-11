@@ -30,7 +30,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="readEventBtn">
        <property name="text">
         <string>读取事件</string>
        </property>

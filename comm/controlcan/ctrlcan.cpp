@@ -108,6 +108,10 @@ void CtrlCan::slot_close_device()
 
 void CtrlCan::transmit_task()
 {
+    if(!is_open())
+    {
+        return;
+    }
     can_farme_t tx_data;
     while (transmit_dequeue(tx_data))
     {
@@ -137,11 +141,14 @@ void CtrlCan::receive_task()
 {
     uint         len;
     VCI_ERR_INFO errinfo; //错误结构体
-
+    if(!is_open())
+    {
+        return;
+    }
     len = VCI_GetReceiveNum(dev_type, device_index, channel_index); //查看缓冲区有多少帧数据
     if (len > 0)
     {
-        len = VCI_Receive(dev_type, device_index, channel_index, recv_data, CAN_RECV_DATA_SIZE, 1); //接收数据
+        len = VCI_Receive(dev_type, device_index, channel_index, recv_data, CAN_RECV_DATA_SIZE, 0); //接收数据
         if (len == 0xFFFFFFFF)                                                                      //读取错误
         {
             VCI_ReadErrInfo(dev_type, device_index, channel_index, &errinfo); //读取错误信息

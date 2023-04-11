@@ -2,7 +2,6 @@ include($$PWD/zlgcan/zlgcan.pri)
 
 include($$PWD/controlcan/controlcan.pri)
 include($$PWD/j1939/j1939.pri)
-include($$PWD/boot_update/boot_update.pri)
 
 INCLUDEPATH += $$PWD
 INCLUDEPATH += $$PWD/j1939/include

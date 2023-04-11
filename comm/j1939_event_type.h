@@ -5,6 +5,9 @@ typedef uint32_t event_id_t;
 
 #define EVENT_SAVE_DATA_MAX_SIZE 8
 
+#define ERR_EVENT_FLAG          (0x8000) // 故障事件记录码
+#define ERR_EVENT_ID_DECODE(id) (id & (~ERR_EVENT_FLAG))
+
 typedef struct
 {
     event_id_t        id;

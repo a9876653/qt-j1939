@@ -124,7 +124,7 @@ void PageWidgetsCollect::json_items_handle(QJsonDocument *jdoc)
             int     column_cnt    = obj.value("column_cnt").toInt();
             QString row_header    = obj.value("row_header").toString();
             QString column_header = obj.value("column_header").toString();
-            int     end_index     = start_index + row_cnt * column_cnt;
+            // int     end_index     = start_index + row_cnt * column_cnt;
 
             MValueLabelTable *widget = new MValueLabelTable(node, row_cnt, column_cnt, row_header, column_header);
             for (int i = 0; i < row_cnt; i++)

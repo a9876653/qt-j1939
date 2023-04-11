@@ -3,7 +3,9 @@
 
 MValueLabel::MValueLabel(bool read_only, QWidget *parent) : QWidget(parent), ui(new Ui::MValueLabel)
 {
+    (void)read_only;
     ui->setupUi(this);
+
     ui->valueLabel->setText("#");
 }
 

@@ -60,6 +60,7 @@ void DataObjMap::json_items_handle(QJsonDocument *jdoc)
         int         array_size = obj.value("array_size").toInt();
         int         max        = obj.value("max").toInt();
         int         min        = obj.value("min").toInt();
+        int param_id = obj.value("param_id").toInt();
         QString     type       = obj.value("type").toString();
         int         reg_num    = 1;
         JsonStruct *node       = new JsonStruct(name, id, def_v, is_array, is_write, array_size, type);
@@ -75,9 +76,9 @@ void DataObjMap::json_items_handle(QJsonDocument *jdoc)
             {
                 param_name = name + QString("-%1").arg(i);
             }
-            int          param_id = id + reg_num * i;
-            DataObj     *p        = new DataObj(param_name, param_id, type, min, max, def_v);
-            CommDbValue *v        = J1939DbIns->db_reg_register(src_addr, param_id, reg_num);
+            int          msg_id = id + reg_num * i;
+            DataObj     *p        = new DataObj(param_name, msg_id, type, min, max, def_v);
+            CommDbValue *v        = J1939DbIns->db_reg_register(src_addr, msg_id, reg_num);
 
             connect(p, &DataObj::sig_request_read_reg, J1939DbIns, &CommJ1939Db::slot_request_read_reg);
             connect(v, &CommDbValue::sig_read_finish, p, &DataObj::slot_read_finish);
@@ -86,7 +87,12 @@ void DataObjMap::json_items_handle(QJsonDocument *jdoc)
                 connect(p, &DataObj::sig_request_write_reg, J1939DbIns, &CommJ1939Db::slot_request_write_reg);
                 connect(v, &CommDbValue::sig_write_finish, p, &DataObj::slot_write_finish);
             }
-            obj_map.insert(param_id, p);
+            obj_map.insert(msg_id, p);
+            if(param_id >= 0)
+            {
+                param_map.insert(param_id, p);
+            }
         }
+
     }
 }

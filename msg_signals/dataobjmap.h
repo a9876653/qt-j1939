@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include "dataobj.h"
+#include "singleton.h"
 
 class JsonStruct
 {
@@ -25,17 +26,18 @@ public:
 class DataObjMap : public QObject
 {
 public:
-    DataObjMap(int src_addr);
+    DataObjMap(int src_addr = 0xFF);
 
     void json_items_handle(QJsonDocument *jdoc);
     bool load_json(QString path);
 
 public:
     QMap<int, DataObj *> obj_map;
+    QMap<int, DataObj *> param_map;
 
 private:
     QMap<int, JsonStruct *> json_struct_map;
     int                     src_addr;
 };
-
+#define DataObjMapIns Singleton<DataObjMap>::getInstance()
 #endif // DATAOBJMAP_H

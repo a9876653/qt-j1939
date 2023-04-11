@@ -9,6 +9,4 @@ HEADERS += \
 SOURCES += \
     $$PWD/ctrlcan.cpp
 
-DISTFILES += \
-    $$PWD/ControlCAN.dll \
-    $$PWD/ControlCAN.lib
+DISTFILES += $$PWD/ControlCAN.lib
