@@ -2,13 +2,16 @@
 #include "ui_pagefilemsgdisplay.h"
 #include "filehandle.h"
 #include "QDebug"
+#include "pagereadevent.h"
 #define PAGEFILE_DBG(x...) qDebug(x)
 
 PageFileMsgDisplay::PageFileMsgDisplay(uint8_t src) : src(src), ui(new Ui::PageFileMsgDisplay)
 {
     ui->setupUi(this);
-    udp_socket      = new QUdpSocket(this);
-    MsgSignals *msg = new MsgSignals();
+    udp_socket                = new QUdpSocket(this);
+    MsgSignals    *msg        = new MsgSignals();
+    PageReadEvent *read_event = new PageReadEvent(src);
+    ui->tabWidget->addTab(read_event, "事件读取");
     for (QString msg_key : msg->file_msg_map.keys())
     {
         PageMsgDisplay *page = new PageMsgDisplay(msg->file_msg_map.value(msg_key), src);
