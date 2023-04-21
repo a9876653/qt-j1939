@@ -87,7 +87,7 @@ void DataObjMap::json_items_handle(QJsonDocument *jdoc)
             QString param_name = name;
             if (is_array)
             {
-                param_name = name + QString("-%1").arg(i);
+                param_name = name + QString("-%1").arg(i + 1);
             }
             int          msg_id = id + reg_num * i;
             DataObj     *p      = new DataObj(param_name, msg_id, type, min, max, def_v, value_des);
