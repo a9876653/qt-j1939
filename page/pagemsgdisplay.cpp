@@ -1,7 +1,7 @@
 #include "pagemsgdisplay.h"
 #include "ui_pagemsgdisplay.h"
 
-PageMsgDisplay::PageMsgDisplay(QMap<uint, MsgData *> msgs_map, bool request_pgn, uint8_t src)
+PageMsgDisplay::PageMsgDisplay(QMap<uint, MsgData *> msgs_map, uint8_t src, bool request_pgn)
     : msgs_map(msgs_map), request_pgn(request_pgn), src(src), ui(new Ui::PageMsgDisplay)
 {
     ui->setupUi(this);

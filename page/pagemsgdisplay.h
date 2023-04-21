@@ -15,7 +15,7 @@ class PageMsgDisplay : public QWidget
     Q_OBJECT
 
 public:
-    explicit PageMsgDisplay(QMap<uint, MsgData *> msgs_map, bool request_pgn = true, uint8_t src = 255);
+    explicit PageMsgDisplay(QMap<uint, MsgData *> msgs_map, uint8_t src = 255, bool request_pgn = true);
     ~PageMsgDisplay();
 
     QMap<uint, MsgData *> msgs_map;
