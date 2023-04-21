@@ -32,7 +32,7 @@ private slots:
 private:
     void insert_item(int row, int column, QString s);
 
-    void start_read(int start_index = 1);
+    void start_read(int start_index = 1, int stop_index = -1);
     void stop_read();
 
 private:
@@ -40,7 +40,8 @@ private:
     int                src;
     J1939Event        *event;
 
-    int read_index = 0;
+    int read_index  = 0;
+    int end_index   = 0;
     int timeout_cnt = 0;
 
     const int read_timeout_ms = 500;

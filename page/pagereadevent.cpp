@@ -73,7 +73,7 @@ QString timestamp_ms_to_qstring(uint64_t timestamp_ms)
 
 void PageReadEvent::slot_recv_read_event(read_event_respond_t respond)
 {
-    if (respond.index == (uint32_t)-1)
+    if (respond.index == (uint32_t)-1 || respond.index == end_index)
     {
         stop_read();
         return;
@@ -108,9 +108,10 @@ void PageReadEvent::slot_recv_read_event(read_event_respond_t respond)
     read_timer.start(read_timeout_ms);
 }
 
-void PageReadEvent::start_read(int start_index)
+void PageReadEvent::start_read(int start_index, int stop_index)
 {
     read_index  = start_index;
+    end_index   = stop_index;
     timeout_cnt = 0;
     read_timer.start(read_timeout_ms);
     event->request_event(read_index);
@@ -134,7 +135,12 @@ void PageReadEvent::read_timeout()
 
 void PageReadEvent::on_readEventBtn_clicked()
 {
-    start_read(ui->spinBox->value());
+    int row_cnt = ui->tableWidget->rowCount();
+    for (int i = 0; i < row_cnt; i++)
+    {
+        ui->tableWidget->removeRow(0);
+    }
+    start_read(1, ui->spinBox->value() + 1);
 }
 
 void PageReadEvent::on_readAllBtn_clicked()

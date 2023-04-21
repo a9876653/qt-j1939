@@ -4,7 +4,8 @@ HEADERS += \
     $$PWD/msg_signals.h \
     $$PWD/msgdata.h \
     $$PWD/paramdata.h \
-    $$PWD/paramshandle.h
+    $$PWD/paramshandle.h \
+    $$PWD/value_des.h
 
 SOURCES += \
     $$PWD/dataobj.cpp \

@@ -106,7 +106,7 @@ void PageWidgetsCollect::json_items_handle(QJsonDocument *jdoc)
                     // 获取数据实例，关联各种信号槽
                     DataObj *obj = data->obj_map.value(i);
 
-                    MLabel *label = new MLabel(obj->name);                           // 创建带描述的只读控件
+                    MLabel *label = new MLabel(obj->name, obj->value_des);           // 创建带描述的只读控件
                     connect(obj, &DataObj::sig_update, label, &MLabel::slot_update); // 链接更新
                     widget->insert(label);
 

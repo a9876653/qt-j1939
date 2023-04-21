@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QVariant>
+#include "value_des.h"
 
 typedef uint32_t obj_value_t;
 
@@ -11,7 +12,13 @@ class DataObj : public QObject
     Q_OBJECT
 
 public:
-    DataObj(QString name, uint32_t id, QString type, obj_value_t min = 0, obj_value_t max = 0xFFFFFFFF, obj_value_t def = 0);
+    DataObj(QString     name,
+            uint32_t    id,
+            QString     type,
+            obj_value_t min       = 0,
+            obj_value_t max       = 0xFFFFFFFF,
+            obj_value_t def       = 0,
+            ValueDes    value_des = ValueDes());
 
 signals:
     void sig_write_finish();
@@ -33,6 +40,7 @@ public:
     obj_value_t min     = 0x0;
     obj_value_t max     = 0xFFFFFFFF;
     obj_value_t def     = 0;
+    ValueDes    value_des;
 };
 
 #endif // DATAOBJ_H

@@ -1,5 +1,6 @@
 HEADERS += \
     $$PWD/CustomTextWidget.h \
+    $$PWD/enumvalueveiw.h \
     $$PWD/frmcentericon.h \
     $$PWD/mlabel.h \
     $$PWD/mlabeltable.h \
@@ -12,6 +13,7 @@ HEADERS += \
     $$PWD/widgetnumlineedit.h
 
 FORMS += \
+    $$PWD/enumvalueveiw.ui \
     $$PWD/frmcentericon.ui \
     $$PWD/mlabel.ui \
     $$PWD/mlabeltable.ui \
@@ -21,6 +23,7 @@ FORMS += \
     $$PWD/mwritereadtable.ui
 
 SOURCES += \
+    $$PWD/enumvalueveiw.cpp \
     $$PWD/frmcentericon.cpp \
     $$PWD/mlabel.cpp \
     $$PWD/mlabeltable.cpp \

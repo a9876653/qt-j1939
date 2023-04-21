@@ -1,8 +1,8 @@
 #include "dataobjmap.h"
-#include "filehandle.h"
-#include "canard_dsdl.h"
-#include "j1939_modbus_master.h"
 #include "QDebug"
+#include "canard_dsdl.h"
+#include "filehandle.h"
+#include "j1939_modbus_master.h"
 #define DATAMAP_DBG(x...) qDebug(x)
 
 DataObjMap::DataObjMap(int src_addr) : src_addr(src_addr)
@@ -51,7 +51,7 @@ void DataObjMap::json_items_handle(QJsonDocument *jdoc)
 
     for (auto param : json_map)
     {
-        auto        obj        = param.toObject();
+        QJsonObject obj        = param.toObject();
         QString     name       = obj.value("note").toString();
         int         id         = obj.value("id").toInt();
         double      def_v      = obj.value("def_value").toDouble();
@@ -60,10 +60,23 @@ void DataObjMap::json_items_handle(QJsonDocument *jdoc)
         int         array_size = obj.value("array_size").toInt();
         int         max        = obj.value("max").toInt();
         int         min        = obj.value("min").toInt();
-        int param_id = obj.value("param_id").toInt();
-        QString     type       = obj.value("type").toString();
-        int         reg_num    = 1;
-        JsonStruct *node       = new JsonStruct(name, id, def_v, is_array, is_write, array_size, type);
+        int         param_id   = obj.value("param_id").toInt();
+        ValueDes    value_des;
+        if (obj.contains("value_des"))
+        {
+            QJsonObject value_des_obj = obj.value("value_des").toObject();
+            value_des.is_bit_des      = value_des_obj.value("is_bit_des").toBool(false);
+            QJsonObject des_map       = value_des_obj.value("value_des_enum").toObject();
+            for (QString key : des_map.keys())
+            {
+                QVariant k = key.toUInt();
+                value_des.value_des_map.insert(k, des_map.value(key).toString());
+            }
+        }
+
+        QString     type    = obj.value("type").toString();
+        int         reg_num = 1;
+        JsonStruct *node    = new JsonStruct(name, id, def_v, is_array, is_write, array_size, type);
         json_struct_map.insert(id, node);
         if (type.contains("32"))
         {
@@ -77,8 +90,8 @@ void DataObjMap::json_items_handle(QJsonDocument *jdoc)
                 param_name = name + QString("-%1").arg(i);
             }
             int          msg_id = id + reg_num * i;
-            DataObj     *p        = new DataObj(param_name, msg_id, type, min, max, def_v);
-            CommDbValue *v        = J1939DbIns->db_reg_register(src_addr, msg_id, reg_num);
+            DataObj     *p      = new DataObj(param_name, msg_id, type, min, max, def_v, value_des);
+            CommDbValue *v      = J1939DbIns->db_reg_register(src_addr, msg_id, reg_num);
 
             connect(p, &DataObj::sig_request_read_reg, J1939DbIns, &CommJ1939Db::slot_request_read_reg);
             connect(v, &CommDbValue::sig_read_finish, p, &DataObj::slot_read_finish);
@@ -88,11 +101,10 @@ void DataObjMap::json_items_handle(QJsonDocument *jdoc)
                 connect(v, &CommDbValue::sig_write_finish, p, &DataObj::slot_write_finish);
             }
             obj_map.insert(msg_id, p);
-            if(param_id >= 0)
+            if (param_id >= 0)
             {
                 param_map.insert(param_id, p);
             }
         }
-
     }
 }

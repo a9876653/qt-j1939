@@ -1,8 +1,8 @@
 #include "dataobj.h"
 #include "canard_dsdl.h"
 
-DataObj::DataObj(QString name, uint32_t id, QString type, obj_value_t min, obj_value_t max, obj_value_t def)
-    : name(name), id(id), type(type), min(min), max(max), def(def)
+DataObj::DataObj(QString name, uint32_t id, QString type, obj_value_t min, obj_value_t max, obj_value_t def, ValueDes value_des)
+    : name(name), id(id), type(type), min(min), max(max), def(def), value_des(value_des)
 {
     if (type.contains("32"))
     {
