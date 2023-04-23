@@ -5,6 +5,7 @@ TARGET = ../bin/j1939_tool
 RC_ICONS = battery.ico
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+QMAKE_CXXFLAGS=-fpermissive
 
 CONFIG += c++17
 CONFIG += console
