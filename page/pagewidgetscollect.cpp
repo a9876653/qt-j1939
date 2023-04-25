@@ -84,7 +84,7 @@ void PageWidgetsCollect::slot_auto_read_timeout()
 void PageWidgetsCollect::json_items_handle(QJsonDocument *jdoc)
 {
     auto       json_map = jdoc->toVariant().toJsonArray();
-    QLayout   *layout   = ui->verticalLayout;
+    QLayout *  layout   = ui->verticalLayout;
     QList<int> widget_height_list;
     // 解析json文件，并生成相应的界面
     for (auto widget_attr : json_map)
@@ -136,7 +136,7 @@ void PageWidgetsCollect::json_items_handle(QJsonDocument *jdoc)
                     if (data->obj_map.contains(index))
                     {
                         // 获取数据实例，关联各种信号槽
-                        DataObj     *obj   = data->obj_map.value(index);
+                        DataObj *    obj   = data->obj_map.value(index);
                         MValueLabel *label = new MValueLabel();                               // 创建一个只读控件
                         connect(obj, &DataObj::sig_update, label, &MValueLabel::slot_update); // 链接更新
                         widget->insert(i, j, label);                                          // 插入可视表
@@ -161,9 +161,10 @@ void PageWidgetsCollect::json_items_handle(QJsonDocument *jdoc)
                 if (data->obj_map.contains(i))
                 {
                     // 获取数据实例，关联各种信号槽
-                    DataObj          *obj = data->obj_map.value(i);
-                    MWriteReadWidget *w = new MWriteReadWidget(obj->name, obj->min, obj->max, obj->def); // 创建一个读写控件
-                    connect(obj, &DataObj::sig_update, w, &MWriteReadWidget::slot_update);               // 关联数据更新
+                    DataObj *         obj = data->obj_map.value(i);
+                    MWriteReadWidget *w
+                        = new MWriteReadWidget(obj->name, obj->min, obj->max, obj->def, obj->write_value); // 创建一个读写控件
+                    connect(obj, &DataObj::sig_update, w, &MWriteReadWidget::slot_update);                 // 关联数据更新
                     connect(obj, &DataObj::sig_write_finish, w, &MWriteReadWidget::slot_update_finish);
                     connect(w, &MWriteReadWidget::sig_request_read, obj, &DataObj::slot_request_read_reg); // 链接请求读
                     connect(w, &MWriteReadWidget::sig_update, obj, &DataObj::slot_request_write_reg);      // 链接请求写

@@ -27,9 +27,12 @@ class DataObjMap : public QObject
 {
 public:
     DataObjMap(int src_addr = 0xFF);
+    ~DataObjMap();
 
     void json_items_handle(QJsonDocument *jdoc);
     bool load_json(QString path);
+    bool save_write_data_json(QString path);
+    bool load_write_data_json(QString path);
 
 public:
     QMap<int, DataObj *> obj_map;

@@ -23,18 +23,27 @@ void DataObj::slot_request_write_reg(QVariant value)
 {
     if (type == "int16_t")
     {
-        int16_t v = value.toInt();
-        emit    sig_request_write_reg(id, (uint16_t *)&v, reg_len);
+        int16_t v   = value.toInt();
+        write_value = v;
+        emit sig_request_write_reg(id, (uint16_t *)&v, reg_len);
     }
     else if (type == "uint32_t")
     {
-        uint32_t v = value.toUInt();
-        emit     sig_request_write_reg(id, (uint16_t *)&v, reg_len);
+        uint32_t v  = value.toUInt();
+        write_value = v;
+        emit sig_request_write_reg(id, (uint16_t *)&v, reg_len);
+    }
+    else if (type == "int32_t")
+    {
+        int32_t v   = value.toInt();
+        write_value = v;
+        emit sig_request_write_reg(id, (uint16_t *)&v, reg_len);
     }
     else
     {
-        uint16_t v = value.toUInt();
-        emit     sig_request_write_reg(id, (uint16_t *)&v, reg_len);
+        uint16_t v  = value.toUInt();
+        write_value = v;
+        emit sig_request_write_reg(id, (uint16_t *)&v, reg_len);
     }
 }
 

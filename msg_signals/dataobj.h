@@ -36,10 +36,11 @@ public:
     QString     name;
     uint32_t    id;
     QString     type;
-    uint16_t    reg_len = 1;
-    obj_value_t min     = 0x0;
-    obj_value_t max     = 0xFFFFFFFF;
-    obj_value_t def     = 0;
+    uint16_t    reg_len     = 1;
+    obj_value_t min         = 0x0;
+    obj_value_t max         = 0xFFFFFFFF;
+    obj_value_t def         = 0;
+    int         write_value = 0xFFFFFFFF;
     ValueDes    value_des;
 };
 

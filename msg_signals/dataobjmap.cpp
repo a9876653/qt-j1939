@@ -3,6 +3,7 @@
 #include "canard_dsdl.h"
 #include "filehandle.h"
 #include "j1939_modbus_master.h"
+#include "json_file.h"
 #define DATAMAP_DBG(x...) qDebug(x)
 
 DataObjMap::DataObjMap(int src_addr) : src_addr(src_addr)
@@ -17,6 +18,46 @@ DataObjMap::DataObjMap(int src_addr) : src_addr(src_addr)
             load_json(info.filePath());
         }
     }
+    load_write_data_json("./temp/obj_temp.json");
+}
+
+DataObjMap::~DataObjMap()
+{
+    save_write_data_json("./temp/obj_temp.json");
+}
+
+bool DataObjMap::save_write_data_json(QString path)
+{
+    QJsonObject root;
+    for (DataObj *obj : obj_map)
+    {
+        root.insert(QString("%1").arg(obj->id), obj->write_value);
+    }
+    QJsonDocument tempJdoc(root);
+    write_json_file(path, &tempJdoc);
+    return true;
+}
+
+bool DataObjMap::load_write_data_json(QString path)
+{
+    QJsonObject root;
+    if (load_json_file(path, &root))
+    {
+        QVariantMap map = root.toVariantMap();
+        for (QString key : map.keys())
+        {
+            bool ok = false;
+            int  id = key.toInt(&ok);
+            if (ok)
+            {
+                if (obj_map.contains(id))
+                {
+                    obj_map.value(id)->write_value = map.value(key).toInt();
+                }
+            }
+        }
+    }
+    return true;
 }
 
 bool DataObjMap::load_json(QString path)
@@ -90,7 +131,7 @@ void DataObjMap::json_items_handle(QJsonDocument *jdoc)
                 param_name = name + QString("-%1").arg(i + 1);
             }
             int          msg_id = id + reg_num * i;
-            DataObj     *p      = new DataObj(param_name, msg_id, type, min, max, def_v, value_des);
+            DataObj *    p      = new DataObj(param_name, msg_id, type, min, max, def_v, value_des);
             CommDbValue *v      = J1939DbIns->db_reg_register(src_addr, msg_id, reg_num);
 
             connect(p, &DataObj::sig_request_read_reg, J1939DbIns, &CommJ1939Db::slot_request_read_reg);

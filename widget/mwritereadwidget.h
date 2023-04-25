@@ -14,7 +14,11 @@ class MWriteReadWidget : public QObject
     Q_OBJECT
 
 public:
-    explicit MWriteReadWidget(QString des, QVariant min = -999999999, QVariant max = 999999999, QVariant def = 0);
+    explicit MWriteReadWidget(QString  des,
+                              QVariant min         = -999999999,
+                              QVariant max         = 999999999,
+                              QVariant def         = 0,
+                              QVariant write_value = 0);
     ~MWriteReadWidget();
 
 private:
@@ -31,11 +35,11 @@ private slots:
     void on_readBtn_clicked();
 
 public:
-    QLabel        *des_label     = nullptr;
-    MQSpinBox     *read_spinbox  = nullptr;
-    MQSpinBox     *write_spinbox = nullptr;
-    QToolButton   *read_btn      = nullptr;
-    QToolButton   *write_btn     = nullptr;
+    QLabel *       des_label     = nullptr;
+    MQSpinBox *    read_spinbox  = nullptr;
+    MQSpinBox *    write_spinbox = nullptr;
+    QToolButton *  read_btn      = nullptr;
+    QToolButton *  write_btn     = nullptr;
     frmCenterIcon *text_icon     = nullptr;
 
 private:

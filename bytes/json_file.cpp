@@ -33,6 +33,7 @@ void write_json_file(QString path, QJsonDocument *jdoc)
     QByteArray read_array = jdoc->toJson();
     file_write.write(read_array);
     file_write.close();
+    JSON_FILE_DBG("write file %s finish", path.toLocal8Bit().data());
 }
 
 bool load_json_file(QString path, QJsonObject *root)

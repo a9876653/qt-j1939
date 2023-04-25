@@ -35,6 +35,7 @@ PageParse::PageParse(int src_addr, QWidget *parent) : QWidget(parent), ui(new Ui
 PageParse::~PageParse()
 {
     delete ui;
+    delete data;
 }
 
 void PageParse::set_src_addr(int addr)

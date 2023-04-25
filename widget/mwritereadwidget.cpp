@@ -1,6 +1,7 @@
 #include "mwritereadwidget.h"
 
-MWriteReadWidget::MWriteReadWidget(QString des, QVariant min, QVariant max, QVariant def) : des(des), min(min), max(max), def(def)
+MWriteReadWidget::MWriteReadWidget(QString des, QVariant min, QVariant max, QVariant def, QVariant write_value)
+    : des(des), min(min), max(max), def(def)
 {
     text_icon     = new frmCenterIcon(QPixmap(":/icons/true_icon"));
     des_label     = new QLabel(des);
@@ -14,7 +15,7 @@ MWriteReadWidget::MWriteReadWidget(QString des, QVariant min, QVariant max, QVar
 
     write_spinbox->setMaximum(max.toInt());
     write_spinbox->setMinimum(min.toInt());
-    write_spinbox->setValue(def.toInt());
+    write_spinbox->setValue(write_value.toInt());
 
     read_spinbox->setReadOnly(true);                                            // 只读
     read_spinbox->setButtonSymbols(QAbstractSpinBox::ButtonSymbols::NoButtons); // 无按钮
