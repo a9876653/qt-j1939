@@ -86,3 +86,11 @@ int MWriteReadTable::get_row_cnt()
 {
     return ui->tableWidget->rowCount();
 }
+
+void MWriteReadTable::on_changeBtn_clicked()
+{
+    for (MWriteReadWidget *ins : ins_list)
+    {
+        ins->set_write_value(ui->spinBox->value());
+    }
+}

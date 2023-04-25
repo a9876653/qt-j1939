@@ -30,12 +30,14 @@ private slots:
 
     void on_writeAllBtn_clicked();
 
+    void on_changeBtn_clicked();
+
 protected:
     void showEvent(QShowEvent *event);
     void hideEvent(QHideEvent *event);
 
 private:
-    Ui::MWriteReadTable      *ui;
+    Ui::MWriteReadTable *     ui;
     QList<MWriteReadWidget *> ins_list;
 
     int    read_index  = 0;

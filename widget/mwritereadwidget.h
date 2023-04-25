@@ -20,6 +20,7 @@ public:
                               QVariant def         = 0,
                               QVariant write_value = 0);
     ~MWriteReadWidget();
+    void set_write_value(QVariant value);
 
 private:
 signals:

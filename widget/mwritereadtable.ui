@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>691</width>
-    <height>113</height>
+    <width>688</width>
+    <height>241</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -92,6 +92,26 @@
            </size>
           </property>
          </spacer>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="spinBox">
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <property name="minimum">
+           <number>-99999999</number>
+          </property>
+          <property name="maximum">
+           <number>999999999</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="changeBtn">
+          <property name="text">
+           <string>一键更改</string>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QPushButton" name="readAllBtn">

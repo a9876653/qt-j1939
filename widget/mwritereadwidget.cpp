@@ -56,3 +56,8 @@ void MWriteReadWidget::on_readBtn_clicked()
     text_icon->set_icon(QPixmap(":/icons/false_icon"), "正在读取");
     emit sig_request_read();
 }
+
+void MWriteReadWidget::set_write_value(QVariant value)
+{
+    write_spinbox->setValue(value.toInt());
+}
