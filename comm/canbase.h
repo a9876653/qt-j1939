@@ -68,12 +68,12 @@ public:
     {
         if (transmit_queue.count() > CAN_SEND_DATA_SIZE)
         {
-            CAN_DBG("CAN Transmit Queue is full");
+            // CAN_DBG("CAN Transmit Queue is full");
             return 0;
         }
         if (!is_open())
         {
-            CAN_DBG("CAN Device is close");
+            // CAN_DBG("CAN Device is close");
             return 0;
         }
         if (len > CAN_MAX_DATA_LEN)

@@ -39,6 +39,11 @@ void DataObj::slot_request_write_reg(QVariant value)
         write_value = v;
         emit sig_request_write_reg(id, (uint16_t *)&v, reg_len);
     }
+    else if (type == "int32_t")
+    {
+        int32_t v = value.toUInt();
+        emit    sig_request_write_reg(id, (uint16_t *)&v, reg_len);
+    }
     else
     {
         uint16_t v  = value.toUInt();
@@ -61,6 +66,10 @@ void DataObj::slot_read_finish(uint32_t v)
     else if (type == "uint32_t")
     {
         value = (uint32_t)v;
+    }
+    else if (type == "int32_t")
+    {
+        value = (int32_t)v;
     }
     else
     {
