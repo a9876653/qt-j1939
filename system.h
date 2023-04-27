@@ -2,9 +2,10 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <QString>
 
 typedef int32_t  timeDelta_t;
-typedef uint32_t timeMs_t;
+typedef uint64_t timeMs_t;
 typedef uint64_t timeUs_t;
 
 static inline timeDelta_t cmp_time_us(timeUs_t a, timeUs_t b)
@@ -25,5 +26,7 @@ void     sys_delay_ms(timeMs_t nMs);
 timeUs_t sys_get_us(void);
 timeMs_t sys_get_ms(void);
 
+QString  timestamp_ms_to_qstring(uint64_t timestamp_ms);
+QString  get_current_time_ms_qstring();
 bool     sys_time_is_elapsed(uint32_t start, uint32_t duration_ms);
 timeMs_t sys_time_get_elapsed(uint32_t start);

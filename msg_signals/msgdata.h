@@ -8,15 +8,15 @@
 class Signal
 {
 public:
-    QString  name;
-    uint32_t bit_length;
-    uint32_t start_bit;
-    bool     is_float;
-    bool     is_signed;
-    float    value_f;
-    uint     value_u;
-    int      value_i;
-
+    QString          name;
+    uint32_t         bit_length;
+    uint32_t         start_bit;
+    bool             is_float;
+    bool             is_signed;
+    float            value_f;
+    uint             value_u;
+    int              value_i;
+    QString          value_s;
     CustomTextWidget send_widget;
     CustomTextWidget rec_dec_widget;
     CustomTextWidget rec_hex_widget;

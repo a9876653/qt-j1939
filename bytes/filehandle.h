@@ -7,4 +7,6 @@
 
 QFileInfoList GetFileList(QString path);
 
+bool CsvAppend(QString path, QList<QString> header, QList<QString> data);
+
 #endif // FILEHANDLE_H

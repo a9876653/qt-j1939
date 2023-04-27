@@ -48,29 +48,6 @@ void PageReadEvent::insert_item(int row, int column, QString s)
     ui->tableWidget->setItem(row, column, item);
 }
 
-QString timestamp_ms_to_qstring(uint64_t timestamp_ms)
-{
-    if (timestamp_ms == 0)
-    {
-        return QString("None");
-    }
-    struct tm    time;
-    uint16_t     time_ms  = timestamp_ms % 1000;
-    const time_t time_sec = timestamp_ms / 1000;
-    gmtime_r(&time_sec, &time);
-    time.tm_year = time.tm_year + 1900;
-    time.tm_mon  = time.tm_mon + 1;
-
-    return QString("%1/%2/%3-%4:%5:%6:%7")
-        .arg(time.tm_year)
-        .arg(time.tm_mon)
-        .arg(time.tm_mday)
-        .arg(time.tm_hour)
-        .arg(time.tm_min)
-        .arg(time.tm_sec)
-        .arg(time_ms);
-}
-
 void PageReadEvent::slot_recv_read_event(read_event_respond_t respond)
 {
     if (respond.index == (uint32_t)-1 || respond.index == end_index)

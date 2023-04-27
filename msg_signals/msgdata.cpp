@@ -61,7 +61,7 @@ void MsgData::decode(uint8_t *data, uint16_t data_size)
             dec_s = QString("%1").arg(sig->value_u);
             hex_s = QString("%1").arg(sig->value_u, 8, 16, QLatin1Char('0'));
         }
-
+        sig->value_s = dec_s;
         sig->rec_dec_widget.text->setText(dec_s);
         sig->rec_hex_widget.text->setText(hex_s);
     }

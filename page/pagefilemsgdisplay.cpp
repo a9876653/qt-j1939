@@ -3,13 +3,14 @@
 #include "filehandle.h"
 #include "QDebug"
 #include "pagereadevent.h"
+#include "system.h"
 #define PAGEFILE_DBG(x...) qDebug(x)
 
 PageFileMsgDisplay::PageFileMsgDisplay(uint8_t src) : src(src), ui(new Ui::PageFileMsgDisplay)
 {
     ui->setupUi(this);
     udp_socket                = new QUdpSocket(this);
-    MsgSignals    *msg        = new MsgSignals();
+    MsgSignals *   msg        = new MsgSignals();
     PageReadEvent *read_event = new PageReadEvent(src);
     ui->tabWidget->addTab(read_event, "事件读取");
     for (QString msg_key : msg->file_msg_map.keys())
@@ -18,6 +19,24 @@ PageFileMsgDisplay::PageFileMsgDisplay(uint8_t src) : src(src), ui(new Ui::PageF
         msg_page_map.insert(msg_key, page);
         ui->tabWidget->addTab(page, msg_key);
     }
+    csv_time_key = "时间";
+    csv_map.insert(csv_time_key, get_current_time_ms_qstring());
+    for (MsgData *m : msg->msgs_map)
+    {
+        for (Signal *sig : m->signals_list)
+        {
+            csv_map.insert(sig->name, sig->value_s);
+        }
+    }
+
+    QDateTime time;
+    QDate     time_data = time.currentDateTime().date();
+    QString   time_s    = QString("%1%2%3")
+                         .arg(time_data.year())
+                         .arg(time_data.month(), 2, 10, QChar('0'))
+                         .arg(time_data.day(), 2, 10, QChar('0'));
+    csv_path = QString("./save_data/%1-%2.csv").arg(time_s).arg(src);
+
     //    QString       dir      = "./cfg/regs_json";
     //    QFileInfoList fileList = GetFileList(dir); //获取目录下所有的文件
     //    for (QFileInfo info : fileList)
@@ -31,6 +50,8 @@ PageFileMsgDisplay::PageFileMsgDisplay(uint8_t src) : src(src), ui(new Ui::PageF
     //            ui->tabWidget->addTab(param_page, info.fileName());
     //        }
     //    }
+    connect(&csv_timer, &QTimer::timeout, this, &PageFileMsgDisplay::csv_save_file);
+    csv_timer.start(1000);
 }
 
 PageFileMsgDisplay::~PageFileMsgDisplay()
@@ -68,6 +89,20 @@ void PageFileMsgDisplay::msg_data_polt_send(MsgData *msg_data)
     udp_socket->writeDatagram(array.data(), array.size(), QHostAddress("127.0.0.1"), 9870);
 }
 
+void PageFileMsgDisplay::write_csv_data(MsgData *msg_data)
+{
+    csv_map[csv_time_key] = get_current_time_ms_qstring();
+    for (Signal *s : msg_data->signals_list)
+    {
+        csv_map[s->name] = s->value_s;
+    }
+}
+
+void PageFileMsgDisplay::csv_save_file()
+{
+    CsvAppend(csv_path, csv_map.keys(), csv_map.values());
+}
+
 void PageFileMsgDisplay::parse(uint32_t pgn, uint8_t *data, uint16_t len)
 {
     for (PageMsgDisplay *p : msg_page_map)
@@ -77,6 +112,7 @@ void PageFileMsgDisplay::parse(uint32_t pgn, uint8_t *data, uint16_t len)
             MsgData *msg_data = p->msgs_map.value(pgn);
             msg_data->decode(data, len);
             msg_data_polt_send(msg_data);
+            write_csv_data(msg_data);
             // break;
         }
     }
