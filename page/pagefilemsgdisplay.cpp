@@ -10,7 +10,7 @@ PageFileMsgDisplay::PageFileMsgDisplay(uint8_t src) : src(src), ui(new Ui::PageF
 {
     ui->setupUi(this);
     udp_socket                = new QUdpSocket(this);
-    MsgSignals *   msg        = new MsgSignals();
+    MsgSignals    *msg        = new MsgSignals();
     PageReadEvent *read_event = new PageReadEvent(src);
     ui->tabWidget->addTab(read_event, "事件读取");
     for (QString msg_key : msg->file_msg_map.keys())
@@ -100,6 +100,13 @@ void PageFileMsgDisplay::write_csv_data(MsgData *msg_data)
 
 void PageFileMsgDisplay::csv_save_file()
 {
+    QDateTime time;
+    QDate     time_data = time.currentDateTime().date();
+    QString   time_s    = QString("%1%2%3")
+                         .arg(time_data.year())
+                         .arg(time_data.month(), 2, 10, QChar('0'))
+                         .arg(time_data.day(), 2, 10, QChar('0'));
+    csv_path = QString("./save_data/%1-%2.csv").arg(time_s).arg(src);
     CsvAppend(csv_path, csv_map.keys(), csv_map.values());
 }
 
