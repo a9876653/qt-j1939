@@ -34,10 +34,10 @@ public:
     QList<Signal *> signals_list;
     uint8_t         encode_buff[J1939_DEF_BUFF_SIZE];
 
-    void decode(uint8_t *data, uint16_t data_size);
+    void decode(QByteArray array);
 
 signals:
-    void sig_msg_send(uint32_t pgn, uint8_t *data, uint16_t len);
+    void sig_msg_send(uint32_t pgn, QByteArray array);
     void sig_request_pgn(uint32_t pgn, uint8_t dst, uint16_t len);
 
 public slots:

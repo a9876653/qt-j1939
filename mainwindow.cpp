@@ -119,11 +119,10 @@ void MainWindow::on_openDevicePushButton_clicked()
     }
 }
 
-void MainWindow::slot_recv_pgn_handle(uint32_t pgn, uint8_t src, uint8_t *data, uint16_t data_size)
+void MainWindow::slot_recv_pgn_handle(uint32_t pgn, uint8_t src, QByteArray data)
 {
     (void)pgn;
     (void)data;
-    (void)data_size;
 
     if (!src_page_map.contains(src))
     {
@@ -135,7 +134,7 @@ void MainWindow::slot_recv_pgn_handle(uint32_t pgn, uint8_t src, uint8_t *data, 
         src_page_map.insert(src, page);
     }
     Pages *p = src_page_map.value(src);
-    p->can_dbc->parse(pgn, data, data_size);
+    p->can_dbc->parse(pgn, data);
     //    if (!src_page_map.contains(src))
     //    {
     //        PageFileMsgDisplay *page = new PageFileMsgDisplay(src);

@@ -2,6 +2,7 @@
 #define DATAOBJMAP_H
 
 #include <QObject>
+#include <QTimer>
 #include "dataobj.h"
 #include "singleton.h"
 
@@ -34,6 +35,8 @@ public:
     bool save_write_data_json(QString path);
     bool load_write_data_json(QString path);
 
+    void save_read_data_file();
+
 public:
     QMap<int, DataObj *> obj_map;
     QMap<int, DataObj *> param_map;
@@ -41,6 +44,10 @@ public:
 private:
     QMap<int, JsonStruct *> json_struct_map;
     int                     src_addr;
+
+    QTimer      csv_timer;
+    QStringList csv_header;
+    QString     csv_path;
 };
 #define DataObjMapIns Singleton<DataObjMap>::getInstance()
 #endif // DATAOBJMAP_H

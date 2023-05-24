@@ -24,7 +24,7 @@ public:
 
 signals:
     void sig_request_read_reg(uint16_t reg_addr, uint16_t reg_len);
-    void sig_request_write_reg(uint16_t reg_addr, uint16_t *data, uint16_t reg_len);
+    void sig_request_write_reg(uint16_t reg_addr, QVector<uint16_t> array);
 
 public slots:
     void slot_set_icon(bool ok);

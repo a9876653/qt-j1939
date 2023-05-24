@@ -29,14 +29,18 @@ void j1939_recv_cb(uint32_t pgn, uint8_t src, uint8_t *data, uint16_t len)
     }
     else
     {
-        J1939Ins->recv_pgn_handle(pgn, src, data, len);
+        J1939Ins->recv_pgn_handle(pgn, src, QByteArray((const char *)data, len));
     }
 }
 
 j1939_ret_e comm_j1939_pgn_cb(j1939_t *handle, j1939_message_t *msg)
 {
     (void)handle;
-    J1939Ins->recv_pgn_handle(msg->pgn, msg->src, msg->data, msg->len);
+    if (msg->len > 8)
+    {
+        return J1939_EWRONG_DATA_LEN;
+    }
+    J1939Ins->recv_pgn_handle(msg->pgn, msg->src, QByteArray((const char *)msg->data, msg->len));
     return J1939_OK;
 }
 

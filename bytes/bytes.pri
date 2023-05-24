@@ -5,6 +5,7 @@ HEADERS += \
     $$PWD/filehandle.h \
     $$PWD/json_file.h \
     $$PWD/modbus_crc.h \
+    $$PWD/mthread.h \
     $$PWD/utils.h
 
 SOURCES += \

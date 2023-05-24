@@ -4,7 +4,8 @@
 
 int j1939_can_write(uint32_t id, uint8_t *data, uint8_t len)
 {
-    return J1939Ins->can_write(id, data, len);
+    QByteArray array((const char *)data, len);
+    return J1939Ins->can_write(id, array);
 }
 
 CommJ1939::CommJ1939()
@@ -28,17 +29,17 @@ void CommJ1939::close_device()
     return can_dev->close_device();
 }
 
-void CommJ1939::can_recv(uint32_t id, uint flag, uint8_t *data, uint16_t len)
+void CommJ1939::can_recv(uint32_t id, uint flag, QByteArray array)
 {
     (void)flag;
-    j1939_receive_handle(&j1939_ins, id, data, len);
+    j1939_receive_handle(&j1939_ins, id, (uint8_t *)array.data(), array.size());
 }
 
-int CommJ1939::can_write(uint32_t id, uint8_t *data, uint8_t len)
+int CommJ1939::can_write(uint32_t id, QByteArray array)
 {
-    if (can_dev->transmit(id, MSG_FLAG_EXT, data, len) == 1)
+    if (can_dev->transmit(id, MSG_FLAG_EXT, array) == 1)
     {
-        return len;
+        return array.size();
     }
     return 0;
 }
@@ -55,9 +56,12 @@ void CommJ1939::init()
     j1939_poll_timer.start(5);
 }
 
-int CommJ1939::msg_send(uint32_t pgn, uint8_t priority, uint8_t dst, uint8_t *data, uint16_t len, uint32_t timeout)
+int CommJ1939::msg_send(uint32_t pgn, uint8_t priority, uint8_t dst, QByteArray array, uint32_t timeout)
 {
-    j1939_ret_e ret = J1939_OK;
+    j1939_ret_e ret  = J1939_OK;
+    int         len  = array.size();
+    uint8_t    *data = (uint8_t *)array.data();
+
     if (len > 8)
     {
         if (dst == ADDRESS_GLOBAL)
@@ -110,14 +114,14 @@ uint8_t CommJ1939::get_dst_addr()
     return dst_addr;
 }
 
-void CommJ1939::slot_msg_send(uint32_t pgn, uint8_t *data, uint16_t len)
+void CommJ1939::slot_msg_send(uint32_t pgn, QByteArray array)
 {
-    msg_send(pgn, J1939_PRIORITY_DEFAULT, dst_addr, data, len, J1939_DEF_TIMEOUT);
+    msg_send(pgn, J1939_PRIORITY_DEFAULT, dst_addr, array, J1939_DEF_TIMEOUT);
 }
 
-void CommJ1939::recv_pgn_handle(uint32_t pgn, uint8_t src, uint8_t *data, uint16_t data_size)
+void CommJ1939::recv_pgn_handle(uint32_t pgn, uint8_t src, QByteArray array)
 {
-    emit this->sig_recv_pgn_handle(pgn, src, data, data_size);
+    emit this->sig_recv_pgn_handle(pgn, src, array);
 }
 
 int CommJ1939::pgn_register(const uint32_t pgn, uint8_t code, pgn_callback_t cb)

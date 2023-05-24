@@ -27,7 +27,7 @@ public:
     void    set_dst_addr(uint8_t addr);
     uint8_t get_src_addr();
     uint8_t get_dst_addr();
-    int     msg_send(uint32_t pgn, uint8_t priority, uint8_t dst, uint8_t *data, uint16_t len, uint32_t timeout);
+    int     msg_send(uint32_t pgn, uint8_t priority, uint8_t dst, QByteArray array, uint32_t timeout);
     int     pgn_register(const uint32_t pgn, uint8_t code, pgn_callback_t cb);
     int     tp_rx_register(uint8_t              src,
                            uint8_t              dst,
@@ -42,17 +42,17 @@ public:
                             session_recv_fun rec_finish,
                             session_err_fun  err_handle);
 
-    int  can_write(uint32_t id, uint8_t *data, uint8_t len);
-    void can_recv(uint32_t id, uint flag, uint8_t *data, uint16_t len);
+    int  can_write(uint32_t id, QByteArray array);
+    void can_recv(uint32_t id, uint flag, QByteArray array);
 
-    void recv_pgn_handle(uint32_t pgn, uint8_t src, uint8_t *data, uint16_t data_size);
+    void recv_pgn_handle(uint32_t pgn, uint8_t src, QByteArray array);
 
 public slots:
-    void slot_msg_send(uint32_t pgn, uint8_t *data, uint16_t len);
+    void slot_msg_send(uint32_t pgn, QByteArray array);
     void slot_request_pgn(uint32_t pgn, uint8_t dst, uint16_t len);
 
 signals:
-    void sig_recv_pgn_handle(uint32_t pgn, uint8_t src, uint8_t *data, uint16_t data_size);
+    void sig_recv_pgn_handle(uint32_t pgn, uint8_t src, QByteArray array);
     void sig_open_finish(int ret);
 
 private:

@@ -3,7 +3,6 @@
 
 #include <QWidget>
 #include "pagemsgdisplay.h"
-#include "pageparams.h"
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QtNetwork>
@@ -21,7 +20,7 @@ public:
     explicit PageFileMsgDisplay(uint8_t src);
     ~PageFileMsgDisplay();
 
-    void parse(uint32_t pgn, uint8_t *data, uint16_t len);
+    void parse(uint32_t pgn, QByteArray data);
 
 private:
     void msg_data_polt_send(MsgData *msg_data);
@@ -33,9 +32,8 @@ private slots:
 private:
     uint8_t src;
 
-    Ui::PageFileMsgDisplay *        ui;
+    Ui::PageFileMsgDisplay         *ui;
     QMap<QString, PageMsgDisplay *> msg_page_map;
-    QMap<QString, PageParams *>     page_params_map;
 
     QUdpSocket *udp_socket;
 

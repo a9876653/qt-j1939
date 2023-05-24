@@ -32,11 +32,11 @@ CtrlCan::CtrlCan()
 
     send_timer = new QTimer;
     connect(send_timer, &QTimer::timeout, this, &CtrlCan::transmit_task);
-    send_timer->start(5);
+    send_timer->start(1);
 
     recv_timer = new QTimer;
     connect(recv_timer, &QTimer::timeout, this, &CtrlCan::receive_task);
-    recv_timer->start(5);
+    recv_timer->start(1);
     thread->start();
 }
 
@@ -157,12 +157,12 @@ void CtrlCan::receive_task()
         {
             for (uint i = 0; i < len; i++)
             {
-                uint32_t id   = recv_data[i].ID;
-                uint8_t  flag = recv_data[i].ExternFlag ? MSG_FLAG_EXT : 0;
-                uint16_t len  = recv_data[i].DataLen;
-                uint8_t *data = (uint8_t *)&recv_data[i].Data[0];
-
-                emit sig_receive(id, flag, data, len);
+                uint32_t   id   = recv_data[i].ID;
+                uint8_t    flag = recv_data[i].ExternFlag ? MSG_FLAG_EXT : 0;
+                uint16_t   len  = recv_data[i].DataLen;
+                uint8_t   *data = (uint8_t *)&recv_data[i].Data[0];
+                QByteArray array((const char *)data, len);
+                emit       sig_receive(id, flag, array);
             }
         }
     }

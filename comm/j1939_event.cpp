@@ -48,12 +48,20 @@ void J1939Event::request_event_cnt()
 {
     read_event_cnt_request_t request;
     request.megic_num = READ_EVENT_MAGIC;
-    J1939Ins->msg_send(PGN_READ_EVENT_CNT, J1939_PRIORITY_DEFAULT, src, (uint8_t *)&request, sizeof(read_event_cnt_request_t), 0);
+    J1939Ins->msg_send(PGN_READ_EVENT_CNT,
+                       J1939_PRIORITY_DEFAULT,
+                       src,
+                       QByteArray((const char *)&request, sizeof(read_event_cnt_request_t)),
+                       0);
 }
 void J1939Event::request_event(int index)
 {
     read_event_request_t request;
     request.megic_num = READ_EVENT_MAGIC;
     request.index     = index;
-    J1939Ins->msg_send(PGN_READ_EVENT, J1939_PRIORITY_DEFAULT, src, (uint8_t *)&request, sizeof(read_event_request_t), 0);
+    J1939Ins->msg_send(PGN_READ_EVENT,
+                       J1939_PRIORITY_DEFAULT,
+                       src,
+                       QByteArray((const char *)&request, sizeof(read_event_request_t)),
+                       0);
 }

@@ -156,7 +156,8 @@ void ZlgCan::receive_task()
             uint16_t len  = recv_data[i].frame.can_dlc;
             uint8_t *data = (uint8_t *)&recv_data[i].frame.data[0];
 
-            emit sig_receive(id, flag, data, len);
+            QByteArray array((const char *)data, len);
+            emit       sig_receive(id, flag, array);
         }
     }
 }

@@ -13,7 +13,7 @@ uint8_t dest_addr = ADDRESS_GLOBAL;
 
 void boot_send(uint32_t msg_id, uint8_t *data, uint16_t len)
 {
-    J1939Ins->msg_send(msg_id, J1939_DEF_PRIORITY, dest_addr, data, len, J1939_SEND_TIME_OUT);
+    J1939Ins->msg_send(msg_id, J1939_DEF_PRIORITY, dest_addr, QByteArray((const char *)data, len), J1939_SEND_TIME_OUT);
 }
 
 void boot_update_failed(void)
@@ -205,11 +205,11 @@ uint32_t get_file_data(uint32_t offset, uint8_t *data, uint16_t len)
     return ret_len;
 }
 
-void j1939_update_cmd_recv_cb(uint32_t pgn, uint8_t src, uint8_t *data, uint16_t len)
+void j1939_update_cmd_recv_cb(uint32_t pgn, uint8_t src, QByteArray array)
 {
     (void)src;
-    (void)len;
-    (void)data;
+    uint8_t *data = (uint8_t *)array.data();
+    int      len  = array.size();
     if (pgn == BOOT_MSG_ID_READ_APP_INFO_RESPONE)
     {
         app_info_str_t str = get_app_info_str((app_info_t *)data);

@@ -40,8 +40,9 @@ void ParamData::slot_request_write()
     icon_widget->set_icon(QPixmap(":/icons/false_icon"));
     QString dec_s = send_widget.line_edit->text();
     write_value   = dec_s.toInt();
-
-    emit sig_request_write_reg(id, (uint16_t *)&write_value, reg_len);
+    QVector<uint16_t> array(reg_len);
+    memcpy(&array[0], &write_value, reg_len * 2);
+    emit sig_request_write_reg(id, array);
 
     PAGEDATA_DBG("%s", QString("请求设置参数 %1 : id %2, value %3").arg(name).arg(id).arg(write_value).toStdString().c_str());
 }

@@ -64,8 +64,9 @@ public:
         return true;
     }
 
-    virtual uint transmit(uint32_t id, uint flag, uint8_t *data, uint16_t len)
+    virtual uint transmit(uint32_t id, uint flag, QByteArray array)
     {
+        int len = array.size();
         if (transmit_queue.count() > CAN_SEND_DATA_SIZE)
         {
             // CAN_DBG("CAN Transmit Queue is full");
@@ -86,7 +87,7 @@ public:
         transmit_data.id   = id;
         transmit_data.len  = len;
         transmit_data.flag = flag;
-        memcpy(transmit_data.data, data, len);
+        memcpy(transmit_data.data, array.data(), len);
         transmit_queue.enqueue(transmit_data);
 
         return 1;
@@ -103,7 +104,7 @@ public:
     }
 
 signals:
-    void sig_receive(uint32_t id, uint flag, uint8_t *data, uint16_t len);
+    void sig_receive(uint32_t id, uint flag, QByteArray array);
     void sig_open_device(uint8_t device_index, uint32_t baudrate);
     void sig_open_finish(int ret);
     void sig_close_device();

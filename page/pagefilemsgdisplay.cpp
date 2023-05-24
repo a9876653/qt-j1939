@@ -110,14 +110,14 @@ void PageFileMsgDisplay::csv_save_file()
     CsvAppend(csv_path, csv_map.keys(), csv_map.values());
 }
 
-void PageFileMsgDisplay::parse(uint32_t pgn, uint8_t *data, uint16_t len)
+void PageFileMsgDisplay::parse(uint32_t pgn, QByteArray data)
 {
     for (PageMsgDisplay *p : msg_page_map)
     {
         if (p->msgs_map.contains(pgn))
         {
             MsgData *msg_data = p->msgs_map.value(pgn);
-            msg_data->decode(data, len);
+            msg_data->decode(data);
             msg_data_polt_send(msg_data);
             write_csv_data(msg_data);
             // break;

@@ -183,10 +183,9 @@ void ParamsHandle::request_get_regs()
     J1939DbIns->slot_request_read_reg(request_reg_addr, reg_len);
 }
 
-void ParamsHandle::slot_respond_read_reg(uint16_t reg_addr, uint8_t data_len, uint8_t *data)
+void ParamsHandle::slot_respond_read_reg(uint16_t reg_addr, QByteArray array)
 {
-    (void)data_len;
-    (void)data;
+    (void)array;
     if (reg_addr == request_reg_addr)
     {
         request_get_regs();

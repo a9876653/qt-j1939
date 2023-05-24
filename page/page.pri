@@ -1,7 +1,6 @@
 FORMS += \
     $$PWD/pagefilemsgdisplay.ui \
     $$PWD/pagemsgdisplay.ui \
-    $$PWD/pageparams.ui \
     $$PWD/pageparse.ui \
     $$PWD/pagereadevent.ui \
     $$PWD/pagewidgetscollect.ui
@@ -9,7 +8,6 @@ FORMS += \
 HEADERS += \
     $$PWD/pagefilemsgdisplay.h \
     $$PWD/pagemsgdisplay.h \
-    $$PWD/pageparams.h \
     $$PWD/pageparse.h \
     $$PWD/pagereadevent.h \
     $$PWD/pagewidgetscollect.h
@@ -17,7 +15,6 @@ HEADERS += \
 SOURCES += \
     $$PWD/pagefilemsgdisplay.cpp \
     $$PWD/pagemsgdisplay.cpp \
-    $$PWD/pageparams.cpp \
     $$PWD/pageparse.cpp \
     $$PWD/pagereadevent.cpp \
     $$PWD/pagewidgetscollect.cpp

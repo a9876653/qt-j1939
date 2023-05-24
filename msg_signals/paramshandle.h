@@ -38,7 +38,7 @@ private:
 private slots:
     void slot_request_get_timeout();
     void slot_request_set_timeout();
-    void slot_respond_read_reg(uint16_t reg_addr, uint8_t data_len, uint8_t *data);
+    void slot_respond_read_reg(uint16_t reg_addr, QByteArray array);
 };
 
 #endif // PARAMSHANDLE_H

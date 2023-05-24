@@ -19,11 +19,41 @@ DataObjMap::DataObjMap(int src_addr) : src_addr(src_addr)
         }
     }
     load_write_data_json("./temp/obj_temp.json");
+    csv_header.append("时间");
+    csv_header.append("时间UTC");
+    for (DataObj *obj : obj_map)
+    {
+        csv_header.append(obj->name_en);
+    }
+
+    connect(&csv_timer, &QTimer::timeout, this, &DataObjMap::save_read_data_file);
+    csv_timer.start(1000);
 }
 
 DataObjMap::~DataObjMap()
 {
     save_write_data_json("./temp/obj_temp.json");
+}
+
+void DataObjMap::save_read_data_file()
+{
+    QList<QString> data;
+    QDateTime      time;
+    QDate          time_data = time.currentDateTime().date();
+    QString        time_s    = QString("%1%2%3")
+                         .arg(time_data.year())
+                         .arg(time_data.month(), 2, 10, QChar('0'))
+                         .arg(time_data.day(), 2, 10, QChar('0'));
+    csv_path = QString("./save_data/db-%1-%2.csv").arg(time_s).arg(src_addr);
+    data.append(get_current_time_ms_qstring());
+    data.append(QString("%1").arg(sys_get_ms()));
+
+    for (DataObj *obj : obj_map)
+    {
+        data.append(QString("%1").arg(obj->read_value.toString()));
+    }
+
+    CsvAppend(csv_path, csv_header, data);
 }
 
 bool DataObjMap::save_write_data_json(QString path)
@@ -94,6 +124,8 @@ void DataObjMap::json_items_handle(QJsonDocument *jdoc)
     {
         QJsonObject obj        = param.toObject();
         QString     name       = obj.value("note").toString();
+        QString     name_en    = obj.value("name").toString();
+        QString     unit       = obj.value("unit").toString();
         int         id         = obj.value("id").toInt();
         double      def_v      = obj.value("def_value").toDouble();
         bool        is_array   = obj.value("is_array").toBool();
@@ -102,7 +134,11 @@ void DataObjMap::json_items_handle(QJsonDocument *jdoc)
         int         max        = obj.value("max").toInt();
         int         min        = obj.value("min").toInt();
         int         param_id   = obj.value("param_id").toInt();
-        ValueDes    value_des;
+        if (unit != "")
+        {
+            name += QString("(%1)").arg(unit);
+        }
+        ValueDes value_des;
         if (obj.contains("value_des"))
         {
             QJsonObject value_des_obj = obj.value("value_des").toObject();
@@ -125,13 +161,15 @@ void DataObjMap::json_items_handle(QJsonDocument *jdoc)
         }
         for (int i = 0; i < array_size; i++)
         {
-            QString param_name = name;
+            QString param_name    = name;
+            QString param_name_en = name_en;
             if (is_array)
             {
-                param_name = name + QString("-%1").arg(i + 1);
+                param_name    = name + QString("-%1").arg(i + 1);
+                param_name_en = name_en + QString("-%1").arg(i + 1);
             }
             int          msg_id = id + reg_num * i;
-            DataObj *    p      = new DataObj(param_name, msg_id, type, min, max, def_v, value_des);
+            DataObj     *p      = new DataObj(param_name, param_name_en, msg_id, type, min, max, def_v, value_des);
             CommDbValue *v      = J1939DbIns->db_reg_register(src_addr, msg_id, reg_num);
 
             connect(p, &DataObj::sig_request_read_reg, J1939DbIns, &CommJ1939Db::slot_request_read_reg);
