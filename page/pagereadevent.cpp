@@ -1,7 +1,9 @@
 #include "pagereadevent.h"
 #include "ui_pagereadevent.h"
 #include "dataobjmap.h"
-
+#include "filehandle.h"
+#include <QFile>
+#include <QFileDialog>
 #include "QDebug"
 
 #define PAGEEVENT_DBG(x...) qDebug(x)
@@ -50,7 +52,7 @@ void PageReadEvent::insert_item(int row, int column, QString s)
 
 void PageReadEvent::slot_recv_read_event(read_event_respond_t respond)
 {
-    if (respond.index == (uint32_t)-1 || respond.index == end_index)
+    if (respond.index == (uint32_t)-1 || respond.index == (uint32_t)end_index)
     {
         stop_read();
         return;
@@ -128,4 +130,29 @@ void PageReadEvent::on_readAllBtn_clicked()
         ui->tableWidget->removeRow(0);
     }
     start_read();
+}
+
+void PageReadEvent::on_saveBtn_clicked()
+{
+    QString filepath = QFileDialog::getSaveFileName(this, tr("Save"), ".", tr(" (*.csv)"));
+    if (!filepath.isEmpty())
+    {
+        int            row    = ui->tableWidget->rowCount();
+        int            column = ui->tableWidget->columnCount();
+        QList<QString> header_list;
+        for (int i = 0; i < column; i++)
+        {
+            header_list.append(ui->tableWidget->horizontalHeaderItem(i)->text());
+        }
+
+        for (int i = 0; i < row; i++)
+        {
+            QList<QString> str_list;
+            for (int j = 0; j < column; j++)
+            {
+                str_list.append(ui->tableWidget->item(i, j)->text());
+            }
+            CsvAppend(filepath, header_list, str_list);
+        }
+    }
 }

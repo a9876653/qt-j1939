@@ -29,6 +29,8 @@ private slots:
 
     void on_readAllBtn_clicked();
 
+    void on_saveBtn_clicked();
+
 private:
     void insert_item(int row, int column, QString s);
 

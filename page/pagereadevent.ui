@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>436</width>
+    <height>361</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -40,6 +40,13 @@
       <widget class="QPushButton" name="readAllBtn">
        <property name="text">
         <string>读取所有事件</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="saveBtn">
+       <property name="text">
+        <string>保存</string>
        </property>
       </widget>
      </item>
