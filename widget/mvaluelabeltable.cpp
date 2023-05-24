@@ -48,6 +48,10 @@ void MValueLabelTable::slot_update(QVariant value)
 {
     (void)value;
     MValueLabel *item = qobject_cast<MValueLabel *>(sender());
+    if (item == nullptr || max_item == nullptr || min_item == nullptr)
+    {
+        return;
+    }
     if (item->value >= max_item->value)
     {
         max_item->set_backcolor(normal_brush.color());

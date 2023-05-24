@@ -48,11 +48,17 @@ int MTableView::index2cloumn(int index)
 }
 void MTableView::set_item_backcolor(int index, QBrush brush)
 {
-    data_model->item(index2row(index), index2cloumn(index))->setBackground(brush);
+    if (index < row_cnt * cloumn_cnt)
+    {
+        data_model->item(index2row(index), index2cloumn(index))->setBackground(brush);
+    }
 }
 void MTableView::set_item_value(int index, QVariant value)
 {
-    data_model->item(index2row(index), index2cloumn(index))->setText(value.toString());
+    if (index < row_cnt * cloumn_cnt)
+    {
+        data_model->item(index2row(index), index2cloumn(index))->setText(value.toString());
+    }
 }
 
 void MTableView::slot_update(int index, QVariant value)
