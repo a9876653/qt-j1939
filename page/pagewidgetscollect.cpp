@@ -11,8 +11,7 @@
 #include "mwritereadtable.h"
 #include <QLayout>
 
-PageWidgetsCollect::PageWidgetsCollect(DataObjMap *data, QWidget *parent)
-    : QWidget(parent), ui(new Ui::PageWidgetsCollect), data(data)
+PageWidgetsCollect::PageWidgetsCollect(DataObjMap *data) : ui(new Ui::PageWidgetsCollect), data(data)
 {
     ui->setupUi(this);
     connect(&auto_read_timer, &QTimer::timeout, this, &PageWidgetsCollect::slot_auto_read_timeout);
@@ -39,7 +38,8 @@ void PageWidgetsCollect::hideEvent(QHideEvent *event)
 void PageWidgetsCollect::auto_read_start()
 {
     request_get_index = 0;
-    auto_read_timer.start(1000);
+    auto_read_timer.stop();
+    auto_read_timer.start(update_period);
 }
 
 void PageWidgetsCollect::auto_read_stop()
@@ -49,32 +49,35 @@ void PageWidgetsCollect::auto_read_stop()
 
 void PageWidgetsCollect::slot_auto_read_timeout()
 {
-    if (reg_map.count() < 1 || (request_get_index >= reg_map.count() && !is_auto_read))
+    uint16_t map_count = reg_info_list.count();
+    if (map_count < 1 || (request_get_index >= map_count && !is_auto_read))
     {
         auto_read_stop();
         return;
     }
     else
     {
-        if (request_get_index >= reg_map.count())
+        if (request_get_index >= reg_info_list.count())
         {
             request_get_index = 0;
         }
     }
+
     uint16_t reg_len          = 0;
-    uint16_t request_reg_addr = reg_map.keys().at(request_get_index);
+    RegInfo  p                = reg_info_list.at(request_get_index);
+    uint16_t request_reg_addr = p.reg_addr;
     int      id               = request_reg_addr;
     int      id_back          = id + 1;
-    for (int i = request_get_index; i < reg_map.count(); i++)
+    for (int i = request_get_index; i < map_count; i++)
     {
-        id         = reg_map.keys().at(i);
-        RegInfo *p = reg_map.value(id);
+        RegInfo p = reg_info_list.at(i);
+        id        = p.reg_addr;
         if (qAbs(id - request_reg_addr) >= 64)
         {
             break;
         }
         request_get_index++;
-        id_back = id + p->reg_len;
+        id_back = id + p.reg_len;
     }
 
     reg_len = qMin(qAbs(id_back - request_reg_addr), 64);
@@ -86,8 +89,25 @@ void PageWidgetsCollect::json_items_handle(QJsonDocument *jdoc)
     auto       json_map = jdoc->toVariant().toMap();
     QLayout   *layout   = ui->verticalLayout;
     QList<int> widget_height_list;
-    is_auto_read = json_map.value("is_auto_read").toBool();
-
+    QString    is_auto_read_key   = "is_auto_read";
+    QString    read_period_ms_key = "read_period_ms";
+    if (json_map.contains(is_auto_read_key))
+    {
+        is_auto_read = json_map.value(is_auto_read_key).toBool();
+    }
+    else
+    {
+        is_auto_read = false;
+    }
+    if (json_map.contains(read_period_ms_key))
+    {
+        update_period = json_map.value(read_period_ms_key).toInt();
+    }
+    else
+    {
+        update_period = 1000;
+    }
+    ui->updatePeriodSpinBox->setValue(update_period);
     auto pages_map = json_map.value("pages").toJsonArray();
     // 解析json文件，并生成相应的界面
     for (auto widget_attr : pages_map)
@@ -119,7 +139,7 @@ void PageWidgetsCollect::json_items_handle(QJsonDocument *jdoc)
                     MLabel *label = new MLabel(obj->name, obj->value_des);           // 创建带描述的只读控件
                     connect(obj, &DataObj::sig_update, label, &MLabel::slot_update); // 链接更新
                     widget->insert(label);
-
+                    reg_info_list.append(RegInfo(i, obj->reg_len));
                     reg_map.insert(i, new RegInfo(i, obj->reg_len));
                 }
             }
@@ -148,6 +168,7 @@ void PageWidgetsCollect::json_items_handle(QJsonDocument *jdoc)
                         connect(obj, &DataObj::sig_update, label, &MValueLabel::slot_update); // 链接更新
                         widget->insert(i, j, label);                                          // 插入可视表
                         inc_len = obj->reg_len;
+                        reg_info_list.append(RegInfo(index, obj->reg_len));
                         reg_map.insert(index, new RegInfo(index, obj->reg_len));
                     }
                 }
@@ -172,6 +193,7 @@ void PageWidgetsCollect::json_items_handle(QJsonDocument *jdoc)
                     connect(w, &MWriteReadWidget::sig_update, obj, &DataObj::slot_request_write_reg);      // 链接请求写
                     widget->insert(w);
 
+                    reg_info_list.append(RegInfo(i, obj->reg_len));
                     reg_map.insert(i, new RegInfo(i, obj->reg_len));
                 }
             }
@@ -199,4 +221,10 @@ void PageWidgetsCollect::on_checkBox_stateChanged(int arg1)
     {
         auto_read_stop();
     }
+}
+
+void PageWidgetsCollect::on_updatePeriodSpinBox_valueChanged(int arg1)
+{
+    update_period = ui->updatePeriodSpinBox->value();
+    on_checkBox_stateChanged(arg1);
 }

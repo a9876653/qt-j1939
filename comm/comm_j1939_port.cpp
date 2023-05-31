@@ -46,12 +46,13 @@ j1939_ret_e comm_j1939_pgn_cb(j1939_t *handle, j1939_message_t *msg)
 
 void comm_j1939_port_init(QMap<uint, MsgData *> &msgs_map)
 {
+    int buff_size = 512;
     for (int i = 0; i < J1939_NODE_ADDR_MAX; i++)
     {
-        uint8_t *src_data = (uint8_t *)malloc(512);
-        J1939Ins->tp_rx_data_register(i, J1939_SRC_ADDR, src_data, 512, j1939_recv_cb, NULL);
-        uint8_t *global_data = (uint8_t *)malloc(512);
-        J1939Ins->tp_rx_data_register(i, ADDRESS_GLOBAL, global_data, 512, j1939_recv_cb, NULL);
+        uint8_t *src_data = (uint8_t *)malloc(buff_size);
+        J1939Ins->tp_rx_data_register(i, J1939_SRC_ADDR, src_data, buff_size, j1939_recv_cb, NULL);
+        uint8_t *global_data = (uint8_t *)malloc(buff_size);
+        J1939Ins->tp_rx_data_register(i, ADDRESS_GLOBAL, global_data, buff_size, j1939_recv_cb, NULL);
     }
     for (MsgData *msg_data : msgs_map)
     {

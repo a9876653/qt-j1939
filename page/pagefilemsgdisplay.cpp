@@ -37,19 +37,6 @@ PageFileMsgDisplay::PageFileMsgDisplay(uint8_t src) : src(src), ui(new Ui::PageF
                          .arg(time_data.day(), 2, 10, QChar('0'));
     csv_path = QString("./save_data/%1-%2.csv").arg(time_s).arg(src);
 
-    //    QString       dir      = "./cfg/regs_json";
-    //    QFileInfoList fileList = GetFileList(dir); //获取目录下所有的文件
-    //    for (QFileInfo info : fileList)
-    //    {
-    //        PAGEFILE_DBG() << "file path:" << info.filePath() << "   file name:" << info.fileName();
-    //        if (info.filePath().contains(".json")) // 只处理JSON文件
-    //        {
-    //            PageParams *param_page = new PageParams(src);
-    //            param_page->load_json(info.filePath());
-    //            page_params_map.insert(info.filePath(), param_page);
-    //            ui->tabWidget->addTab(param_page, info.fileName());
-    //        }
-    //    }
     connect(&csv_timer, &QTimer::timeout, this, &PageFileMsgDisplay::csv_save_file);
     csv_timer.start(1000);
 }
@@ -91,10 +78,16 @@ void PageFileMsgDisplay::msg_data_polt_send(MsgData *msg_data)
 
 void PageFileMsgDisplay::write_csv_data(MsgData *msg_data)
 {
-    csv_map[csv_time_key] = get_current_time_ms_qstring();
-    for (Signal *s : msg_data->signals_list)
+    if (csv_map.contains(csv_time_key) && msg_data != nullptr)
     {
-        csv_map[s->name] = s->value_s;
+        csv_map[csv_time_key] = get_current_time_ms_qstring();
+        for (Signal *s : msg_data->signals_list)
+        {
+            if (csv_map.contains(s->name))
+            {
+                csv_map[s->name] = s->value_s;
+            }
+        }
     }
 }
 

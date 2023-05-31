@@ -7,6 +7,7 @@
 #include "comm_j1939.h"
 #include "comm_j1939_port.h"
 #include "mthread.h"
+#include "mthreadqueue.h"
 
 class CommDbValue : public QObject
 {
@@ -59,11 +60,10 @@ private:
 
     QMap<uint16_t, CommDbValue *> db_map;
 
-    QQueue<db_request_read_t> db_read_queue;
+    ThreadSafeQueue<db_request_read_t> db_read_queue;
 
     MThread   *request_read_thread = nullptr;
     QSemaphore read_wait_sem;
-    QSemaphore read_request_sem;
 };
 
 #define J1939DbIns Singleton<CommJ1939Db>::getInstance()

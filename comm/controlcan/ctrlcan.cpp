@@ -26,26 +26,14 @@ CtrlCan::CtrlCan()
 {
     connect(this, &CtrlCan::sig_open_device, this, slot_open_device);
     connect(this, &CtrlCan::sig_close_device, this, slot_close_device);
-
-    thread = new QThread;
-    this->moveToThread(thread);
-
-    send_timer = new QTimer;
-    connect(send_timer, &QTimer::timeout, this, &CtrlCan::transmit_task);
-    send_timer->start(1);
-
-    recv_timer = new QTimer;
-    connect(recv_timer, &QTimer::timeout, this, &CtrlCan::receive_task);
-    recv_timer->start(1);
-    thread->start();
+    can_task_thread = new MThread(std::bind(&CtrlCan::can_task, this));
+    can_task_thread->start();
 }
 
 CtrlCan::~CtrlCan()
 {
-    send_timer->stop();
-    recv_timer->stop();
+    can_task_thread->stop();
     slot_close_device();
-    thread->exit();
 }
 
 bool CtrlCan::is_open()
@@ -157,13 +145,19 @@ void CtrlCan::receive_task()
         {
             for (uint i = 0; i < len; i++)
             {
-                uint32_t   id   = recv_data[i].ID;
-                uint8_t    flag = recv_data[i].ExternFlag ? MSG_FLAG_EXT : 0;
-                uint16_t   len  = recv_data[i].DataLen;
-                uint8_t   *data = (uint8_t *)&recv_data[i].Data[0];
-                QByteArray array((const char *)data, len);
-                emit       sig_receive(id, flag, array);
+                uint32_t id   = recv_data[i].ID;
+                uint8_t  flag = recv_data[i].ExternFlag ? MSG_FLAG_EXT : 0;
+                uint16_t len  = recv_data[i].DataLen;
+                uint8_t *data = (uint8_t *)&recv_data[i].Data[0];
+                emit     sig_receive(id, flag, QByteArray((const char *)data, len));
             }
         }
     }
+}
+
+void CtrlCan::can_task()
+{
+    transmit_task();
+    receive_task();
+    QThread::msleep(1);
 }

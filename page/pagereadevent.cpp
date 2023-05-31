@@ -61,13 +61,13 @@ void PageReadEvent::slot_recv_read_event(read_event_respond_t respond)
     int column = 0;
     int row    = ui->tableWidget->rowCount();
     ui->tableWidget->setRowCount(row + 1);
-    int     err_event_id = respond.err_event.id;
-    int     event_id     = ERR_EVENT_ID_DECODE(err_event_id);
-    int     id           = CELL_EVENT_ID_CONVER(event_id);
-    QString id_s         = QString("%1(0x%2)").arg(id).arg(err_event_id, 4, 16, QLatin1Char('0'));
-    QString start_time   = timestamp_ms_to_qstring(respond.err_event.start_time);
-    QString end_time     = timestamp_ms_to_qstring(respond.err_event.end_time);
-    QString des          = "None";
+    event_id_t err_event_id = respond.err_event.id;
+    event_id_t event_id     = ERR_EVENT_ID_DECODE(err_event_id);
+    event_id_t id           = CELL_EVENT_ID_CONVER(event_id);
+    QString    id_s         = QString("%1(0x%2)").arg(id).arg(err_event_id, 4, 16, QLatin1Char('0'));
+    QString    start_time   = timestamp_ms_to_qstring(respond.err_event.start_time);
+    QString    end_time     = timestamp_ms_to_qstring(respond.err_event.end_time);
+    QString    des          = "None";
     if (DataObjMapIns->param_map.contains(id))
     {
         DataObj *obj = DataObjMapIns->param_map.value(id);

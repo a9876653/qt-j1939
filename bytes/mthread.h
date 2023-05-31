@@ -10,13 +10,14 @@ class MThread : public QThread
     typedef std::function<void(void)> thread_task_t;
 
 public:
-    MThread(thread_task_t task) : task(task)
+    MThread(thread_task_t task = nullptr) : task(task)
     {
     }
     ~MThread()
     {
         stop();
     }
+
     void stop()
     {
         cycle_flag = false;

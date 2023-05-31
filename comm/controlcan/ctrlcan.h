@@ -3,6 +3,7 @@
 #include <QObject>
 #include "ControlCAN.h"
 #include "canbase.h"
+#include "mthread.h"
 
 class CtrlCan : public CanBase
 {
@@ -25,10 +26,7 @@ private:
     bool started       = false;
     int  dev_type      = VCI_USBCAN2;
 
-    QThread *thread = nullptr;
-
-    QTimer *recv_timer = nullptr;
-    QTimer *send_timer = nullptr;
+    MThread *can_task_thread = nullptr;
 
     uint32_t u32_baudrate = 500000;
 
@@ -39,4 +37,5 @@ private:
 protected:
     void transmit_task();
     void receive_task();
+    void can_task();
 };

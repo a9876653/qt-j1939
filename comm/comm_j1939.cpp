@@ -16,6 +16,8 @@ CommJ1939::CommJ1939()
     connect(can_dev, &CanBase::sig_open_finish, this, &CommJ1939::sig_open_finish);
 
     connect(&j1939_poll_timer, &QTimer::timeout, this, &CommJ1939::poll);
+
+    connect(this, &CommJ1939::sig_msg_send, this, &CommJ1939::msg_send);
     j1939_poll_timer.stop();
 }
 

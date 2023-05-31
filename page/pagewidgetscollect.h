@@ -16,7 +16,7 @@ class PageWidgetsCollect : public QWidget
     Q_OBJECT
 
 public:
-    explicit PageWidgetsCollect(DataObjMap *data, QWidget *parent = nullptr);
+    explicit PageWidgetsCollect(DataObjMap *data);
     ~PageWidgetsCollect();
 
     void json_items_handle(QJsonDocument *jdoc);
@@ -43,12 +43,13 @@ private:
         bool     is_auto_read = true;
     };
 
-    int auto_read_index;
-    int auto_read_offset;
+    DataObjMap *data;
+
+    int update_period     = 0;
+    int auto_read_index   = 0;
+    int auto_read_offset  = 0;
     int is_auto_read      = true;
     int request_get_index = 0;
-
-    DataObjMap *data;
 
     QList<RegInfo>       reg_info_list;
     QMap<int, RegInfo *> reg_map;
@@ -60,6 +61,7 @@ protected:
     void hideEvent(QHideEvent *event);
 private slots:
     void on_checkBox_stateChanged(int arg1);
+    void on_updatePeriodSpinBox_valueChanged(int arg1);
 };
 
 #endif // PAGEWIDGETSCOLLECT_H

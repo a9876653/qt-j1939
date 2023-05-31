@@ -13,7 +13,7 @@ uint8_t dest_addr = ADDRESS_GLOBAL;
 
 void boot_send(uint32_t msg_id, uint8_t *data, uint16_t len)
 {
-    J1939Ins->msg_send(msg_id, J1939_DEF_PRIORITY, dest_addr, QByteArray((const char *)data, len), J1939_SEND_TIME_OUT);
+    J1939Ins->sig_msg_send(msg_id, J1939_DEF_PRIORITY, dest_addr, QByteArray((const char *)data, len), J1939_SEND_TIME_OUT);
 }
 
 void boot_update_failed(void)
