@@ -5,6 +5,7 @@
 #include <QFile>
 #include <QFileDialog>
 #include "QDebug"
+#include <QMessageBox>
 
 #define PAGEEVENT_DBG(x...) qDebug(x)
 
@@ -154,5 +155,16 @@ void PageReadEvent::on_saveBtn_clicked()
             }
             CsvAppend(filepath, header_list, str_list);
         }
+    }
+}
+
+void PageReadEvent::on_cleanBtn_clicked()
+{
+    QMessageBox::StandardButton rb
+        = QMessageBox::question(NULL, "清除事件", "是否清除所有事件?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+    if (rb == QMessageBox::Yes)
+    {
+        event->request_event_format();
+        PAGEEVENT_DBG("清除所有事件");
     }
 }

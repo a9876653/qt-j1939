@@ -14,6 +14,7 @@ public:
 
     void request_event_cnt();
     void request_event(int index);
+    void request_event_format();
 
 signals:
     void sig_recv_event_cnt(int cnt);

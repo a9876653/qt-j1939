@@ -65,3 +65,15 @@ void J1939Event::request_event(int index)
                        QByteArray((const char *)&request, sizeof(read_event_request_t)),
                        0);
 }
+
+void J1939Event::request_event_format()
+{
+    read_event_request_t request;
+    request.megic_num = READ_EVENT_MAGIC;
+    request.index     = 0;
+    J1939Ins->msg_send(PGN_FORMAT_EVENT,
+                       J1939_PRIORITY_DEFAULT,
+                       src,
+                       QByteArray((const char *)&request, sizeof(read_event_request_t)),
+                       0);
+}

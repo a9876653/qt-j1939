@@ -28,4 +28,5 @@ enum j1939_pgn_e
     PGN_RESPOND_EVENT_CNT = 0x3100, // 事件数读取应答
     PGN_READ_EVENT        = 0x3200, // 事件读取请求
     PGN_RESPOND_EVENT     = 0x3300, // 事件读取应答
+    PGN_FORMAT_EVENT      = 0x3400, // 事件格式化
 };
