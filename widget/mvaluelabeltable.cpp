@@ -29,6 +29,9 @@ MValueLabelTable::MValueLabelTable(QString  des,
     }
     ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch); //先自适应宽度
     ui->tableWidget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents); //然后设置要根据内容使用宽度的列
+
+    connect(&update_timer, &QTimer::timeout, this, &MValueLabelTable::slot_update_max_min);
+    update_timer.stop();
 }
 
 MValueLabelTable::~MValueLabelTable()
@@ -36,11 +39,22 @@ MValueLabelTable::~MValueLabelTable()
     delete ui;
 }
 
+void MValueLabelTable::showEvent(QShowEvent *event)
+{
+    (void)event;
+    update_timer.start(1000);
+}
+void MValueLabelTable::hideEvent(QHideEvent *event)
+{
+    (void)event;
+    update_timer.stop();
+}
+
 void MValueLabelTable::insert(int row, int column, MValueLabel *label)
 {
     ui->tableWidget->setCellWidget(row, column + 1, label);
 
-    connect(label, &MValueLabel::sig_update, this, &MValueLabelTable::slot_update);
+    // connect(label, &MValueLabel::sig_update, this, &MValueLabelTable::slot_update);
     max_item = min_item = label;
 }
 
@@ -62,6 +76,52 @@ void MValueLabelTable::slot_update(QVariant value)
     {
         min_item->set_backcolor(normal_brush.color());
         min_item = item;
+        min_item->set_backcolor(min_brush.color());
+    }
+}
+
+void MValueLabelTable::slot_update_max_min()
+{
+    int          column   = ui->tableWidget->columnCount();
+    int          row      = ui->tableWidget->rowCount();
+    MValueLabel *max_temp = max_item;
+    MValueLabel *min_temp = min_item;
+    for (int c = 0; c < column; c++)
+    {
+        for (int r = 0; r < row; r++)
+        {
+            MValueLabel *item = (MValueLabel *)ui->tableWidget->cellWidget(r, c);
+            if (item != nullptr && max_temp != nullptr)
+            {
+                if (item->value >= max_temp->value)
+                {
+                    max_temp = item;
+                }
+            }
+            if (item != nullptr && min_temp != nullptr)
+            {
+                if (item->value <= min_temp->value)
+                {
+                    min_temp = item;
+                }
+            }
+        }
+    }
+
+    if (max_temp == nullptr || min_temp == nullptr || max_item == nullptr || min_item == nullptr)
+    {
+        return;
+    }
+    // if (max_temp != max_item)
+    {
+        max_item->set_backcolor(normal_brush.color());
+        max_item = max_temp;
+        max_item->set_backcolor(max_brush.color());
+    }
+    // if (min_temp != min_item)
+    {
+        min_item->set_backcolor(normal_brush.color());
+        min_item = min_temp;
         min_item->set_backcolor(min_brush.color());
     }
 }

@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QBrush>
 #include <QVariant>
+#include <QTimer>
 #include "mvaluelabel.h"
 
 namespace Ui
@@ -31,6 +32,13 @@ public:
 public slots:
     void slot_update(QVariant value);
 
+private slots:
+    void slot_update_max_min();
+
+protected:
+    void showEvent(QShowEvent *event);
+    void hideEvent(QHideEvent *event);
+
 private:
     Ui::MValueLabelTable *ui;
     int                   row_cnt    = 0;
@@ -45,6 +53,8 @@ private:
 
     MValueLabel *max_item = nullptr;
     MValueLabel *min_item = nullptr;
+
+    QTimer update_timer;
 };
 
 #endif // MVALUELABELTABLE_H

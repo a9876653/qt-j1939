@@ -27,7 +27,6 @@ SOURCES += \
     $$PWD/frmcentericon.cpp \
     $$PWD/mlabel.cpp \
     $$PWD/mlabeltable.cpp \
-    $$PWD/mqspinbox.cpp \
     $$PWD/mtableview.cpp \
     $$PWD/mvaluelabel.cpp \
     $$PWD/mvaluelabeltable.cpp \
