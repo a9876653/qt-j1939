@@ -10,6 +10,7 @@ void j1939_err_handle(uint32_t pgn, uint8_t src)
 {
     (void)pgn;
     (void)src;
+    BOOT_PORT_DBG("src %d pgn %d tp err!", src, pgn);
 }
 
 void j1939_recv_cb(uint32_t pgn, uint8_t src, uint8_t *data, uint16_t len)
@@ -46,13 +47,13 @@ j1939_ret_e comm_j1939_pgn_cb(j1939_t *handle, j1939_message_t *msg)
 
 void comm_j1939_port_init(QMap<uint, MsgData *> &msgs_map)
 {
-    int buff_size = 512;
+    int buff_size = J1939_TP_BUFF_SIZE;
     for (int i = 0; i < J1939_NODE_ADDR_MAX; i++)
     {
         uint8_t *src_data = (uint8_t *)malloc(buff_size);
-        J1939Ins->tp_rx_data_register(i, J1939_SRC_ADDR, src_data, buff_size, j1939_recv_cb, NULL);
+        J1939Ins->tp_rx_data_register(i, J1939_SRC_ADDR, src_data, buff_size, j1939_recv_cb, j1939_err_handle);
         uint8_t *global_data = (uint8_t *)malloc(buff_size);
-        J1939Ins->tp_rx_data_register(i, ADDRESS_GLOBAL, global_data, buff_size, j1939_recv_cb, NULL);
+        J1939Ins->tp_rx_data_register(i, ADDRESS_GLOBAL, global_data, buff_size, j1939_recv_cb, j1939_err_handle);
     }
     for (MsgData *msg_data : msgs_map)
     {

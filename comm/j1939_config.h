@@ -4,9 +4,13 @@
 #include "system.h"
 #include "stdlib.h"
 
-#define J1939_MALLOC   malloc
-#define J1939_FREE     free
-#define J1939_GET_MS() sys_get_ms()
+#define J1939_MALLOC       malloc
+#define J1939_FREE         free
+#define J1939_GET_MS()     sys_get_ms()
+#define J1939_TP_BUFF_SIZE 512
+#define J1939_CAN_DLC      8
+
+typedef uint64_t j1939_time_ms_t;
 
 enum j1939_pgn_e
 {
