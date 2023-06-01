@@ -62,26 +62,28 @@ void PageWidgetsCollect::slot_auto_read_timeout()
             request_get_index = 0;
         }
     }
-
-    uint16_t reg_len          = 0;
-    RegInfo  p                = reg_info_list.at(request_get_index);
-    uint16_t request_reg_addr = p.reg_addr;
-    int      id               = request_reg_addr;
-    int      id_back          = id + 1;
-    for (int i = request_get_index; i < map_count; i++)
+    while (request_get_index < map_count)
     {
-        RegInfo p = reg_info_list.at(i);
-        id        = p.reg_addr;
-        if (qAbs(id - request_reg_addr) >= 64)
+        uint16_t reg_len          = 0;
+        RegInfo  p                = reg_info_list.at(request_get_index);
+        uint16_t request_reg_addr = p.reg_addr;
+        int      id               = request_reg_addr;
+        int      id_back          = id + 1;
+        for (int i = request_get_index; i < map_count; i++)
         {
-            break;
+            RegInfo p = reg_info_list.at(i);
+            id        = p.reg_addr;
+            if (qAbs(id - request_reg_addr) >= 64)
+            {
+                break;
+            }
+            request_get_index++;
+            id_back = id + p.reg_len;
         }
-        request_get_index++;
-        id_back = id + p.reg_len;
-    }
 
-    reg_len = qMin(qAbs(id_back - request_reg_addr), 64);
-    emit sig_request_read_reg(request_reg_addr, reg_len);
+        reg_len = qMin(qAbs(id_back - request_reg_addr), 64);
+        emit sig_request_read_reg(request_reg_addr, reg_len);
+    }
 }
 
 void PageWidgetsCollect::json_items_handle(QJsonDocument *jdoc)
