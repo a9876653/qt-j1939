@@ -24,11 +24,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     comm_j1939_port_init(msgs->msgs_map);
 
-    src_page_parse = new PageParse(255);
     ui->tabWidget->addTab(new EnetConfig, "网卡配置");
 
     ui->tabWidget->addTab(new frmBootloader, "固件升级");
-    // ui->tabWidget->addTab(new PageMsgDisplay(msgs->msgs_map, false), " CAN DB");
+    src_page_parse = new PageParse(255);
     ui->tabWidget->addTab(src_page_parse, "本地读取服务");
     connect(J1939Ins, &CommJ1939::sig_recv_pgn_handle, this, &MainWindow::slot_recv_pgn_handle);
     connect(J1939Ins, &CommJ1939::sig_open_finish, this, &MainWindow::slot_recv_comm_status);
@@ -128,21 +127,13 @@ void MainWindow::slot_recv_pgn_handle(uint32_t pgn, uint8_t src, QByteArray data
     {
         Pages *page   = new Pages();
         page->can_dbc = new PageFileMsgDisplay(src);
-        // page->can_modbus = new PageParse(src);
         ui->tabWidget->addTab(page->can_dbc, QString("CANDBC解析 %1").arg(src));
+        // page->can_modbus = new PageParse(src);
         // ui->tabWidget->addTab(page->can_modbus, QString("MB协议解析 - %1").arg(src));
         src_page_map.insert(src, page);
     }
     Pages *p = src_page_map.value(src);
     p->can_dbc->parse(pgn, data);
-    //    if (!src_page_map.contains(src))
-    //    {
-    //        PageFileMsgDisplay *page = new PageFileMsgDisplay(src);
-    //        ui->tabWidget->addTab(page, QString("从机 - %1").arg(src));
-    //        src_page_map.insert(src, page);
-    //    }
-    //    PageFileMsgDisplay *p = src_page_map.value(src);
-    //    p->parse(pgn, data, data_size);
 }
 
 void MainWindow::on_srcAddrSpinBox_valueChanged(int arg1)
