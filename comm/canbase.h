@@ -5,6 +5,7 @@
 #include "QObject"
 #include "stdint.h"
 #include <QDebug>
+#include "mthread.h"
 
 #define CAN_DBG(x...) qDebug(x)
 
@@ -64,7 +65,7 @@ public:
         return true;
     }
 
-    virtual uint transmit(uint32_t id, uint flag, QByteArray array)
+    virtual uint transmit(uint32_t id, uint flag, QVector<uint8_t> array)
     {
         int len = array.size();
         if (transmit_queue.count() > CAN_SEND_DATA_SIZE)
@@ -87,7 +88,7 @@ public:
         transmit_data.id   = id;
         transmit_data.len  = len;
         transmit_data.flag = flag;
-        memcpy(transmit_data.data, array.data(), len);
+        memcpy(transmit_data.data, &array[0], len);
         transmit_queue.enqueue(transmit_data);
 
         return 1;
@@ -104,10 +105,13 @@ public:
     }
 
 signals:
-    void sig_receive(uint32_t id, uint flag, QByteArray array);
+    void sig_receive(uint32_t id, uint flag, QVector<uint8_t> array);
     void sig_open_device(uint8_t device_index, uint32_t baudrate);
     void sig_open_finish(int ret);
     void sig_close_device();
+
+public:
+    MThread::thread_task_t extern_task;
 
 private:
     QQueue<can_farme_t> transmit_queue;

@@ -61,7 +61,7 @@ CommDbValue *CommJ1939Db::db_reg_register(uint16_t src_addr, uint16_t reg_addr, 
     return reg;
 }
 
-int CommJ1939Db::msg_send(uint32_t pgn, uint8_t priority, uint8_t dst, QByteArray array)
+int CommJ1939Db::msg_send(uint32_t pgn, uint8_t priority, uint8_t dst, QVector<uint8_t> array)
 {
     return J1939Ins->sig_msg_send(pgn, priority, dst, array, J1939_DEF_TIMEOUT);
 }
@@ -81,10 +81,9 @@ void CommJ1939Db::slot_request_dst_write_reg(uint16_t dst, uint16_t reg_addr, ui
     request_write_reg_t *ptr = (request_write_reg_t *)request_buff;
     ptr->reg_addr            = reg_addr;
     ptr->reg_value           = reg_value;
-    msg_send(DB_FUNC_WRITE_REGISTER,
-             J1939_PRIORITY_DEFAULT,
-             dst,
-             QByteArray((const char *)request_buff, sizeof(request_write_reg_t)));
+    QVector<uint8_t> array(sizeof(request_write_reg_t));
+    memcpy(&array[0], request_buff, sizeof(request_write_reg_t));
+    msg_send(DB_FUNC_WRITE_REGISTER, J1939_PRIORITY_DEFAULT, dst, array);
 }
 
 void CommJ1939Db::slot_request_dst_write_mul_reg(uint16_t dst, uint16_t reg_addr, QVector<uint16_t> array)
@@ -104,7 +103,9 @@ void CommJ1939Db::slot_request_dst_write_mul_reg(uint16_t dst, uint16_t reg_addr
     uint16_t crc               = modbus_crc16((uint8_t *)ptr, crc_offset);
     request_buff[crc_offset++] = crc & 0xFF;
     request_buff[crc_offset++] = crc >> 8;
-    msg_send(DB_FUNC_WRITE_MULTIPLE_REGISTERS, J1939_PRIORITY_DEFAULT, dst, QByteArray((const char *)request_buff, crc_offset));
+    QVector<uint8_t> array_u8(crc_offset);
+    memcpy(&array_u8[0], request_buff, crc_offset);
+    msg_send(DB_FUNC_WRITE_MULTIPLE_REGISTERS, J1939_PRIORITY_DEFAULT, dst, array_u8);
 }
 
 void CommJ1939Db::slot_request_read_reg(uint16_t reg_addr, uint16_t reg_len)
@@ -185,12 +186,12 @@ void CommJ1939Db::recv_read_reg_handle(uint16_t src_addr, respond_read_reg_t *pt
             db->sig_read_finish(value);
         }
     }
-    J1939_MODBUS_MASTER_DBG("read addr %d start reg %d (0x%04x) reg len %d v (0x%04x) successful",
-                            src_addr,
-                            reg_addr,
-                            reg_addr,
-                            ptr->data_len / 2,
-                            *(uint16_t *)ptr->data);
+    //    J1939_MODBUS_MASTER_DBG("read addr %d start reg %d (0x%04x) reg len %d v (0x%04x) successful",
+    //                            src_addr,
+    //                            reg_addr,
+    //                            reg_addr,
+    //                            ptr->data_len / 2,
+    //                            *(uint16_t *)ptr->data);
 
     emit sig_recv_read_reg(ptr->reg_addr, QByteArray((const char *)ptr->data, ptr->data_len));
     read_wait_sem.release();
@@ -235,9 +236,8 @@ void CommJ1939Db::request_read_thread_task()
     request_read_reg_t *ptr = (request_read_reg_t *)request_buff;
     ptr->reg_addr           = request_read.reg_addr;
     ptr->reg_len            = request_read.reg_len;
-    msg_send(DB_FUNC_READ_HOLDING_REGISTER,
-             J1939_PRIORITY_DEFAULT,
-             request_read.dst,
-             QByteArray((const char *)request_buff, sizeof(request_read_reg_t)));
+    QVector<uint8_t> array(sizeof(request_read_reg_t));
+    memcpy(&array[0], request_buff, sizeof(request_read_reg_t));
+    msg_send(DB_FUNC_READ_HOLDING_REGISTER, J1939_PRIORITY_DEFAULT, request_read.dst, array);
     read_wait_sem.tryAcquire(1, 100);
 }

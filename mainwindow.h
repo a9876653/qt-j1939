@@ -26,7 +26,7 @@ public:
 private slots:
     void on_openDevicePushButton_clicked();
 
-    void slot_recv_pgn_handle(uint32_t pgn, uint8_t src, QByteArray data);
+    void slot_recv_pgn_handle(uint32_t pgn, uint8_t src, QVector<uint8_t> data);
 
     void on_srcAddrSpinBox_valueChanged(int arg1);
 

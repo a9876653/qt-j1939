@@ -4,7 +4,8 @@
 
 int j1939_can_write(uint32_t id, uint8_t *data, uint8_t len)
 {
-    QByteArray array((const char *)data, len);
+    QVector<uint8_t> array(len);
+    memcpy(&array[0], data, len);
     return J1939Ins->can_write(id, array);
 }
 
@@ -15,10 +16,12 @@ CommJ1939::CommJ1939()
     connect(can_dev, &CanBase::sig_receive, this, &CommJ1939::can_recv);
     connect(can_dev, &CanBase::sig_open_finish, this, &CommJ1939::sig_open_finish);
 
-    connect(&j1939_poll_timer, &QTimer::timeout, this, &CommJ1939::poll);
+    // connect(&j1939_poll_timer, &QTimer::timeout, this, &CommJ1939::poll);
 
     connect(this, &CommJ1939::sig_msg_send, this, &CommJ1939::msg_send);
-    j1939_poll_timer.stop();
+
+    can_dev->extern_task = std::bind(&CommJ1939::poll, this);
+    // j1939_poll_timer.stop();
 }
 
 bool CommJ1939::open_device(uint8_t device_index, uint32_t baudrate)
@@ -31,13 +34,13 @@ void CommJ1939::close_device()
     return can_dev->close_device();
 }
 
-void CommJ1939::can_recv(uint32_t id, uint flag, QByteArray array)
+void CommJ1939::can_recv(uint32_t id, uint flag, QVector<uint8_t> array)
 {
     (void)flag;
-    j1939_receive_handle(&j1939_ins, id, (uint8_t *)array.data(), array.size());
+    j1939_receive_handle(&j1939_ins, id, (uint8_t *)&array[0], array.size());
 }
 
-int CommJ1939::can_write(uint32_t id, QByteArray array)
+int CommJ1939::can_write(uint32_t id, QVector<uint8_t> array)
 {
     if (can_dev->transmit(id, MSG_FLAG_EXT, array) == 1)
     {
@@ -58,11 +61,11 @@ void CommJ1939::init()
     j1939_poll_timer.start(5);
 }
 
-int CommJ1939::msg_send(uint32_t pgn, uint8_t priority, uint8_t dst, QByteArray array, uint32_t timeout)
+int CommJ1939::msg_send(uint32_t pgn, uint8_t priority, uint8_t dst, QVector<uint8_t> array, uint32_t timeout)
 {
     j1939_ret_e ret  = J1939_OK;
     int         len  = array.size();
-    uint8_t    *data = (uint8_t *)array.data();
+    uint8_t    *data = (uint8_t *)&array[0];
 
     if (len > 8)
     {
@@ -116,12 +119,12 @@ uint8_t CommJ1939::get_dst_addr()
     return dst_addr;
 }
 
-void CommJ1939::slot_msg_send(uint32_t pgn, QByteArray array)
+void CommJ1939::slot_msg_send(uint32_t pgn, QVector<uint8_t> array)
 {
     msg_send(pgn, J1939_PRIORITY_DEFAULT, dst_addr, array, J1939_DEF_TIMEOUT);
 }
 
-void CommJ1939::recv_pgn_handle(uint32_t pgn, uint8_t src, QByteArray array)
+void CommJ1939::recv_pgn_handle(uint32_t pgn, uint8_t src, QVector<uint8_t> array)
 {
     emit this->sig_recv_pgn_handle(pgn, src, array);
 }
@@ -131,23 +134,9 @@ int CommJ1939::pgn_register(const uint32_t pgn, uint8_t code, pgn_callback_t cb)
     return j1939_pgn_register(&j1939_ins, pgn, code, cb);
 }
 
-int CommJ1939::tp_rx_register(uint8_t              src,
-                              uint8_t              dst,
-                              session_get_data_fun get_data,
-                              session_recv_fun     rec_finish,
-                              session_err_fun      err_handle)
+int CommJ1939::session_cb_register(session_recv_fun recv_cb, session_err_fun err_cb)
 {
-    return j1939_tp_rx_register(&j1939_ins, src, dst, get_data, rec_finish, err_handle);
-}
-
-int CommJ1939::tp_rx_data_register(uint8_t          src,
-                                   uint8_t          dst,
-                                   uint8_t         *data,
-                                   uint16_t         data_size,
-                                   session_recv_fun rec_finish,
-                                   session_err_fun  err_handle)
-{
-    return j1939_tp_rx_data_register(&j1939_ins, src, dst, data, data_size, rec_finish, err_handle);
+    return j1939_tp_session_register_cb(&j1939_ins, recv_cb, err_cb);
 }
 
 void CommJ1939::slot_request_pgn(uint32_t pgn, uint8_t dst, uint16_t len)

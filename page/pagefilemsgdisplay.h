@@ -20,7 +20,7 @@ public:
     explicit PageFileMsgDisplay(uint8_t src);
     ~PageFileMsgDisplay();
 
-    void parse(uint32_t pgn, QByteArray data);
+    void parse(uint32_t pgn, QVector<uint8_t> data);
 
 private:
     void msg_data_polt_send(MsgData *msg_data);

@@ -101,27 +101,29 @@ void CtrlCan::transmit_task()
         return;
     }
     can_farme_t tx_data;
-    while (transmit_dequeue(tx_data))
+    uint        frame_num = 0;
+    while (frame_num < CAN_SEND_DATA_SIZE && transmit_dequeue(tx_data))
     {
-        VCI_CAN_OBJ transmit_data;
-        memset(&transmit_data, 0, sizeof(transmit_data));
-        uint8_t is_ext_frame     = tx_data.flag & MSG_FLAG_EXT ? 1 : 0;
-        transmit_data.ExternFlag = is_ext_frame;
-        transmit_data.ID         = tx_data.id;
-        transmit_data.DataLen    = tx_data.len;
-        memcpy(transmit_data.Data, tx_data.data, tx_data.len);
-        uint ret = VCI_Transmit(dev_type, device_index, channel_index, &transmit_data, 1);
-        if (ret < 1)
-        {
-            CANCTRL_DBG("CAN TRANSMIT FAILED ret %d, len %d!", ret, transmit_data.DataLen);
+        VCI_CAN_OBJ *obj = &send_data[frame_num];
+        memset(obj, 0, sizeof(VCI_CAN_OBJ));
+        uint8_t is_ext_frame = tx_data.flag & MSG_FLAG_EXT ? 1 : 0;
+        obj->ExternFlag      = is_ext_frame;
+        obj->ID              = tx_data.id;
+        obj->DataLen         = tx_data.len;
+        memcpy(obj->Data, tx_data.data, tx_data.len);
+        frame_num++;
+    }
+    uint ret = VCI_Transmit(dev_type, device_index, channel_index, send_data, frame_num);
+    if (ret < frame_num)
+    {
+        CANCTRL_DBG("CAN TRANSMIT FAILED ret %d, num %d!", ret, frame_num);
 
-            if (!open_device(channel_index, u32_baudrate))
-            {
-                slot_close_device();
-                CANCTRL_DBG("CAN RESTART FAILED!");
-            }
-            VCI_Transmit(dev_type, device_index, channel_index, &transmit_data, 1);
+        if (!open_device(channel_index, u32_baudrate))
+        {
+            slot_close_device();
+            CANCTRL_DBG("CAN RESTART FAILED!");
         }
+        VCI_Transmit(dev_type, device_index, channel_index, send_data, frame_num);
     }
 }
 
@@ -145,11 +147,14 @@ void CtrlCan::receive_task()
         {
             for (uint i = 0; i < len; i++)
             {
-                uint32_t id   = recv_data[i].ID;
-                uint8_t  flag = recv_data[i].ExternFlag ? MSG_FLAG_EXT : 0;
-                uint16_t len  = recv_data[i].DataLen;
-                uint8_t *data = (uint8_t *)&recv_data[i].Data[0];
-                emit     sig_receive(id, flag, QByteArray((const char *)data, len));
+                uint32_t         id   = recv_data[i].ID;
+                uint8_t          flag = recv_data[i].ExternFlag ? MSG_FLAG_EXT : 0;
+                uint16_t         len  = recv_data[i].DataLen;
+                uint8_t         *data = (uint8_t *)&recv_data[i].Data[0];
+                QVector<uint8_t> array(len);
+                memcpy(&array[0], data, len);
+
+                emit sig_receive(id, flag, array);
             }
         }
     }
@@ -159,5 +164,9 @@ void CtrlCan::can_task()
 {
     transmit_task();
     receive_task();
+    if (extern_task)
+    {
+        extern_task();
+    }
     QThread::msleep(1);
 }

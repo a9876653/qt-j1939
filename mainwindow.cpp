@@ -118,7 +118,7 @@ void MainWindow::on_openDevicePushButton_clicked()
     }
 }
 
-void MainWindow::slot_recv_pgn_handle(uint32_t pgn, uint8_t src, QByteArray data)
+void MainWindow::slot_recv_pgn_handle(uint32_t pgn, uint8_t src, QVector<uint8_t> data)
 {
     (void)pgn;
     (void)data;

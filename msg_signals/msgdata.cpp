@@ -28,7 +28,8 @@ void MsgData::slot_encode_send()
             canardDSDLSetUxx(encode_buff, sig->start_bit, value, sig->bit_length);
         }
     }
-    QByteArray array((const char *)encode_buff, msg_len);
+    QVector<uint8_t> array(msg_len);
+    memcpy(&array[0], encode_buff, msg_len);
 
     emit sig_msg_send(pgn, array);
 }
@@ -39,7 +40,7 @@ void MsgData::slot_request_pgn(uint8_t src)
     emit sig_request_pgn(pgn, src, msg_len);
 }
 
-void MsgData::decode(QByteArray array)
+void MsgData::decode(QVector<uint8_t> array)
 {
     uint8_t *data      = (uint8_t *)array.data();
     uint16_t data_size = array.size();

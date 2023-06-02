@@ -103,7 +103,7 @@ void PageFileMsgDisplay::csv_save_file()
     CsvAppend(csv_path, csv_map.keys(), csv_map.values());
 }
 
-void PageFileMsgDisplay::parse(uint32_t pgn, QByteArray data)
+void PageFileMsgDisplay::parse(uint32_t pgn, QVector<uint8_t> data)
 {
     for (PageMsgDisplay *p : msg_page_map)
     {

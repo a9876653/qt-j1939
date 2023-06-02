@@ -29,34 +29,23 @@ public:
     uint8_t get_dst_addr();
 
     int pgn_register(const uint32_t pgn, uint8_t code, pgn_callback_t cb);
-    int tp_rx_register(uint8_t              src,
-                       uint8_t              dst,
-                       session_get_data_fun get_data,
-                       session_recv_fun     rec_finish,
-                       session_err_fun      err_handle);
+    int session_cb_register(session_recv_fun recv_cb, session_err_fun err_cb);
 
-    int tp_rx_data_register(uint8_t          src,
-                            uint8_t          dst,
-                            uint8_t         *data,
-                            uint16_t         data_size,
-                            session_recv_fun rec_finish,
-                            session_err_fun  err_handle);
+    int  can_write(uint32_t id, QVector<uint8_t> array);
+    void can_recv(uint32_t id, uint flag, QVector<uint8_t> array);
 
-    int  can_write(uint32_t id, QByteArray array);
-    void can_recv(uint32_t id, uint flag, QByteArray array);
-
-    void recv_pgn_handle(uint32_t pgn, uint8_t src, QByteArray array);
+    void recv_pgn_handle(uint32_t pgn, uint8_t src, QVector<uint8_t> array);
 
 private:
-    int msg_send(uint32_t pgn, uint8_t priority, uint8_t dst, QByteArray array, uint32_t timeout);
+    int msg_send(uint32_t pgn, uint8_t priority, uint8_t dst, QVector<uint8_t> array, uint32_t timeout);
 
 public slots:
-    void slot_msg_send(uint32_t pgn, QByteArray array);
+    void slot_msg_send(uint32_t pgn, QVector<uint8_t> array);
     void slot_request_pgn(uint32_t pgn, uint8_t dst, uint16_t len);
 
 signals:
-    int  sig_msg_send(uint32_t pgn, uint8_t priority, uint8_t dst, QByteArray array, uint32_t timeout);
-    void sig_recv_pgn_handle(uint32_t pgn, uint8_t src, QByteArray array);
+    int  sig_msg_send(uint32_t pgn, uint8_t priority, uint8_t dst, QVector<uint8_t> array, uint32_t timeout);
+    void sig_recv_pgn_handle(uint32_t pgn, uint8_t src, QVector<uint8_t> array);
     void sig_open_finish(int ret);
 
 private:

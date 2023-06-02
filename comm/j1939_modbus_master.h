@@ -54,7 +54,7 @@ public slots:
     void slot_request_write_reg(uint16_t reg_addr, QVector<uint16_t> array);
 
 private:
-    int msg_send(uint32_t pgn, uint8_t priority, uint8_t dst, QByteArray array);
+    int msg_send(uint32_t pgn, uint8_t priority, uint8_t dst, QVector<uint8_t> array);
 
     void request_read_thread_task();
 

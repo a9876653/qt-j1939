@@ -31,6 +31,7 @@ private:
     uint32_t u32_baudrate = 500000;
 
     VCI_CAN_OBJ recv_data[CAN_RECV_DATA_SIZE];
+    VCI_CAN_OBJ send_data[CAN_SEND_DATA_SIZE];
 
     bool set_baudrate(uint16_t channel_index, uint baudrate);
 
