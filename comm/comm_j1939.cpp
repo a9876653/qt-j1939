@@ -94,9 +94,9 @@ void CommJ1939::set_src_addr(uint8_t addr)
         j1939_sessions_t *handle = &j1939_ins.sessions;
         j1939_session_t  *sess   = j1939_session_search_addr(handle, i, j1939_ins.node_addr);
         uint16_t          key    = (i << 8) | j1939_ins.node_addr;
-        hasht_delete(&handle->sessions, key);
+        hasht_delete(&handle->hasht, key);
         uint16_t new_key = (i << 8) | addr;
-        hasht_insert(&handle->sessions, new_key, sess);
+        hasht_insert(&handle->hasht, new_key, sess);
     }
     j1939_ins.node_addr = addr;
 }
