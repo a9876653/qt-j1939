@@ -25,15 +25,18 @@ void frmCenterIcon::set_icon(QPixmap icon, QString str)
     int    width  = ui->iconLabel->size().width() - 8;
     double k      = 1;
     /** 以较小值作为缩放系数 **/
-    if (height < width)
+    if (icon.height() > 0 && icon.width() > 0)
     {
-        k = double(height) / icon.height();
+        if (height < width)
+        {
+            k = double(height) / icon.height();
+        }
+        else
+        {
+            k = double(width) / icon.width();
+        }
+        icon = icon.scaled(icon.height() * k, icon.width() * k);
     }
-    else
-    {
-        k = double(width) / icon.width();
-    }
-    icon = icon.scaled(icon.height() * k, icon.width() * k);
     ui->iconLabel->setPixmap(icon);
     ui->textLabel->setText(str);
 }

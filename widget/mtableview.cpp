@@ -40,7 +40,11 @@ MTableView::~MTableView()
 }
 int MTableView::index2row(int index)
 {
-    return index / (cloumn_cnt - 1);
+    if (cloumn_cnt > 1)
+    {
+        return index / (cloumn_cnt - 1);
+    }
+    return index;
 }
 int MTableView::index2cloumn(int index)
 {

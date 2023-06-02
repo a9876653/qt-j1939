@@ -2,7 +2,7 @@
 #include "ui_mlabeltable.h"
 
 MLabelTable::MLabelTable(QString des, int column_count, QWidget *parent)
-    :   QWidget(parent),ui(new Ui::MLabelTable),column_count(column_count)
+    : QWidget(parent), ui(new Ui::MLabelTable), column_count(column_count)
 {
     ui->setupUi(this);
     ui->groupBox->setTitle(des);

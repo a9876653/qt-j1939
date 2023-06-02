@@ -7,6 +7,7 @@
 class MThread : public QThread
 {
     Q_OBJECT
+public:
     typedef std::function<void(void)> thread_task_t;
 
 public:

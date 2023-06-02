@@ -31,9 +31,9 @@
 #    define CANARD_PRIVATE static
 #endif
 
-#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 199901L)
-#    error "Unsupported language: ISO C99 or a newer version is required."
-#endif
+//#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 199901L)
+//#    error "Unsupported language: ISO C99 or a newer version is required."
+//#endif
 
 /// In general, _Static_assert is not present on C99 compilers, except for gnu99
 #if !defined(static_assert)
