@@ -37,6 +37,10 @@ void frmCenterIcon::set_icon(QPixmap icon, QString str)
         }
         icon = icon.scaled(icon.height() * k, icon.width() * k);
     }
+    else
+    {
+        qDebug("icon size is zero!");
+    }
     ui->iconLabel->setPixmap(icon);
     ui->textLabel->setText(str);
 }

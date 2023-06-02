@@ -18,7 +18,7 @@ void MValueLabel::slot_update(QVariant v)
 {
     value = v;
     ui->valueLabel->setText(value.toString());
-    emit sig_update(v);
+    // emit sig_update(v);
 }
 
 void MValueLabel::set_backcolor(QColor color)
