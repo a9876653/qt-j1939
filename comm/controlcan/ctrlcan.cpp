@@ -147,14 +147,17 @@ void CtrlCan::receive_task()
         {
             for (uint i = 0; i < len; i++)
             {
-                uint32_t         id   = recv_data[i].ID;
-                uint8_t          flag = recv_data[i].ExternFlag ? MSG_FLAG_EXT : 0;
-                uint16_t         len  = recv_data[i].DataLen;
-                uint8_t         *data = (uint8_t *)&recv_data[i].Data[0];
-                QVector<uint8_t> array(len);
-                memcpy(&array[0], data, len);
+                if (recv_data[i].DataLen > 0)
+                {
+                    uint32_t         id   = recv_data[i].ID;
+                    uint8_t          flag = recv_data[i].ExternFlag ? MSG_FLAG_EXT : 0;
+                    uint16_t         dlc  = recv_data[i].DataLen;
+                    uint8_t         *data = (uint8_t *)&recv_data[i].Data[0];
+                    QVector<uint8_t> array(dlc);
+                    memcpy(&array[0], data, dlc);
 
-                emit sig_receive(id, flag, array);
+                    emit sig_receive(id, flag, array);
+                }
             }
         }
     }
