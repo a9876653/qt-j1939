@@ -108,13 +108,11 @@ void MainWindow::on_openDevicePushButton_clicked()
 {
     if (!device_status)
     {
-        device_status = J1939Ins->open_device(ui->canIndexSpinBox->value(), ui->baudrateSpinBox->value() * 1000);
+        J1939Ins->open_device(ui->canIndexSpinBox->value(), ui->baudrateSpinBox->value() * 1000);
     }
     else
     {
         J1939Ins->close_device();
-        device_status = false;
-        ui->openDevicePushButton->setText("打开设备");
     }
 }
 
