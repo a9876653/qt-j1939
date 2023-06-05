@@ -26,8 +26,6 @@ private:
     bool started       = false;
     int  dev_type      = VCI_USBCAN2;
 
-    MThread *can_task_thread = nullptr;
-
     uint32_t u32_baudrate = 500000;
 
     VCI_CAN_OBJ recv_data[CAN_RECV_DATA_SIZE];
@@ -38,5 +36,4 @@ private:
 protected:
     void transmit_task();
     void receive_task();
-    void can_task();
 };

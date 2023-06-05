@@ -26,13 +26,10 @@ CtrlCan::CtrlCan()
 {
     connect(this, &CtrlCan::sig_open_device, this, slot_open_device);
     connect(this, &CtrlCan::sig_close_device, this, slot_close_device);
-    can_task_thread = new MThread(std::bind(&CtrlCan::can_task, this));
-    can_task_thread->start();
 }
 
 CtrlCan::~CtrlCan()
 {
-    can_task_thread->stop();
     slot_close_device();
 }
 
@@ -161,15 +158,4 @@ void CtrlCan::receive_task()
             }
         }
     }
-}
-
-void CtrlCan::can_task()
-{
-    transmit_task();
-    receive_task();
-    if (extern_task)
-    {
-        extern_task();
-    }
-    QThread::msleep(1);
 }

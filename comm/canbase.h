@@ -49,14 +49,26 @@ public:
     } can_farme_t;
 
 public:
+    CanBase()
+    {
+        can_task_thread = new MThread(std::bind(&CanBase::can_task, this));
+    }
+
+    ~CanBase()
+    {
+        can_task_thread->stop();
+    }
+
     bool open_device(uint8_t device_index, uint32_t baudrate)
     {
+        can_task_thread->start();
         emit sig_open_device(device_index, baudrate);
         return true;
     }
 
     void close_device()
     {
+        can_task_thread->stop();
         emit sig_close_device();
     }
 
@@ -94,6 +106,14 @@ public:
         return 1;
     }
 
+    virtual void transmit_task()
+    {
+    }
+
+    virtual void receive_task()
+    {
+    }
+
     bool transmit_dequeue(can_farme_t &transmit_data)
     {
         if (transmit_queue.isEmpty())
@@ -104,6 +124,16 @@ public:
         return true;
     }
 
+    void can_task()
+    {
+        transmit_task();
+        receive_task();
+        if (extern_task)
+        {
+            extern_task();
+        }
+        QThread::msleep(1);
+    }
 signals:
     void sig_receive(uint32_t id, uint flag, QVector<uint8_t> array);
     void sig_open_device(uint8_t device_index, uint32_t baudrate);
@@ -115,4 +145,6 @@ public:
 
 private:
     QQueue<can_farme_t> transmit_queue;
+
+    MThread *can_task_thread = nullptr;
 };
