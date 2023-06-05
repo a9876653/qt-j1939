@@ -36,7 +36,7 @@ public:
 
 public:
     CommJ1939Db();
-    void         init();
+
     CommDbValue *db_reg_register(uint16_t src_addr, uint16_t reg_addr, uint16_t reg_size);
     void         recv_read_reg_handle(uint16_t src_addr, respond_read_reg_t *ptr);
     void         recv_write_reg_handle(uint16_t src_addr, request_write_reg_t *ptr);
@@ -54,7 +54,8 @@ public slots:
     void slot_request_write_reg(uint16_t reg_addr, QVector<uint16_t> array);
 
 private:
-    int msg_send(uint32_t pgn, uint8_t priority, uint8_t dst, QVector<uint8_t> array);
+    void init();
+    int  msg_send(uint32_t pgn, uint8_t priority, uint8_t dst, QVector<uint8_t> array);
 
     void request_read_thread_task();
 

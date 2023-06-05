@@ -53,32 +53,23 @@ public:
 public:
     CanBase()
     {
-        can_task_thread = new MThread(std::bind(&CanBase::can_task, this));
         transmit_queue.set_max_size(4096);
         recv_queue.set_max_size(4096);
     }
 
     ~CanBase()
     {
-        can_task_thread->stop();
     }
 
     bool open_device(uint8_t device_index, uint32_t baudrate)
     {
-        m_device_index = device_index;
-        m_baudrate     = baudrate;
-
-        can_task_thread->start();
-        m_request_start = true;
-        // emit sig_open_device(device_index, baudrate);
+        emit sig_open_device(device_index, baudrate);
         return true;
     }
 
     void close_device()
     {
-        m_request_stop = true;
-        can_task_thread->stop();
-        // emit sig_close_device();
+        emit sig_close_device();
     }
 
     virtual bool is_open()
@@ -138,28 +129,13 @@ public:
 
     void can_task()
     {
-        if (m_request_start)
-        {
-            m_request_start = false;
-            emit sig_open_device(m_device_index, m_baudrate);
-        }
-        else
+        if (is_open())
         {
             transmit_task();
             receive_task();
-            if (extern_task != nullptr)
-            {
-                extern_task();
-            }
-            QThread::msleep(1);
-
-            if (m_request_stop)
-            {
-                m_request_stop = false;
-                emit sig_close_device();
-            }
         }
     }
+
 signals:
     void sig_receive(uint32_t id, uint flag, QVector<uint8_t> array);
     void sig_open_device(uint8_t device_index, uint32_t baudrate);
@@ -167,17 +143,8 @@ signals:
     void sig_close_device();
 
 public:
-    MThread::thread_task_t extern_task;
-
     ThreadSafeQueue<can_farme_t> recv_queue;
 
 private:
     ThreadSafeQueue<can_farme_t> transmit_queue;
-
-    MThread *can_task_thread = nullptr;
-
-    uint8_t  m_device_index;
-    uint32_t m_baudrate;
-    bool     m_request_start = false;
-    bool     m_request_stop  = false;
 };

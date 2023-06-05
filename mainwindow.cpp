@@ -17,8 +17,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 {
     ui->setupUi(this);
 
-    J1939Ins->init();
-    J1939DbIns->init();
+    J1939Ins;
+    J1939DbIns;
 
     msgs = new MsgSignals(true);
 
@@ -29,8 +29,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->tabWidget->addTab(new frmBootloader, "固件升级");
     src_page_parse = new PageParse(255);
     ui->tabWidget->addTab(src_page_parse, "本地读取服务");
-    connect(J1939Ins, &CommJ1939::sig_recv_pgn_handle, this, &MainWindow::slot_recv_pgn_handle);
-    connect(J1939Ins, &CommJ1939::sig_open_finish, this, &MainWindow::slot_recv_comm_status);
+    connect(J1939Ins, &CommJ1939::sig_recv_pgn_handle, this, &MainWindow::slot_recv_pgn_handle, Qt::QueuedConnection);
+    connect(J1939Ins, &CommJ1939::sig_open_finish, this, &MainWindow::slot_recv_comm_status, Qt::QueuedConnection);
 
     load_cfg_data("./temp/cfg_temp.json");
     on_openDevicePushButton_clicked();

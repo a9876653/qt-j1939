@@ -24,6 +24,7 @@ const QVector<baudrate_map_t> baudrate_map = {
 
 CtrlCan::CtrlCan()
 {
+    memset(&errinfo, 0, sizeof(errinfo));
     connect(this, &CtrlCan::sig_open_device, this, slot_open_device);
     connect(this, &CtrlCan::sig_close_device, this, slot_close_device);
 }
@@ -79,7 +80,18 @@ void CtrlCan::slot_open_device(uint8_t ch_index, uint32_t baudrate)
         slot_close_device();
         return;
     }
+
+    int ret = VCI_Transmit(dev_type, device_index, channel_index, send_data, 1);
+    if (ret <= 0)
+    {
+        CANCTRL_DBG("CAN 接线故障!");
+        slot_close_device();
+        return;
+    }
+
+    VCI_ReadErrInfo(dev_type, device_index, channel_index, &errinfo); //读取错误信息
     CANCTRL_DBG("CAN INIT SUCCESSFUL BAUDRATE:%d", baudrate);
+
     started = true;
     emit sig_open_finish(STATUS_OK);
 }
@@ -97,8 +109,12 @@ void CtrlCan::transmit_task()
     {
         return;
     }
+    if (errinfo.ErrCode & ERR_CAN_BUSOFF || errinfo.ErrCode & ERR_CAN_BUSERR)
+    {
+        return;
+    }
     can_farme_t tx_data;
-    uint        frame_num = 0;
+    int         frame_num = 0;
     while (frame_num < CAN_SEND_DATA_SIZE && transmit_dequeue(tx_data))
     {
         VCI_CAN_OBJ *obj = &send_data[frame_num];
@@ -110,9 +126,11 @@ void CtrlCan::transmit_task()
         memcpy(obj->Data, tx_data.data, tx_data.len);
         frame_num++;
     }
-    uint ret = VCI_Transmit(dev_type, device_index, channel_index, send_data, frame_num);
+    int ret = VCI_Transmit(dev_type, device_index, channel_index, send_data, frame_num);
     if (ret < frame_num)
     {
+        VCI_ReadErrInfo(dev_type, device_index, channel_index, &errinfo); //读取错误信息
+
         CANCTRL_DBG("CAN TRANSMIT FAILED ret %d, num %d!", ret, frame_num);
 
         if (!open_device(channel_index, u32_baudrate))
@@ -120,14 +138,14 @@ void CtrlCan::transmit_task()
             slot_close_device();
             CANCTRL_DBG("CAN RESTART FAILED!");
         }
-        VCI_Transmit(dev_type, device_index, channel_index, send_data, frame_num);
+        // VCI_Transmit(dev_type, device_index, channel_index, send_data, frame_num);
     }
 }
 
 void CtrlCan::receive_task()
 {
-    int          len;
-    VCI_ERR_INFO errinfo; //错误结构体
+    int len;
+
     if (!is_open())
     {
         return;
@@ -136,7 +154,7 @@ void CtrlCan::receive_task()
     if (len > 0)
     {
         len = VCI_Receive(dev_type, device_index, channel_index, recv_data, CAN_RECV_DATA_SIZE, 0); //接收数据
-        if (len == 0xFFFFFFFF)                                                                      //读取错误
+        if (len < 0)                                                                                //读取错误
         {
             VCI_ReadErrInfo(dev_type, device_index, channel_index, &errinfo); //读取错误信息
         }

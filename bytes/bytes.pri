@@ -6,6 +6,7 @@ HEADERS += \
     $$PWD/json_file.h \
     $$PWD/modbus_crc.h \
     $$PWD/mthread.h \
+    $$PWD/mthreadperiodtask.h \
     $$PWD/mthreadqueue.h \
     $$PWD/utils.h
 

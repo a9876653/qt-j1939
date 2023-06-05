@@ -32,6 +32,7 @@ j1939_ret_e respond_write_mul_reg_cb(j1939_t *handle, j1939_message_t *msg)
 
 CommJ1939Db::CommJ1939Db()
 {
+    init();
     db_read_queue.set_max_size(200);
     request_read_thread = new MThread(std::bind(&CommJ1939Db::request_read_thread_task, this));
     request_read_thread->start();
@@ -63,7 +64,8 @@ CommDbValue *CommJ1939Db::db_reg_register(uint16_t src_addr, uint16_t reg_addr, 
 
 int CommJ1939Db::msg_send(uint32_t pgn, uint8_t priority, uint8_t dst, QVector<uint8_t> array)
 {
-    return J1939Ins->sig_msg_send(pgn, priority, dst, array, J1939_DEF_TIMEOUT);
+    J1939Ins->sig_msg_send(pgn, priority, dst, array, J1939_DEF_TIMEOUT);
+    return array.length();
 }
 
 void CommJ1939Db::slot_request_dst_read_reg(uint16_t dst, uint16_t reg_addr, uint16_t reg_len)
@@ -232,7 +234,7 @@ void CommJ1939Db::recv_write_mul_reg_handle(uint16_t src_addr, respond_write_mul
 void CommJ1939Db::request_read_thread_task()
 {
     db_request_read_t request_read;
-    if (db_read_queue.dequeue(request_read))
+    if (db_read_queue.dequeue(request_read, 500))
     {
         static uint8_t      request_buff[sizeof(request_read_reg_t)];
         request_read_reg_t *ptr = (request_read_reg_t *)request_buff;
