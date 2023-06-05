@@ -13,7 +13,7 @@ CommJ1939::CommJ1939()
 {
     // can_dev = new ZlgCan();
     can_dev = new CtrlCan();
-    connect(can_dev, &CanBase::sig_receive, this, &CommJ1939::can_recv);
+    // connect(can_dev, &CanBase::sig_receive, this, &CommJ1939::can_recv);
     connect(can_dev, &CanBase::sig_open_finish, this, &CommJ1939::sig_open_finish);
 
     // connect(&j1939_poll_timer, &QTimer::timeout, this, &CommJ1939::poll);
@@ -34,10 +34,13 @@ void CommJ1939::close_device()
     return can_dev->close_device();
 }
 
-void CommJ1939::can_recv(uint32_t id, uint flag, QVector<uint8_t> array)
+void CommJ1939::can_recv_task()
 {
-    (void)flag;
-    j1939_receive_handle(&j1939_ins, id, (uint8_t *)&array[0], array.size());
+    CanBase::can_farme_t frame;
+    while (can_dev->recv_dequeue(frame))
+    {
+        j1939_receive_handle(&j1939_ins, frame.id, frame.data, frame.len);
+    }
 }
 
 int CommJ1939::can_write(uint32_t id, QVector<uint8_t> array)
@@ -51,6 +54,7 @@ int CommJ1939::can_write(uint32_t id, QVector<uint8_t> array)
 
 void CommJ1939::poll(void)
 {
+    can_recv_task();
     j1939_tp_poll(&j1939_ins);
 }
 

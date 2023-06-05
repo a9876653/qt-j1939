@@ -231,13 +231,16 @@ void CommJ1939Db::recv_write_mul_reg_handle(uint16_t src_addr, respond_write_mul
 
 void CommJ1939Db::request_read_thread_task()
 {
-    db_request_read_t   request_read = db_read_queue.dequeue();
-    static uint8_t      request_buff[sizeof(request_read_reg_t)];
-    request_read_reg_t *ptr = (request_read_reg_t *)request_buff;
-    ptr->reg_addr           = request_read.reg_addr;
-    ptr->reg_len            = request_read.reg_len;
-    QVector<uint8_t> array(sizeof(request_read_reg_t));
-    memcpy(&array[0], request_buff, sizeof(request_read_reg_t));
-    msg_send(DB_FUNC_READ_HOLDING_REGISTER, J1939_PRIORITY_DEFAULT, request_read.dst, array);
-    read_wait_sem.tryAcquire(1, 100);
+    db_request_read_t request_read;
+    if (db_read_queue.dequeue(request_read))
+    {
+        static uint8_t      request_buff[sizeof(request_read_reg_t)];
+        request_read_reg_t *ptr = (request_read_reg_t *)request_buff;
+        ptr->reg_addr           = request_read.reg_addr;
+        ptr->reg_len            = request_read.reg_len;
+        QVector<uint8_t> array(sizeof(request_read_reg_t));
+        memcpy(&array[0], request_buff, sizeof(request_read_reg_t));
+        msg_send(DB_FUNC_READ_HOLDING_REGISTER, J1939_PRIORITY_DEFAULT, request_read.dst, array);
+        read_wait_sem.tryAcquire(1, 100);
+    }
 }

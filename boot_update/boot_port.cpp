@@ -210,10 +210,11 @@ uint32_t get_file_data(uint32_t offset, uint8_t *data, uint16_t len)
 void j1939_update_cmd_recv_cb(uint32_t pgn, uint8_t src, QVector<uint8_t> array)
 {
     (void)src;
-    uint8_t *data = (uint8_t *)&array[0];
-    int      len  = array.size();
     if (pgn == BOOT_MSG_ID_READ_APP_INFO_RESPONE)
     {
+        uint8_t *data = (uint8_t *)&array[0];
+        int      len  = array.size();
+
         app_info_str_t str = get_app_info_str((app_info_t *)data);
         MiddleSignalIns->app_info_update(str);
         BOOT_PORT_DBG("boot recv pgn 0x%04x, src: %d, len %d", pgn, src, len);

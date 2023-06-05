@@ -9,14 +9,16 @@
 template <typename T> class ThreadSafeQueue
 {
 public:
-    ThreadSafeQueue(int max_size = 100) : m_max_size(max_size)
+    ThreadSafeQueue(int max_size = 4096)
     {
+        set_max_size(max_size);
     }
 
     void set_max_size(int max_size)
     {
         QMutexLocker locker(&m_mutex);
         m_max_size = max_size;
+        m_queue.reserve(max_size);
     }
     // 添加元素到队列尾部
     void enqueue(const T &value)
@@ -34,15 +36,16 @@ public:
     }
 
     // 从队列头部移除一个元素，并返回它
-    T dequeue()
+    bool dequeue(T &value)
     {
         m_sem.tryAcquire(1, -1);
         QMutexLocker locker(&m_mutex);
         if (m_queue.isEmpty())
         {
-            return T();
+            return false;
         }
-        return m_queue.dequeue();
+        value = m_queue.dequeue();
+        return true;
     }
 
     // 返回队列是否为空

@@ -14,26 +14,11 @@ ZlgCan::ZlgCan()
     ZLGCAN_DBG("Main Thread id %d", (int)QThread::currentThreadId());
     connect(this, &ZlgCan::sig_open_device, this, slot_open_device);
     connect(this, &ZlgCan::sig_close_device, this, slot_close_device);
-
-    thread = new QThread;
-    this->moveToThread(thread);
-
-    send_timer = new QTimer;
-    connect(send_timer, &QTimer::timeout, this, &ZlgCan::transmit_task);
-    send_timer->start(5);
-
-    recv_timer = new QTimer;
-    connect(recv_timer, &QTimer::timeout, this, &ZlgCan::receive_task);
-    recv_timer->start(5);
-    thread->start();
 }
 
 ZlgCan::~ZlgCan()
 {
-    send_timer->stop();
-    recv_timer->stop();
     slot_close_device();
-    thread->exit();
 }
 
 bool ZlgCan::set_baudrate(uint16_t channel_index, uint baudrate)
@@ -118,47 +103,55 @@ bool ZlgCan::is_open()
 void ZlgCan::transmit_task()
 {
     can_farme_t tx_data;
+    uint        send_cnt = 0;
     while (transmit_dequeue(tx_data))
     {
-        ZCAN_Transmit_Data transmit_data;
-        memset(&transmit_data, 0, sizeof(transmit_data));
-        transmit_data.transmit_type = 0;
-        uint8_t is_ext_frame        = tx_data.flag & MSG_FLAG_EXT ? 1 : 0;
-        transmit_data.frame.can_id  = MAKE_CAN_ID(tx_data.id, is_ext_frame, 0, 0);
-        transmit_data.frame.can_dlc = tx_data.len;
-        memcpy(transmit_data.frame.data, tx_data.data, tx_data.len);
-        uint ret = ZCAN_Transmit(channel_handle, &transmit_data, 1);
-        if (ret < 1)
+        if (tx_data.len > 0)
         {
-            ZLGCAN_DBG("CAN TRANSMIT FAILED ret %d, len %d!", ret, transmit_data.frame.can_dlc);
-
-            if (!open_device(device_index, u32_baudrate))
-            {
-                ZLGCAN_DBG("CAN RESTART FAILED!");
-            }
-            ZCAN_Transmit(channel_handle, &transmit_data, 1); // 重发一次
+            ZCAN_Transmit_Data *p = &send_data[send_cnt];
+            memset(p, 0, sizeof(ZCAN_Transmit_Data));
+            p->transmit_type     = 0;
+            uint8_t is_ext_frame = tx_data.flag & MSG_FLAG_EXT ? 1 : 0;
+            p->frame.can_id      = MAKE_CAN_ID(tx_data.id, is_ext_frame, 0, 0);
+            p->frame.can_dlc     = tx_data.len;
+            memcpy(p->frame.data, tx_data.data, tx_data.len);
+            send_cnt++;
         }
+    }
+    uint ret = ZCAN_Transmit(channel_handle, send_data, send_cnt);
+    if (ret < send_cnt)
+    {
+        ZLGCAN_DBG("CAN TRANSMIT FAILED ret %d, len %d!", ret, send_cnt);
+
+        if (!open_device(device_index, u32_baudrate))
+        {
+            ZLGCAN_DBG("CAN RESTART FAILED!");
+        }
+        ZCAN_Transmit(channel_handle, send_data, send_cnt); // 重发一次
     }
 }
 
 void ZlgCan::receive_task()
 {
-    uint len;
+    int len;
     len = ZCAN_GetReceiveNum(channel_handle, TYPE_CAN);
     if (len > 0)
     {
         len = ZCAN_Receive(channel_handle, recv_data, CAN_RECV_DATA_SIZE, 0);
-        for (uint i = 0; i < len; i++)
+        for (int i = 0; i < len; i++)
         {
-            uint32_t id   = recv_data[i].frame.can_id;
-            uint8_t  flag = IS_EFF(id) ? MSG_FLAG_EXT : 0;
-            id            = GET_ID(id);
-            uint16_t len  = recv_data[i].frame.can_dlc;
-            uint8_t *data = (uint8_t *)&recv_data[i].frame.data[0];
-
-            QVector<uint8_t> array(len);
-            memcpy(&array[0], data, len);
-            emit sig_receive(id, flag, array);
+            uint8_t dlc = recv_data[i].frame.can_dlc;
+            if (dlc > 0 && dlc <= 8)
+            {
+                can_farme_t frame;
+                uint32_t    id = recv_data[i].frame.can_id;
+                frame.id       = id;
+                frame.flag     = IS_EFF(id) ? MSG_FLAG_EXT : 0;
+                frame.id       = GET_ID(id);
+                frame.len      = dlc;
+                memcpy(frame.data, recv_data[i].frame.data, dlc);
+                recv_queue.enqueue(frame);
+            }
         }
     }
 }

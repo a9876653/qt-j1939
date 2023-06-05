@@ -11,7 +11,7 @@ public:
     typedef std::function<void(void)> thread_task_t;
 
 public:
-    MThread(thread_task_t task = nullptr) : task(task)
+    MThread(thread_task_t task = nullptr) : m_task(task)
     {
     }
     ~MThread()
@@ -19,27 +19,41 @@ public:
         stop();
     }
 
+    void start()
+    {
+        if (!m_is_run)
+        {
+            m_is_run = true;
+            QThread::start();
+        }
+    }
+
     void stop()
     {
-        cycle_flag = false;
+        m_is_run = false;
         quit();
         wait();
+    }
+
+    bool is_run()
+    {
+        return m_is_run;
     }
 
 private:
     void run() override
     {
-        while (cycle_flag)
+        while (m_is_run)
         {
-            if (task != nullptr)
+            if (m_task != nullptr)
             {
-                task();
+                m_task();
             }
         }
     }
 
-    bool          cycle_flag = true;
-    thread_task_t task       = nullptr;
+    bool          m_is_run = false;
+    thread_task_t m_task   = nullptr;
 };
 
 #endif // MTHREAD_H

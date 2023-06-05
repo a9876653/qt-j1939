@@ -126,7 +126,7 @@ void CtrlCan::transmit_task()
 
 void CtrlCan::receive_task()
 {
-    uint         len;
+    int          len;
     VCI_ERR_INFO errinfo; //错误结构体
     if (!is_open())
     {
@@ -142,18 +142,19 @@ void CtrlCan::receive_task()
         }
         else
         {
-            for (uint i = 0; i < len; i++)
+            for (int i = 0; i < len; i++)
             {
-                if (recv_data[i].DataLen > 0)
+                uint8_t dlc = recv_data[i].DataLen;
+                if (dlc > 0 && dlc <= 8)
                 {
-                    uint32_t         id   = recv_data[i].ID;
-                    uint8_t          flag = recv_data[i].ExternFlag ? MSG_FLAG_EXT : 0;
-                    uint16_t         dlc  = recv_data[i].DataLen;
-                    uint8_t         *data = (uint8_t *)&recv_data[i].Data[0];
-                    QVector<uint8_t> array(dlc);
-                    memcpy(&array[0], data, dlc);
+                    can_farme_t frame;
 
-                    emit sig_receive(id, flag, array);
+                    frame.id   = recv_data[i].ID;
+                    frame.flag = recv_data[i].ExternFlag ? MSG_FLAG_EXT : 0;
+                    frame.len  = dlc;
+                    memcpy(frame.data, recv_data[i].Data, dlc);
+
+                    recv_queue.enqueue(frame);
                 }
             }
         }

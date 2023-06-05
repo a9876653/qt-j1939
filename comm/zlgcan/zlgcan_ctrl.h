@@ -34,7 +34,8 @@ private:
     uint8_t  device_index = 0;
     uint32_t u32_baudrate = 500000;
 
-    ZCAN_Receive_Data recv_data[CAN_RECV_DATA_SIZE];
+    ZCAN_Transmit_Data send_data[CAN_SEND_DATA_SIZE];
+    ZCAN_Receive_Data  recv_data[CAN_RECV_DATA_SIZE];
 
     bool set_baudrate(uint16_t channel_index, uint baudrate);
 

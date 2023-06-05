@@ -31,13 +31,13 @@ public:
     int pgn_register(const uint32_t pgn, uint8_t code, pgn_callback_t cb);
     int session_cb_register(session_recv_fun recv_cb, session_err_fun err_cb);
 
-    int  can_write(uint32_t id, QVector<uint8_t> array);
-    void can_recv(uint32_t id, uint flag, QVector<uint8_t> array);
+    int can_write(uint32_t id, QVector<uint8_t> array);
 
     void recv_pgn_handle(uint32_t pgn, uint8_t src, QVector<uint8_t> array);
 
 private:
-    int msg_send(uint32_t pgn, uint8_t priority, uint8_t dst, QVector<uint8_t> array, uint32_t timeout);
+    int  msg_send(uint32_t pgn, uint8_t priority, uint8_t dst, QVector<uint8_t> array, uint32_t timeout);
+    void can_recv_task();
 
 public slots:
     void slot_msg_send(uint32_t pgn, QVector<uint8_t> array);
