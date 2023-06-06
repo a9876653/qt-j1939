@@ -32,7 +32,7 @@ void PageWidgetsCollect::showEvent(QShowEvent *event)
 void PageWidgetsCollect::hideEvent(QHideEvent *event)
 {
     (void)event;
-    auto_read_stop();
+    // auto_read_stop();
 }
 
 void PageWidgetsCollect::auto_read_start()

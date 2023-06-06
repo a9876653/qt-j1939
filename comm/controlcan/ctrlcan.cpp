@@ -112,6 +112,7 @@ void CtrlCan::transmit_task()
     if (errinfo.ErrCode & ERR_CAN_BUSOFF || errinfo.ErrCode & ERR_CAN_BUSERR)
     {
         VCI_ResetCAN(dev_type, device_index, channel_index);
+        VCI_ReadErrInfo(dev_type, device_index, channel_index, &errinfo); //重新加载错误信息
         return;
     }
     can_farme_t tx_data;
