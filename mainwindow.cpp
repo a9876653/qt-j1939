@@ -22,17 +22,18 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     msgs = new MsgSignals(true);
 
+    load_cfg_data("./temp/cfg_temp.json");
+
     comm_j1939_port_init(msgs->msgs_map);
 
     ui->tabWidget->addTab(new EnetConfig, "网卡配置");
 
     ui->tabWidget->addTab(new frmBootloader, "固件升级");
-    src_page_parse = new PageParse(255);
+    src_page_parse = new PageParse(ui->objAddrspinBox->value());
     ui->tabWidget->addTab(src_page_parse, "本地读取服务");
     connect(J1939Ins, &CommJ1939::sig_recv_pgn_handle, this, &MainWindow::slot_recv_pgn_handle, Qt::QueuedConnection);
     connect(J1939Ins, &CommJ1939::sig_open_finish, this, &MainWindow::slot_recv_comm_status, Qt::QueuedConnection);
 
-    load_cfg_data("./temp/cfg_temp.json");
     on_openDevicePushButton_clicked();
 }
 
@@ -142,5 +143,8 @@ void MainWindow::on_srcAddrSpinBox_valueChanged(int arg1)
 void MainWindow::on_objAddrspinBox_valueChanged(int arg1)
 {
     J1939Ins->set_dst_addr(arg1);
-    src_page_parse->set_src_addr(arg1);
+    if (src_page_parse != nullptr)
+    {
+        src_page_parse->set_src_addr(arg1);
+    }
 }
