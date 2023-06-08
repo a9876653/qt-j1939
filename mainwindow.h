@@ -34,6 +34,8 @@ private slots:
 
     void slot_recv_comm_status(int ret);
 
+    void on_consoleBtn_clicked();
+
 private:
     Ui::MainWindow *ui;
 
@@ -42,6 +44,8 @@ private:
     MsgSignals *msgs = nullptr;
 
     PageParse *src_page_parse = nullptr;
+
+    bool console_is_show = false;
 
     class Pages
     {

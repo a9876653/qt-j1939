@@ -12,10 +12,31 @@
 #include "mwritereadwidget.h"
 #include "mwritereadtable.h"
 #include "pageparse.h"
+#include <Windows.h>
+#include <QDebug>
+
+void alloc_console()
+{
+    AllocConsole();
+    SetConsoleTitleA("调试窗口");
+    freopen("CON", "w", stdout); //将输出定向到控制台
+    freopen("CON", "w", stderr); //将输出定向到控制台
+}
+
+void free_console()
+{
+    fclose(stdout);
+    fclose(stderr);
+    FreeConsole();
+}
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    alloc_console();
+
+    ::ShowWindow(::GetConsoleWindow(), SW_HIDE); // 隐藏控制台
 
     J1939Ins;
     J1939DbIns;
@@ -26,7 +47,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     comm_j1939_port_init(msgs->msgs_map);
 
-    ui->tabWidget->addTab(new EnetConfig, "网卡配置");
+    ui->tabWidget->addTab(new EnetConfig(), "网卡配置");
 
     ui->tabWidget->addTab(new frmBootloader, "固件升级");
     src_page_parse = new PageParse(ui->objAddrspinBox->value());
@@ -43,6 +64,7 @@ MainWindow::~MainWindow()
     delete ui;
     Singleton<CommJ1939Db>::destory();
     Singleton<CommJ1939>::destory();
+    free_console();
 }
 
 void MainWindow::save_cfg_data(QString path)
@@ -146,5 +168,19 @@ void MainWindow::on_objAddrspinBox_valueChanged(int arg1)
     if (src_page_parse != nullptr)
     {
         src_page_parse->set_src_addr(arg1);
+    }
+}
+
+void MainWindow::on_consoleBtn_clicked()
+{
+    if (!console_is_show)
+    {
+        ::ShowWindow(::GetConsoleWindow(), SW_SHOW);
+        console_is_show = true;
+    }
+    else
+    {
+        ::ShowWindow(::GetConsoleWindow(), SW_HIDE);
+        console_is_show = false;
     }
 }
