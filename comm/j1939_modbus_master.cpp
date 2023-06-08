@@ -38,6 +38,11 @@ CommJ1939Db::CommJ1939Db()
     request_read_thread->start();
 }
 
+CommJ1939Db::~CommJ1939Db()
+{
+    delete request_read_thread;
+}
+
 void CommJ1939Db::init()
 {
     J1939Ins->pgn_register(DB_FUNC_READ_HOLDING_REGISTER, 0, respond_read_reg_cb);

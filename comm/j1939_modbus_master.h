@@ -36,6 +36,7 @@ public:
 
 public:
     CommJ1939Db();
+    ~CommJ1939Db();
 
     CommDbValue *db_reg_register(uint16_t src_addr, uint16_t reg_addr, uint16_t reg_size);
     void         recv_read_reg_handle(uint16_t src_addr, respond_read_reg_t *ptr);
