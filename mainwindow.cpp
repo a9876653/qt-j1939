@@ -39,10 +39,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
 MainWindow::~MainWindow()
 {
-    delete src_page_parse;
     save_cfg_data("./temp/cfg_temp.json");
-    delete msgs;
     delete ui;
+    Singleton<CommJ1939Db>::destory();
+    Singleton<CommJ1939>::destory();
 }
 
 void MainWindow::save_cfg_data(QString path)
