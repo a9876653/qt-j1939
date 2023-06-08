@@ -4,16 +4,15 @@
 
 using std::mutex;
 
-template <typename T>
-class Singleton
+template <typename T> class Singleton
 {
 public:
     static T *getInstance()
     {
-        if(instance == nullptr)
+        if (instance == nullptr)
         {
             mtx.lock();
-            if(instance == nullptr)
+            if (instance == nullptr)
             {
                 instance = new T();
             }
@@ -24,21 +23,23 @@ public:
 
     static void destory()
     {
-        if(instance != nullptr)
+        if (instance != nullptr)
         {
-            delete instance;
-            instance = nullptr;
+            mtx.lock();
+            if (instance != nullptr)
+            {
+                delete instance;
+                instance = nullptr;
+                mtx.unlock();
+            }
         }
     }
 
 private:
-    static T *instance;
+    static T    *instance;
     static mutex mtx;
-
 };
 
-template <typename T>
-T *Singleton<T>::instance = nullptr;
+template <typename T> T *Singleton<T>::instance = nullptr;
 
-template <typename T>
-mutex Singleton<T>::mtx;
+template <typename T> mutex Singleton<T>::mtx;
