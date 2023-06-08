@@ -8,7 +8,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 QMAKE_CXXFLAGS=-fpermissive
 
 CONFIG += c++17
-CONFIG += console
+# CONFIG += console
 QMAKE_CC=g++ # c文件使用g++编译器
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
