@@ -58,7 +58,7 @@ int CommJ1939::can_write(uint32_t id, QVector<uint8_t> array)
     {
         return array.size();
     }
-    return 0;
+    return array.size(); // 不考虑发送失败的情况
 }
 
 void CommJ1939::poll(void)
