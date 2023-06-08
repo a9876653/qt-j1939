@@ -17,6 +17,7 @@ class CommJ1939 : public QObject
     Q_OBJECT
 public:
     CommJ1939();
+    ~CommJ1939();
 
     bool is_open();
 

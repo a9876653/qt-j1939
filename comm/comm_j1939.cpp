@@ -22,6 +22,12 @@ CommJ1939::CommJ1939()
     comm_thread->start();
 }
 
+CommJ1939::~CommJ1939()
+{
+    delete can_dev;
+    delete comm_thread;
+}
+
 bool CommJ1939::is_open()
 {
     return can_dev->is_open();
