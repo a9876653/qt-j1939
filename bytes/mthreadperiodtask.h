@@ -33,6 +33,7 @@ public:
     void stop()
     {
         m_is_run = false;
+        m_timer->stop();
         quit();
         wait();
     }
