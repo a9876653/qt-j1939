@@ -12,9 +12,9 @@ public:
     J1939Event(int src);
     ~J1939Event();
 
-    void request_event_cnt();
-    void request_event(int index);
-    void request_event_format();
+    void request_event_cnt(int type);
+    void request_event(int type, int index);
+    void request_event_format(int type);
 
 signals:
     void sig_recv_event_cnt(int cnt);

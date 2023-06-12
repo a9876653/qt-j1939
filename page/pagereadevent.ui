@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>436</width>
+    <width>619</width>
     <height>361</height>
    </rect>
   </property>
@@ -52,6 +52,20 @@
        <property name="text">
         <string>获取事件总数</string>
        </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="eventTypeComboBox">
+       <item>
+        <property name="text">
+         <string>故障事件</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>信息事件</string>
+        </property>
+       </item>
       </widget>
      </item>
      <item>

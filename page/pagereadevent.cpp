@@ -38,7 +38,7 @@ void PageReadEvent::slot_recv_read_event_cnt(int cnt)
 
 void PageReadEvent::on_readEventCntBtn_clicked()
 {
-    event->request_event_cnt();
+    event->request_event_cnt(read_type);
 }
 
 void PageReadEvent::insert_item(int row, int column, QString s)
@@ -84,7 +84,7 @@ void PageReadEvent::slot_recv_read_event(read_event_respond_t respond)
     insert_item(row, column++, end_time);
     insert_item(row, column++, des);
     read_index++;
-    event->request_event(read_index);
+    event->request_event(read_type, read_index);
     read_timer.start(read_timeout_ms);
 }
 
@@ -94,7 +94,7 @@ void PageReadEvent::start_read(int start_index, int stop_index)
     end_index   = stop_index;
     timeout_cnt = 0;
     read_timer.start(read_timeout_ms);
-    event->request_event(read_index);
+    event->request_event(read_type, read_index);
 }
 
 void PageReadEvent::stop_read()
@@ -105,7 +105,7 @@ void PageReadEvent::stop_read()
 
 void PageReadEvent::read_timeout()
 {
-    event->request_event(read_index);
+    event->request_event(read_type, read_index);
     timeout_cnt++;
     if (timeout_cnt > 3)
     {
@@ -164,7 +164,12 @@ void PageReadEvent::on_cleanBtn_clicked()
         = QMessageBox::question(NULL, "清除事件", "是否清除所有事件?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
     if (rb == QMessageBox::Yes)
     {
-        event->request_event_format();
+        event->request_event_format(read_type);
         PAGEEVENT_DBG("清除所有事件");
     }
+}
+
+void PageReadEvent::on_eventTypeComboBox_currentIndexChanged(int index)
+{
+    read_type = index;
 }

@@ -2,6 +2,11 @@
 #include <QMap>
 
 static QMap<int, J1939Event *> j1939_event_map;
+#define EVENT_TYPE_NUM 2
+const uint32_t magic_num_map[] = {
+    READ_ERR_EVENT_MAGIC,
+    READ_INFO_EVENT_MAGIC,
+};
 
 j1939_ret_e respond_read_event_cnt_cb(j1939_t *handle, j1939_message_t *msg)
 {
@@ -44,30 +49,39 @@ J1939Event::~J1939Event()
 {
 }
 
-void J1939Event::request_event_cnt()
+void J1939Event::request_event_cnt(int type)
 {
     read_event_cnt_request_t request;
-    request.megic_num = READ_EVENT_MAGIC;
-    QVector<uint8_t> array(sizeof(read_event_cnt_request_t));
-    memcpy(&array[0], &request, sizeof(read_event_cnt_request_t));
-    J1939Ins->sig_msg_send(PGN_READ_EVENT_CNT, J1939_PRIORITY_DEFAULT, src, array, 0);
+    if (type < EVENT_TYPE_NUM)
+    {
+        request.megic_num = magic_num_map[type];
+        QVector<uint8_t> array(sizeof(read_event_cnt_request_t));
+        memcpy(&array[0], &request, sizeof(read_event_cnt_request_t));
+        J1939Ins->sig_msg_send(PGN_READ_EVENT_CNT, J1939_PRIORITY_DEFAULT, src, array, 0);
+    }
 }
-void J1939Event::request_event(int index)
+void J1939Event::request_event(int type, int index)
 {
     read_event_request_t request;
-    request.megic_num = READ_EVENT_MAGIC;
-    request.index     = index;
-    QVector<uint8_t> array(sizeof(read_event_request_t));
-    memcpy(&array[0], &request, sizeof(read_event_request_t));
-    J1939Ins->sig_msg_send(PGN_READ_EVENT, J1939_PRIORITY_DEFAULT, src, array, 0);
+    if (type < EVENT_TYPE_NUM)
+    {
+        request.megic_num = magic_num_map[type];
+        request.index     = index;
+        QVector<uint8_t> array(sizeof(read_event_request_t));
+        memcpy(&array[0], &request, sizeof(read_event_request_t));
+        J1939Ins->sig_msg_send(PGN_READ_EVENT, J1939_PRIORITY_DEFAULT, src, array, 0);
+    }
 }
 
-void J1939Event::request_event_format()
+void J1939Event::request_event_format(int type)
 {
     read_event_request_t request;
-    request.megic_num = READ_EVENT_MAGIC;
-    request.index     = 0;
-    QVector<uint8_t> array(sizeof(read_event_request_t));
-    memcpy(&array[0], &request, sizeof(read_event_request_t));
-    J1939Ins->sig_msg_send(PGN_FORMAT_EVENT, J1939_PRIORITY_DEFAULT, src, array, 0);
+    if (type < EVENT_TYPE_NUM)
+    {
+        request.megic_num = magic_num_map[type];
+        request.index     = 0;
+        QVector<uint8_t> array(sizeof(read_event_request_t));
+        memcpy(&array[0], &request, sizeof(read_event_request_t));
+        J1939Ins->sig_msg_send(PGN_FORMAT_EVENT, J1939_PRIORITY_DEFAULT, src, array, 0);
+    }
 }

@@ -33,6 +33,8 @@ private slots:
 
     void on_cleanBtn_clicked();
 
+    void on_eventTypeComboBox_currentIndexChanged(int index);
+
 private:
     void insert_item(int row, int column, QString s);
 
@@ -47,6 +49,7 @@ private:
     int read_index  = 0;
     int end_index   = 0;
     int timeout_cnt = 0;
+    int read_type   = 0;
 
     const int read_timeout_ms = 500;
 

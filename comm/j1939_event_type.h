@@ -9,7 +9,8 @@ typedef uint32_t event_id_t;
 #define ERR_EVENT_ID_DECODE(id) (id & (~ERR_EVENT_FLAG))
 
 #define EVENT_RESPOND_HEADER_LEN (4 + sizeof(err_event_t) + 1)
-#define READ_EVENT_MAGIC         0x12345678
+#define READ_ERR_EVENT_MAGIC     0x12345678
+#define READ_INFO_EVENT_MAGIC    0x12345679
 #define READ_EVENT_DES_BUF_SIZE  32
 
 #define SYS_EVENT_CELL_ID               (-1)
