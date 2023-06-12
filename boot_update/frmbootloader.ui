@@ -447,7 +447,7 @@ p, li { white-space: pre-wrap; }
         <string>start: </string>
        </property>
        <property name="value">
-        <number>10</number>
+        <number>0</number>
        </property>
       </widget>
      </item>

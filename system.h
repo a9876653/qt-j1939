@@ -28,5 +28,5 @@ timeMs_t sys_get_ms(void);
 
 QString  timestamp_ms_to_qstring(uint64_t timestamp_ms);
 QString  get_current_time_ms_qstring();
-bool     sys_time_is_elapsed(uint32_t start, uint32_t duration_ms);
-timeMs_t sys_time_get_elapsed(uint32_t start);
+bool     sys_time_is_elapsed(timeMs_t start, timeMs_t duration_ms);
+timeMs_t sys_time_get_elapsed(timeMs_t start);

@@ -55,8 +55,8 @@ typedef struct state_machine_s
 
     uint32_t step;
     uint32_t offset;
-    uint32_t over_time;
-    uint32_t over_tick;
+    timeMs_t over_time;
+    timeMs_t over_tick;
     uint32_t resend_cnt;
     uint32_t resend_cnt_max;
 } state_machine_t;
@@ -170,7 +170,12 @@ void boot_update_wait_respond(state_machine_t *self, state_machine_event_e event
         {
             // 重发
             boot_send(msg_send_id, msg_send_buff, msg_send_buff_len);
-            BOOT_MASTER_DBG("step %d, offset %d, resend %d", self->step, self->offset, self->resend_cnt);
+            BOOT_MASTER_DBG("step %d, offset %d, resend %d , tick %llu, time %llu",
+                            self->step,
+                            self->offset,
+                            self->resend_cnt,
+                            self->over_tick,
+                            self->over_time);
         }
     }
 }

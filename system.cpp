@@ -27,12 +27,12 @@ timeMs_t sys_get_ms(void)
     return ms;
 }
 
-timeMs_t sys_time_get_elapsed(uint32_t start)
+timeMs_t sys_time_get_elapsed(timeMs_t start)
 {
     return sys_get_ms() - start;
 }
 
-bool sys_time_is_elapsed(uint32_t start, uint32_t duration_ms)
+bool sys_time_is_elapsed(timeMs_t start, timeMs_t duration_ms)
 {
     return (sys_time_get_elapsed(start) >= duration_ms);
 }
