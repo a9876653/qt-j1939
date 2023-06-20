@@ -61,28 +61,44 @@ void PageReadEvent::slot_recv_read_event(read_event_respond_t respond)
     int column = 0;
     int row    = ui->tableWidget->rowCount();
     ui->tableWidget->setRowCount(row + 1);
-    event_id_t err_event_id = respond.err_event.id;
-    event_id_t event_id     = ERR_EVENT_ID_DECODE(err_event_id);
-    event_id_t id           = CELL_EVENT_ID_CONVER(event_id);
-    QString    id_s         = QString("%1(0x%2)").arg(id).arg(err_event_id, 4, 16, QLatin1Char('0'));
-    QString    start_time   = timestamp_ms_to_qstring(respond.err_event.start_time);
-    QString    end_time     = timestamp_ms_to_qstring(respond.err_event.end_time);
-    QString    des          = "None";
-    if (DataObjMapIns->param_map.contains(id))
+    if (read_type == SYS_EVENT_TYPE_ERR)
     {
-        DataObj *obj = DataObjMapIns->param_map.value(id);
-        des          = "";
-        if (IS_CELL_EVENT(event_id))
-        {
-            des = QString("电芯 %1 触发故障:").arg(CELL_EVENT_INDEX_CONVER(event_id));
-        }
-        des += obj->name;
-    }
+        err_event_t *err_event = (err_event_t *)respond.data;
 
-    insert_item(row, column++, id_s);
-    insert_item(row, column++, start_time);
-    insert_item(row, column++, end_time);
-    insert_item(row, column++, des);
+        event_id_t err_event_id = err_event->id;
+        event_id_t event_id     = ERR_EVENT_ID_DECODE(err_event_id);
+        event_id_t id           = CELL_EVENT_ID_CONVER(event_id);
+        QString    id_s         = QString("%1(0x%2)").arg(id).arg(err_event_id, 4, 16, QLatin1Char('0'));
+        QString    start_time   = timestamp_ms_to_qstring(err_event->start_time);
+        QString    end_time     = timestamp_ms_to_qstring(err_event->end_time);
+        QString    des          = "None";
+        if (DataObjMapIns->param_map.contains(id))
+        {
+            DataObj *obj = DataObjMapIns->param_map.value(id);
+            des          = "";
+            if (IS_CELL_EVENT(event_id))
+            {
+                des = QString("电芯 %1 触发故障:").arg(CELL_EVENT_INDEX_CONVER(event_id));
+            }
+            des += obj->name;
+        }
+
+        insert_item(row, column++, id_s);
+        insert_item(row, column++, start_time);
+        insert_item(row, column++, end_time);
+        insert_item(row, column++, des);
+    }
+    else if (read_type == SYS_EVENT_TYPE_INFO)
+    {
+        info_event_respond_t *event = (info_event_respond_t *)respond.data;
+
+        QString start_time = timestamp_ms_to_qstring(event->start_time);
+
+        insert_item(row, column++, "");
+        insert_item(row, column++, start_time);
+        insert_item(row, column++, "");
+        insert_item(row, column++, QString(QLatin1String(event->info.data, INFO_SAVE_DATA_MAX_SIZE)));
+    }
     read_index++;
     event->request_event(read_type, read_index);
     read_timer.start(read_timeout_ms);
