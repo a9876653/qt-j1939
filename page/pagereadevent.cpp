@@ -97,7 +97,7 @@ void PageReadEvent::slot_recv_read_event(read_event_respond_t respond)
         insert_item(row, column++, "");
         insert_item(row, column++, start_time);
         insert_item(row, column++, "");
-        insert_item(row, column++, QString(QLatin1String(event->info.data, INFO_SAVE_DATA_MAX_SIZE)));
+        insert_item(row, column++, QString(QLatin1String(event->info.data, strnlen(event->info.data, INFO_SAVE_DATA_MAX_SIZE))));
     }
     read_index++;
     event->request_event(read_type, read_index);
@@ -136,7 +136,7 @@ void PageReadEvent::on_readEventBtn_clicked()
     {
         ui->tableWidget->removeRow(0);
     }
-    start_read(1, ui->spinBox->value() + 1);
+    start_read(ui->startSpinBox->value(), ui->readCntSpinBox->value() + 1);
 }
 
 void PageReadEvent::on_readAllBtn_clicked()
