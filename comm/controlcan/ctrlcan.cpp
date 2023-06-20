@@ -81,15 +81,15 @@ void CtrlCan::slot_open_device(uint8_t ch_index, uint32_t baudrate)
         return;
     }
 
-    int ret = VCI_Transmit(dev_type, device_index, channel_index, send_data, 1);
-    if (ret <= 0)
-    {
-        CANCTRL_DBG("CAN 接线故障!");
-        slot_close_device();
-        return;
-    }
+    //    int ret = VCI_Transmit(dev_type, device_index, channel_index, send_data, 1);
+    //    if (ret <= 0)
+    //    {
+    //        CANCTRL_DBG("CAN 接线故障!");
+    //        slot_close_device();
+    //        return;
+    //    }
 
-    VCI_ReadErrInfo(dev_type, device_index, channel_index, &errinfo); //读取错误信息
+    //    VCI_ReadErrInfo(dev_type, device_index, channel_index, &errinfo); //读取错误信息
     CANCTRL_DBG("CAN INIT SUCCESSFUL BAUDRATE:%d", baudrate);
 
     started = true;
