@@ -20,6 +20,7 @@ frmBootloader::frmBootloader(QWidget *parent) : QWidget(parent), ui(new Ui::frmB
 
     timer = new QTimer();
     connect(timer, &QTimer::timeout, this, &frmBootloader::slotTimerOut);
+    connect(&cycle_timer, &QTimer::timeout, this, &frmBootloader::slotHandshakeTimeout);
 
     connect(MiddleSignalIns, &MiddleSignal::sig_dbg_info, this, &frmBootloader::slotUpdataInfo);
     connect(MiddleSignalIns, &MiddleSignal::sig_app_info_update, this, &frmBootloader::slotAppInfoUpdata);
@@ -183,16 +184,24 @@ void frmBootloader::on_enterBootPushButton_clicked()
     enter_boot(obj_addr.data(), obj_addr.count());
 }
 
+void frmBootloader::slotHandshakeTimeout()
+{
+    QVector<uint8_t> obj_addr = get_update_objs();
+    enter_boot(obj_addr.data(), obj_addr.count());
+}
+
 void frmBootloader::on_stopPushButton_clicked()
 {
     enablePushButton();
     timer->stop();
+    cycle_timer.stop();
 }
 
 void frmBootloader::on_handShakePushButton_clicked()
 {
     QVector<uint8_t> obj_addr = get_update_objs();
     enter_boot(obj_addr.data(), obj_addr.count());
+    cycle_timer.start(50);
 }
 
 void frmBootloader::create_update_obj()

@@ -14,7 +14,7 @@ class PageParse : public QWidget
     Q_OBJECT
 
 public:
-    explicit PageParse(int src_addr, QWidget *parent = nullptr);
+    explicit PageParse(int src_addr, QString dir, QWidget *parent = nullptr);
     ~PageParse();
     bool load_json(QString name, QString path);
     void set_src_addr(int addr);

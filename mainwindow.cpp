@@ -11,6 +11,7 @@
 #include "mtableview.h"
 #include "mwritereadwidget.h"
 #include "mwritereadtable.h"
+#include "frmgroupupdate.h"
 #include "pageparse.h"
 #include <Windows.h>
 #include <QDebug>
@@ -46,12 +47,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     load_cfg_data("./temp/cfg_temp.json");
 
     comm_j1939_port_init(msgs->msgs_map);
+    src_page_parse = new PageParse(ui->objAddrspinBox->value(), "./cfg/page_json");
+    ui->tabWidget->addTab(src_page_parse, "本地读取服务");
 
+    ui->tabWidget->addTab(new FrmGroupUpdate(), "从机升级");
     ui->tabWidget->addTab(new EnetConfig(), "网卡配置");
 
     ui->tabWidget->addTab(new frmBootloader, "固件升级");
-    src_page_parse = new PageParse(ui->objAddrspinBox->value());
-    ui->tabWidget->addTab(src_page_parse, "本地读取服务");
+
     connect(J1939Ins, &CommJ1939::sig_recv_pgn_handle, this, &MainWindow::slot_recv_pgn_handle, Qt::QueuedConnection);
     connect(J1939Ins, &CommJ1939::sig_open_finish, this, &MainWindow::slot_recv_comm_status, Qt::QueuedConnection);
 

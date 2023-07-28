@@ -2,6 +2,7 @@ HEADERS += \
     $$PWD/CustomTextWidget.h \
     $$PWD/enumvalueveiw.h \
     $$PWD/frmcentericon.h \
+    $$PWD/mcheckbox.h \
     $$PWD/mlabel.h \
     $$PWD/mlabeltable.h \
     $$PWD/mqspinbox.h \
@@ -15,6 +16,7 @@ HEADERS += \
 FORMS += \
     $$PWD/enumvalueveiw.ui \
     $$PWD/frmcentericon.ui \
+    $$PWD/mcheckbox.ui \
     $$PWD/mlabel.ui \
     $$PWD/mlabeltable.ui \
     $$PWD/mtableview.ui \
@@ -25,6 +27,7 @@ FORMS += \
 SOURCES += \
     $$PWD/enumvalueveiw.cpp \
     $$PWD/frmcentericon.cpp \
+    $$PWD/mcheckbox.cpp \
     $$PWD/mlabel.cpp \
     $$PWD/mlabeltable.cpp \
     $$PWD/mtableview.cpp \

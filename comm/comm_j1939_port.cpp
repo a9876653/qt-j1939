@@ -49,7 +49,7 @@ j1939_ret_e comm_j1939_pgn_cb(j1939_t *handle, j1939_message_t *msg)
     J1939Ins->recv_pgn_handle(msg->pgn, msg->src, array);
     return J1939_OK;
 }
-
+#include "file_transfer_type.h"
 void comm_j1939_port_init(QMap<uint, MsgData *> &msgs_map)
 {
     J1939Ins->session_cb_register(j1939_recv_cb, j1939_err_handle);
@@ -58,5 +58,11 @@ void comm_j1939_port_init(QMap<uint, MsgData *> &msgs_map)
     {
         J1939Ins->pgn_register(msg_data->pgn, 0, comm_j1939_pgn_cb);
     }
+    J1939Ins->pgn_register(FILE_MSG_ID_START_RESPONE, 0, comm_j1939_pgn_cb);
+    J1939Ins->pgn_register(FILE_MSG_ID_FILE_INFO_RESPONE, 0, comm_j1939_pgn_cb);
+    J1939Ins->pgn_register(FILE_MSG_ID_FILE_DATA_RESPONE, 0, comm_j1939_pgn_cb);
+    J1939Ins->pgn_register(FILE_MSG_ID_CHECK_CRC_RESPONE, 0, comm_j1939_pgn_cb);
+    J1939Ins->pgn_register(BOOT_MSG_ID_START_UPDATE_RESPONE, 0, comm_j1939_pgn_cb);
+    J1939Ins->pgn_register(BOOT_MSG_ID_READ_UPDATE_INFO_RESPONE, 0, comm_j1939_pgn_cb);
     j1939_event_init();
 }

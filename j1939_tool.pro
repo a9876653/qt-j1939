@@ -36,6 +36,8 @@ FORMS += \
 include($$PWD/bytes/bytes.pri)
 INCLUDEPATH += $$PWD/bytes
 
+
+
 include($$PWD/widget/widget.pri)
 INCLUDEPATH += $$PWD/widget
 
@@ -50,6 +52,9 @@ INCLUDEPATH += $$PWD/page
 
 include($$PWD/boot_update/boot_update.pri)
 INCLUDEPATH += $$PWD/boot_update
+
+include($$PWD/group_update/group_update.pri)
+INCLUDEPATH += $$PWD/group_update
 
 include($$PWD/enet_config/enet_config/enet_config.pri)
 INCLUDEPATH += $$PWD/enet_config/enet_config

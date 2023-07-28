@@ -3,7 +3,7 @@
 #include "stdlib.h"
 #include "middle_signal.h"
 
-#define BOOT_NODE_DBG(x...) MiddleSignalIns->dbg_info(x)
+#define BOOT_NODE_DBG(x...) // MiddleSignalIns->dbg_info(x)
 
 void clr_update_root(rt_slist_t *root)
 {
@@ -87,6 +87,43 @@ void remove_update_node_diff(rt_slist_t *root, uint8_t step, uint32_t offset)
                           step,
                           offset);
             free(entry);
+        }
+        update_node = next;
+    }
+}
+
+bool update_node_is_exist(rt_slist_t *root, uint8_t addr)
+{
+    boot_update_list_t *update_node = NULL;
+    /** 遍历单链表 update_list */
+    rt_slist_type_for_each_entry(boot_update_list_t, update_node, root, node)
+    {
+        if (update_node->addr == addr)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void remove_update_node(rt_slist_t *root, uint8_t addr)
+{
+    rt_slist_t *next        = NULL;
+    rt_slist_t *update_node = root->next;
+    while (update_node)
+    {
+        next = update_node->next;
+
+        boot_update_list_t *entry = rt_slist_entry(update_node, boot_update_list_t, node);
+        if (entry->addr == addr)
+        {
+            rt_slist_remove(root, update_node);
+            BOOT_NODE_DBG("boot update remove node, node->addr %d, node->step %d, node->offset %d",
+                          entry->addr,
+                          entry->step,
+                          entry->offset);
+            free(entry);
+            return;
         }
         update_node = next;
     }

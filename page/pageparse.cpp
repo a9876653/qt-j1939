@@ -14,13 +14,13 @@
 
 #define PAGEPARSE_DBG(x...) qDebug(x)
 
-PageParse::PageParse(int src_addr, QWidget *parent) : QWidget(parent), ui(new Ui::PageParse), src_addr(src_addr)
+PageParse::PageParse(int src_addr, QString dir, QWidget *parent) : QWidget(parent), ui(new Ui::PageParse), src_addr(src_addr)
 {
     ui->setupUi(this);
     data = new DataObjMap(src_addr);
     connect(this, &PageParse::sig_request_dst_read_reg, J1939DbIns, &CommJ1939Db::slot_request_dst_read_reg);
 
-    QString       dir      = "./cfg/page_json";
+    // QString       dir      = "./cfg/page_json";
     QFileInfoList fileList = GetFileList(dir); //获取目录下所有的文件
     for (QFileInfo info : fileList)
     {
