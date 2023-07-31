@@ -316,12 +316,15 @@ void FrmGroupUpdate::slotGroupUpdateState(update_info_t info)
             }
         }
     }
-    for (int i = 0; i < info.obj_num; i++)
+    else
     {
-        MCheckBox *obj = obj_addr_find(info.obj_addr[i] & 0x7F);
-        if (obj && obj->isChecked())
+        for (int i = 0; i < info.obj_num; i++)
         {
-            obj->set_icon(QPixmap(":/icons/true_icon"), "从机更新完成");
+            MCheckBox *obj = obj_addr_find(info.obj_addr[i] & 0x7F);
+            if (obj && obj->isChecked())
+            {
+                obj->set_icon(QPixmap(":/icons/true_icon"), QString("从机更新中 %1%").arg(info.process));
+            }
         }
     }
     for (int i = 0; i < update_obj_list.count(); i++)
