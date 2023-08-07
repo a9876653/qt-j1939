@@ -21,7 +21,7 @@ public:
 
     bool is_open();
 
-    bool open_device(uint8_t device_index, uint32_t baudrate);
+    bool open_device(uint8_t device_index, uint8_t ch_index, uint32_t baudrate);
 
     void close_device();
 

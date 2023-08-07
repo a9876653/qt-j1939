@@ -36,12 +36,13 @@ bool ZlgCan::set_baudrate(uint16_t channel_index, uint baudrate)
     return true;
 }
 
-void ZlgCan::slot_open_device(uint8_t channel_index, uint32_t baudrate)
+void ZlgCan::slot_open_device(uint8_t dev_index, uint8_t ch_index, uint32_t baudrate)
 {
     slot_close_device();
 
     int ret       = STATUS_OK;
-    device_index  = channel_index;
+    device_index  = dev_index;
+    channel_index = ch_index;
     u32_baudrate  = baudrate;
     device_handle = ZCAN_OpenDevice(ZCAN_USBCAN2, 0, 0);
     if (device_handle == INVALID_DEVICE_HANDLE)
@@ -123,7 +124,7 @@ void ZlgCan::transmit_task()
     {
         ZLGCAN_DBG("CAN TRANSMIT FAILED ret %d, len %d!", ret, send_cnt);
 
-        if (!open_device(device_index, u32_baudrate))
+        if (!open_device(device_index, channel_index, u32_baudrate))
         {
             ZLGCAN_DBG("CAN RESTART FAILED!");
         }

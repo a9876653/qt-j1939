@@ -74,6 +74,7 @@ void MainWindow::save_cfg_data(QString path)
 {
     QJsonObject root;
     root.insert(QString("%1").arg("can_index"), ui->canIndexSpinBox->value());
+    root.insert(QString("%1").arg("can_channel_index"), ui->canChSpinBox->value());
     root.insert(QString("%1").arg("can_baudrate"), ui->baudrateSpinBox->value());
     root.insert(QString("%1").arg("obj_addr"), ui->objAddrspinBox->value());
     root.insert(QString("%1").arg("src_addr"), ui->srcAddrSpinBox->value());
@@ -97,6 +98,11 @@ void MainWindow::load_cfg_data(QString path)
         {
             value = root_obj.value("can_baudrate").toInt();
             ui->baudrateSpinBox->setValue(value);
+        }
+        if (root_obj.contains("can_channel_index"))
+        {
+            value = root_obj.value("can_channel_index").toInt();
+            ui->canChSpinBox->setValue(value);
         }
         if (root_obj.contains("obj_addr"))
         {
@@ -134,7 +140,7 @@ void MainWindow::on_openDevicePushButton_clicked()
 {
     if (!device_status)
     {
-        J1939Ins->open_device(ui->canIndexSpinBox->value(), ui->baudrateSpinBox->value() * 1000);
+        J1939Ins->open_device(ui->canIndexSpinBox->value(), ui->canChSpinBox->value(), ui->baudrateSpinBox->value() * 1000);
     }
     else
     {

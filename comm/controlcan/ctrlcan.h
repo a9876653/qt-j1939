@@ -17,7 +17,7 @@ private:
     bool is_open();
 
 private slots:
-    void slot_open_device(uint8_t device_index, uint32_t baudrate);
+    void slot_open_device(uint8_t device_index, uint8_t ch_index, uint32_t baudrate);
     void slot_close_device();
 
 private:

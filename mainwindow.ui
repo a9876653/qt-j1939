@@ -64,6 +64,16 @@
        </widget>
       </item>
       <item>
+       <widget class="QSpinBox" name="canChSpinBox">
+        <property name="prefix">
+         <string>CAN通道号：</string>
+        </property>
+        <property name="maximum">
+         <number>4</number>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QSpinBox" name="baudrateSpinBox">
         <property name="prefix">
          <string>波特率(KBps): </string>

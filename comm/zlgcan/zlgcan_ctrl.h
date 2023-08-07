@@ -19,7 +19,7 @@ private:
     bool is_open();
 
 private slots:
-    void slot_open_device(uint8_t device_index, uint32_t baudrate);
+    void slot_open_device(uint8_t device_index, uint8_t ch_index, uint32_t baudrate);
     void slot_close_device();
 
 private:
@@ -31,8 +31,9 @@ private:
     QTimer *recv_timer = nullptr;
     QTimer *send_timer = nullptr;
 
-    uint8_t  device_index = 0;
-    uint32_t u32_baudrate = 500000;
+    uint8_t  device_index  = 0;
+    uint8_t  channel_index = 0;
+    uint32_t u32_baudrate  = 500000;
 
     ZCAN_Transmit_Data send_data[CAN_SEND_DATA_SIZE];
     ZCAN_Receive_Data  recv_data[CAN_RECV_DATA_SIZE];

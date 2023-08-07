@@ -61,9 +61,9 @@ public:
     {
     }
 
-    bool open_device(uint8_t device_index, uint32_t baudrate)
+    bool open_device(uint8_t device_index, uint8_t ch_index, uint32_t baudrate)
     {
-        emit sig_open_device(device_index, baudrate);
+        emit sig_open_device(device_index, ch_index, baudrate);
         return true;
     }
 
@@ -138,7 +138,7 @@ public:
 
 signals:
     void sig_receive(uint32_t id, uint flag, QVector<uint8_t> array);
-    void sig_open_device(uint8_t device_index, uint32_t baudrate);
+    void sig_open_device(uint8_t device_index, uint8_t ch_index, uint32_t baudrate);
     void sig_open_finish(int ret);
     void sig_close_device();
 

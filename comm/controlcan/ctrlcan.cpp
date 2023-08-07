@@ -39,13 +39,14 @@ bool CtrlCan::is_open()
     return started;
 }
 
-void CtrlCan::slot_open_device(uint8_t ch_index, uint32_t baudrate)
+void CtrlCan::slot_open_device(uint8_t dev_index, uint8_t ch_index, uint32_t baudrate)
 {
     slot_close_device();
     VCI_INIT_CONFIG config;
     baudrate_map_t  baudrate_temp = BAUDRATE_INIT(500000, 0x00, 0x1C);
     config.AccCode                = 0;
     config.AccMask                = 0xFFFFFFFF;
+    device_index                  = dev_index;
     channel_index                 = ch_index;
     for (int i = 0; i < baudrate_map.count(); i++)
     {
@@ -135,7 +136,7 @@ void CtrlCan::transmit_task()
 
         CANCTRL_DBG("CAN TRANSMIT FAILED ret %d, num %d!", ret, frame_num);
 
-        if (!open_device(channel_index, u32_baudrate))
+        if (!open_device(device_index, channel_index, u32_baudrate))
         {
             slot_close_device();
             CANCTRL_DBG("CAN RESTART FAILED!");

@@ -33,9 +33,9 @@ bool CommJ1939::is_open()
     return can_dev->is_open();
 }
 
-bool CommJ1939::open_device(uint8_t device_index, uint32_t baudrate)
+bool CommJ1939::open_device(uint8_t device_index, uint8_t ch_index, uint32_t baudrate)
 {
-    return can_dev->open_device(device_index, baudrate);
+    return can_dev->open_device(device_index, ch_index, baudrate);
 }
 
 void CommJ1939::close_device()
