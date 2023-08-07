@@ -86,6 +86,16 @@ void PageWidgetsCollect::slot_auto_read_timeout()
     }
 }
 
+void PageWidgetsCollect::addpend_obj(int index, DataObj *obj)
+{
+    if (is_save)
+    {
+        save_obj_list.append(obj);
+    }
+    reg_info_list.append(RegInfo(index, obj->reg_len));
+    reg_map.insert(index, new RegInfo(index, obj->reg_len));
+}
+
 void PageWidgetsCollect::json_items_handle(QJsonDocument *jdoc)
 {
     auto       json_map = jdoc->toVariant().toMap();
@@ -93,6 +103,7 @@ void PageWidgetsCollect::json_items_handle(QJsonDocument *jdoc)
     QList<int> widget_height_list;
     QString    is_auto_read_key   = "is_auto_read";
     QString    read_period_ms_key = "read_period_ms";
+    QString    is_save_key        = "is_save";
     if (json_map.contains(is_auto_read_key))
     {
         is_auto_read = json_map.value(is_auto_read_key).toBool();
@@ -108,6 +119,14 @@ void PageWidgetsCollect::json_items_handle(QJsonDocument *jdoc)
     else
     {
         update_period = 1000;
+    }
+    if (json_map.contains(is_save_key))
+    {
+        is_save = json_map.value(is_save_key).toInt();
+    }
+    else
+    {
+        is_save = false;
     }
     ui->updatePeriodSpinBox->setValue(update_period);
     auto pages_map = json_map.value("pages").toJsonArray();
@@ -141,8 +160,8 @@ void PageWidgetsCollect::json_items_handle(QJsonDocument *jdoc)
                     MLabel *label = new MLabel(obj->name, obj->value_des);           // 创建带描述的只读控件
                     connect(obj, &DataObj::sig_update, label, &MLabel::slot_update); // 链接更新
                     widget->insert(label);
-                    reg_info_list.append(RegInfo(i, obj->reg_len));
-                    reg_map.insert(i, new RegInfo(i, obj->reg_len));
+
+                    addpend_obj(i, obj);
                 }
             }
             layout->addWidget(widget);
@@ -170,8 +189,7 @@ void PageWidgetsCollect::json_items_handle(QJsonDocument *jdoc)
                         connect(obj, &DataObj::sig_update, label, &MValueLabel::slot_update); // 链接更新
                         widget->insert(i, j, label);                                          // 插入可视表
                         inc_len = obj->reg_len;
-                        reg_info_list.append(RegInfo(index, obj->reg_len));
-                        reg_map.insert(index, new RegInfo(index, obj->reg_len));
+                        addpend_obj(index, obj);
                     }
                 }
             }
@@ -195,8 +213,7 @@ void PageWidgetsCollect::json_items_handle(QJsonDocument *jdoc)
                     connect(w, &MWriteReadWidget::sig_update, obj, &DataObj::slot_request_write_reg);      // 链接请求写
                     widget->insert(w);
 
-                    reg_info_list.append(RegInfo(i, obj->reg_len));
-                    reg_map.insert(i, new RegInfo(i, obj->reg_len));
+                    addpend_obj(i, obj);
                 }
             }
             layout->addWidget(widget);

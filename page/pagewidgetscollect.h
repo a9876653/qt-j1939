@@ -29,6 +29,11 @@ private:
 
     void slot_auto_read_timeout();
 
+    void addpend_obj(int index, DataObj *obj);
+
+public:
+    QList<DataObj *> save_obj_list;
+
 private:
     Ui::PageWidgetsCollect *ui;
     class RegInfo
@@ -49,6 +54,7 @@ private:
     int auto_read_index   = 0;
     int auto_read_offset  = 0;
     int is_auto_read      = true;
+    int is_save           = false;
     int request_get_index = 0;
 
     QList<RegInfo>       reg_info_list;

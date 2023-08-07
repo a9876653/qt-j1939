@@ -19,6 +19,8 @@ DataObjMap::DataObjMap(int src_addr) : src_addr(src_addr)
         }
     }
     load_write_data_json("./temp/obj_temp.json");
+
+#if 0
     csv_header.append("时间");
     csv_header.append("时间UTC");
     for (DataObj *obj : obj_map)
@@ -28,6 +30,7 @@ DataObjMap::DataObjMap(int src_addr) : src_addr(src_addr)
 
     connect(&csv_timer, &QTimer::timeout, this, &DataObjMap::save_read_data_file);
     csv_timer.start(1000);
+#endif
 }
 
 DataObjMap::~DataObjMap()
