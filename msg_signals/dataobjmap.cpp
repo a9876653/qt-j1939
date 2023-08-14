@@ -64,7 +64,7 @@ bool DataObjMap::save_write_data_json(QString path)
     QJsonObject root;
     for (DataObj *obj : obj_map)
     {
-        root.insert(QString("%1").arg(obj->id), obj->write_value);
+        root.insert(QString("%1").arg(obj->id), obj->write_value.toJsonValue());
     }
     QJsonDocument tempJdoc(root);
     write_json_file(path, &tempJdoc);
@@ -134,8 +134,9 @@ void DataObjMap::json_items_handle(QJsonDocument *jdoc)
         bool        is_array   = obj.value("is_array").toBool();
         bool        is_write   = obj.value("is_write").toBool();
         int         array_size = obj.value("array_size").toInt();
-        int         max        = obj.value("max").toInt();
-        int         min        = obj.value("min").toInt();
+        QString     type       = obj.value("type").toString();
+        double      max        = obj.value("max").toDouble();
+        double      min        = obj.value("min").toDouble();
         int         param_id   = obj.value("param_id").toInt();
         if (unit != "")
         {
@@ -154,7 +155,6 @@ void DataObjMap::json_items_handle(QJsonDocument *jdoc)
             }
         }
 
-        QString     type    = obj.value("type").toString();
         int         reg_num = 1;
         JsonStruct *node    = new JsonStruct(name, id, def_v, is_array, is_write, array_size, type);
         json_struct_map.insert(id, node);

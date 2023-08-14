@@ -13,15 +13,15 @@ MWriteReadWidget::MWriteReadWidget(QString des, QVariant min, QVariant max, QVar
     write_btn->setText("写入");
     read_btn->setText("读取");
 
-    write_spinbox->setMaximum(max.toInt());
-    write_spinbox->setMinimum(min.toInt());
-    write_spinbox->setValue(write_value.toInt());
+    write_spinbox->setMaximum(max.toDouble());
+    write_spinbox->setMinimum(min.toDouble());
+    write_spinbox->setValue(write_value.toDouble());
 
     read_spinbox->setReadOnly(true);                                            // 只读
     read_spinbox->setButtonSymbols(QAbstractSpinBox::ButtonSymbols::NoButtons); // 无按钮
-    read_spinbox->setMaximum(max.toInt());
-    read_spinbox->setMinimum(min.toInt());
-    read_spinbox->setValue(def.toInt());
+    read_spinbox->setMaximum(max.toDouble());
+    read_spinbox->setMinimum(min.toDouble());
+    read_spinbox->setValue(def.toDouble());
 
     text_icon->set_icon(QPixmap(":/icons/true_icon"));
 
@@ -47,7 +47,7 @@ void MWriteReadWidget::slot_update_finish()
 
 void MWriteReadWidget::slot_update(QVariant value)
 {
-    read_spinbox->setValue(value.toInt());
+    read_spinbox->setValue(value.toDouble());
     text_icon->set_icon(QPixmap(":/icons/true_icon"), "读取成功");
 }
 

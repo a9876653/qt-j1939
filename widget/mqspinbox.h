@@ -4,12 +4,13 @@
 #include <QObject>
 #include <QSpinBox>
 
-class MQSpinBox : public QSpinBox
+class MQSpinBox : public QDoubleSpinBox
 {
 public:
     MQSpinBox()
     {
         this->setAlignment(Qt::AlignCenter);
+        this->setDecimals(0);
     }
 
 private:

@@ -5,7 +5,7 @@
 #include <QVariant>
 #include "value_des.h"
 
-typedef uint32_t obj_value_t;
+typedef QVariant obj_value_t;
 
 class DataObj : public QObject
 {
@@ -42,7 +42,7 @@ public:
     obj_value_t min         = 0x0;
     obj_value_t max         = 0xFFFFFFFF;
     obj_value_t def         = 0;
-    int         write_value = 0xFFFFFFFF;
+    obj_value_t write_value = 0xFFFFFFFF;
     ValueDes    value_des;
     QVariant    read_value;
 };
