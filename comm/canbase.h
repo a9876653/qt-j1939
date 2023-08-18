@@ -90,6 +90,11 @@ public:
             return 0;
         }
 
+        if (transmit_queue.isFull())
+        {
+            return 0;
+        }
+
         can_farme_t transmit_data;
         memset(&transmit_data, 0, sizeof(transmit_data));
         transmit_data.id   = id;

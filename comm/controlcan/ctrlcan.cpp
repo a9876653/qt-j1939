@@ -42,12 +42,12 @@ bool CtrlCan::is_open()
 void CtrlCan::slot_open_device(uint8_t dev_index, uint8_t ch_index, uint32_t baudrate)
 {
     slot_close_device();
-    VCI_INIT_CONFIG config;
-    baudrate_map_t  baudrate_temp = BAUDRATE_INIT(500000, 0x00, 0x1C);
-    config.AccCode                = 0;
-    config.AccMask                = 0xFFFFFFFF;
-    device_index                  = dev_index;
-    channel_index                 = ch_index;
+
+    baudrate_map_t baudrate_temp = BAUDRATE_INIT(500000, 0x00, 0x1C);
+    vci_config.AccCode           = 0;
+    vci_config.AccMask           = 0xFFFFFFFF;
+    device_index                 = dev_index;
+    channel_index                = ch_index;
     for (int i = 0; i < baudrate_map.count(); i++)
     {
         baudrate_temp = baudrate_map[i];
@@ -56,11 +56,11 @@ void CtrlCan::slot_open_device(uint8_t dev_index, uint8_t ch_index, uint32_t bau
             break;
         }
     }
-    config.Timing0 = baudrate_temp.timing0;
-    config.Timing1 = baudrate_temp.timing1;
+    vci_config.Timing0 = baudrate_temp.timing0;
+    vci_config.Timing1 = baudrate_temp.timing1;
 
-    config.Filter = 1;
-    config.Mode   = 0;
+    vci_config.Filter = 1;
+    vci_config.Mode   = 0;
 
     if (VCI_OpenDevice(dev_type, device_index, 0) != STATUS_OK)
     {
@@ -68,7 +68,7 @@ void CtrlCan::slot_open_device(uint8_t dev_index, uint8_t ch_index, uint32_t bau
         return;
     }
 
-    if (VCI_InitCAN(dev_type, device_index, channel_index, &config) != STATUS_OK)
+    if (VCI_InitCAN(dev_type, device_index, channel_index, &vci_config) != STATUS_OK)
     {
         CANCTRL_DBG("初始化CAN失败!");
         slot_close_device();
@@ -104,6 +104,29 @@ void CtrlCan::slot_close_device()
     emit sig_open_finish(STATUS_OFFLINE);
 }
 
+void CtrlCan::slot_restart_device()
+{
+    VCI_CloseDevice(dev_type, device_index);
+    if (VCI_OpenDevice(dev_type, device_index, 0) != STATUS_OK)
+    {
+        CANCTRL_DBG("设备重启,打开设备失败，请检查设备类型和设备索引号是否正确");
+        return;
+    }
+
+    if (VCI_InitCAN(dev_type, device_index, channel_index, &vci_config) != STATUS_OK)
+    {
+        CANCTRL_DBG("设备重启,初始化CAN失败!");
+        return;
+    }
+
+    if (VCI_StartCAN(dev_type, device_index, channel_index) != STATUS_OK)
+    {
+        CANCTRL_DBG("设备重启,启动CAN失败!");
+        return;
+    }
+    CANCTRL_DBG("设备重启成功");
+}
+
 void CtrlCan::transmit_task()
 {
     if (!is_open())
@@ -136,12 +159,7 @@ void CtrlCan::transmit_task()
 
         CANCTRL_DBG("CAN TRANSMIT FAILED ret %d, num %d!", ret, frame_num);
 
-        if (!open_device(device_index, channel_index, u32_baudrate))
-        {
-            slot_close_device();
-            CANCTRL_DBG("CAN RESTART FAILED!");
-        }
-        // VCI_Transmit(dev_type, device_index, channel_index, send_data, frame_num);
+        slot_restart_device();
     }
 }
 
