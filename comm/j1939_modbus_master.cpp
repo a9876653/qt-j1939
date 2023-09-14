@@ -144,7 +144,7 @@ void CommJ1939Db::slot_request_write_reg(uint16_t reg_addr, QVector<uint16_t> ar
             QVector<uint16_t> vec(w_len);
             for (int i = 0; i < w_len; i++)
             {
-                vec[i] = data[w_index];
+                vec[i] = data[w_index + i];
             }
             slot_request_dst_write_mul_reg(J1939Ins->get_dst_addr(), reg_addr + w_index, vec);
             w_index += w_len;
