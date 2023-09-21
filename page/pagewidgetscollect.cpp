@@ -138,7 +138,7 @@ void PageWidgetsCollect::json_items_handle(QJsonDocument *jdoc)
         QString node        = obj.value("node").toString();
         int     offset      = obj.value("offset").toInt(0);
         int     start_index = obj.value("start_index").toInt() + offset;
-        int     reg_num     = obj.value("reg_num").toInt() + offset;
+        int     reg_num     = obj.value("reg_num").toInt();
         int     end_index   = start_index + reg_num;
         if (obj.contains("end_index"))
         {
