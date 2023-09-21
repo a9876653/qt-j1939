@@ -86,6 +86,40 @@ void ZlgCan::slot_close_device()
     emit sig_open_finish(STATUS_OFFLINE);
 }
 
+void ZlgCan::restart_device()
+{
+    ZCAN_CloseDevice(device_handle);
+    device_handle = ZCAN_OpenDevice(ZCAN_USBCAN2, 0, 0);
+    if (device_handle == INVALID_DEVICE_HANDLE)
+    {
+        ZLGCAN_DBG("CAN RESET OPEN DEVICE FAILED!");
+        return;
+    }
+
+    set_baudrate(channel_index, u32_baudrate);
+
+    ZCAN_CHANNEL_INIT_CONFIG config;
+    memset(&config, 0, sizeof(config));
+    config.can_type     = TYPE_CAN;
+    config.can.mode     = 0;
+    config.can.filter   = 0;
+    config.can.acc_code = 0;
+    config.can.acc_mask = 0xFFFFFFFF;
+    channel_handle      = ZCAN_InitCAN(device_handle, channel_index, &config);
+    if (channel_handle == INVALID_DEVICE_HANDLE)
+    {
+        ZLGCAN_DBG("CAN RESET OPEN CAHNNEL FAILED!");
+        return;
+    }
+
+    if ((ZCAN_StartCAN(channel_handle)) != STATUS_OK)
+    {
+        ZLGCAN_DBG("CAN RESET START FAILED!");
+        return;
+    }
+    ZLGCAN_DBG("CAN RESET INIT SUCCESSFUL");
+}
+
 bool ZlgCan::is_open()
 {
     if (device_handle == INVALID_DEVICE_HANDLE)
@@ -124,11 +158,7 @@ void ZlgCan::transmit_task()
     {
         ZLGCAN_DBG("CAN TRANSMIT FAILED ret %d, len %d!", ret, send_cnt);
 
-        if (!open_device(device_index, channel_index, u32_baudrate))
-        {
-            ZLGCAN_DBG("CAN RESTART FAILED!");
-        }
-        ZCAN_Transmit(channel_handle, send_data, send_cnt); // 重发一次
+        restart_device();
     }
 }
 

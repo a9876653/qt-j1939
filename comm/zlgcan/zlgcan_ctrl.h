@@ -17,6 +17,8 @@ public:
 
 private:
     bool is_open();
+    void restart_device();
+    bool set_baudrate(uint16_t channel_index, uint baudrate);
 
 private slots:
     void slot_open_device(uint8_t device_index, uint8_t ch_index, uint32_t baudrate);
@@ -37,8 +39,6 @@ private:
 
     ZCAN_Transmit_Data send_data[CAN_SEND_DATA_SIZE];
     ZCAN_Receive_Data  recv_data[CAN_RECV_DATA_SIZE];
-
-    bool set_baudrate(uint16_t channel_index, uint baudrate);
 
 protected:
     void transmit_task();
