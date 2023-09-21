@@ -13,10 +13,11 @@ CommJ1939::CommJ1939()
 {
     comm_thread = new MThreadPeriodTask(std::bind(&CommJ1939::poll, this));
     can_dev     = new CtrlCan();
+    // can_dev = new ZlgCan();
     can_dev->moveToThread(comm_thread);
     this->moveToThread(comm_thread);
     init();
-    // can_dev = new ZlgCan();
+
     connect(this, &CommJ1939::sig_msg_send, this, &CommJ1939::msg_send);
     connect(can_dev, &CanBase::sig_open_finish, this, &CommJ1939::sig_open_finish);
     comm_thread->start();

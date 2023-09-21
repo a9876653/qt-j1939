@@ -106,17 +106,31 @@ void CtrlCan::slot_close_device()
 
 void CtrlCan::slot_restart_device()
 {
-    VCI_CloseDevice(dev_type, device_index);
-    if (VCI_OpenDevice(dev_type, device_index, 0) != STATUS_OK)
+    if (errinfo.ErrCode & ERR_CMDFAILED)
     {
-        CANCTRL_DBG("设备重启,打开设备失败，请检查设备类型和设备索引号是否正确");
-        return;
+        CANCTRL_DBG("关闭设备重新打开，重新初始化");
+        VCI_CloseDevice(dev_type, device_index);
+        if (VCI_OpenDevice(dev_type, device_index, 0) != STATUS_OK)
+        {
+            CANCTRL_DBG("设备重启,打开设备失败，请检查设备类型和设备索引号是否正确");
+            return;
+        }
+
+        if (VCI_InitCAN(dev_type, device_index, channel_index, &vci_config) != STATUS_OK)
+        {
+            CANCTRL_DBG("设备重启,初始化CAN失败!");
+            return;
+        }
     }
 
-    if (VCI_InitCAN(dev_type, device_index, channel_index, &vci_config) != STATUS_OK)
+    if (errinfo.ErrCode & ERR_CAN_BUSOFF || errinfo.ErrCode & ERR_CAN_BUSERR)
     {
-        CANCTRL_DBG("设备重启,初始化CAN失败!");
-        return;
+        CANCTRL_DBG("设备重启");
+        if (VCI_ResetCAN(dev_type, device_index, channel_index) != STATUS_OK)
+        {
+            CANCTRL_DBG("设备重启, 复位CAN失败!");
+            return;
+        }
     }
 
     if (VCI_StartCAN(dev_type, device_index, channel_index) != STATUS_OK)
@@ -152,14 +166,17 @@ void CtrlCan::transmit_task()
         memcpy(obj->Data, tx_data.data, tx_data.len);
         frame_num++;
     }
+
     int ret = VCI_Transmit(dev_type, device_index, channel_index, send_data, frame_num);
     if (ret < frame_num)
     {
         VCI_ReadErrInfo(dev_type, device_index, channel_index, &errinfo); //读取错误信息
 
-        CANCTRL_DBG("CAN TRANSMIT FAILED ret %d, num %d!", ret, frame_num);
-
-        slot_restart_device();
+        CANCTRL_DBG("CAN TRANSMIT FAILED ret %d, num %d!, errcode 0x%08x", ret, frame_num, errinfo.ErrCode);
+        if (errinfo.ErrCode > 0)
+        {
+            slot_restart_device();
+        }
     }
 }
 
