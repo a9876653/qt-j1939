@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QThread>
 #include <QTimer>
+#include <QDebug>
 
 class MThreadPeriodTask : public QThread
 {
@@ -14,9 +15,10 @@ public:
 public:
     MThreadPeriodTask(thread_task_t task = nullptr) : m_task(task)
     {
-        m_timer = new QTimer;
-        m_timer->stop();
-        connect(m_timer, &QTimer::timeout, this, &MThreadPeriodTask::slot_period_task);
+        this->moveToThread(this);
+        // QThread::start();
+        connect(this, &MThreadPeriodTask::sig_start, this, &MThreadPeriodTask::slot_start, Qt::QueuedConnection);
+        connect(this, &MThreadPeriodTask::sig_stop, this, &MThreadPeriodTask::slot_stop, Qt::QueuedConnection);
     }
     ~MThreadPeriodTask()
     {
@@ -25,23 +27,23 @@ public:
 
     void start(int period_ms = 1)
     {
-        m_is_run = true;
-        m_timer->start(period_ms);
         QThread::start();
+        emit sig_start(period_ms);
     }
 
     void stop()
     {
-        m_is_run = false;
-        m_timer->stop();
-        quit();
-        wait();
+        emit sig_stop();
     }
 
     bool is_run()
     {
         return m_is_run;
     }
+
+signals:
+    void sig_start(int period_ms = 1);
+    void sig_stop();
 
 private slots:
     void slot_period_task()
@@ -50,6 +52,28 @@ private slots:
         {
             m_task();
         }
+    }
+
+    void slot_start(int period_ms = 1)
+    {
+        qDebug() << "MThreadPeriodTask start thread ID:" << QThread::currentThreadId();
+        m_timer = new QTimer;
+        connect(m_timer, &QTimer::timeout, this, &MThreadPeriodTask::slot_period_task);
+        m_timer->start(period_ms);
+        m_is_run = true;
+    }
+
+    void slot_stop()
+    {
+        if (m_timer != nullptr)
+        {
+            m_timer->stop();
+            delete m_timer;
+            m_timer = nullptr;
+        }
+        m_is_run = false;
+        quit();
+        wait();
     }
 
 private:
