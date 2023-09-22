@@ -41,13 +41,14 @@ bool CtrlCan::is_open()
 
 void CtrlCan::slot_open_device(uint8_t dev_index, uint8_t ch_index, uint32_t baudrate)
 {
+    device_index  = dev_index;
+    channel_index = ch_index;
     slot_close_device();
 
     baudrate_map_t baudrate_temp = BAUDRATE_INIT(500000, 0x00, 0x1C);
     vci_config.AccCode           = 0;
     vci_config.AccMask           = 0xFFFFFFFF;
-    device_index                 = dev_index;
-    channel_index                = ch_index;
+
     for (int i = 0; i < baudrate_map.count(); i++)
     {
         baudrate_temp = baudrate_map[i];
@@ -153,7 +154,7 @@ void CtrlCan::transmit_task()
         VCI_ReadErrInfo(dev_type, device_index, channel_index, &errinfo); //重新加载错误信息
         return;
     }
-    can_farme_t tx_data;
+    can_frame_t tx_data;
     int         frame_num = 0;
     while (frame_num < CAN_SEND_DATA_SIZE && transmit_dequeue(tx_data))
     {
@@ -203,7 +204,7 @@ void CtrlCan::receive_task()
                 uint8_t dlc = recv_data[i].DataLen;
                 if (dlc > 0 && dlc <= 8)
                 {
-                    can_farme_t frame;
+                    can_frame_t frame;
 
                     frame.id   = recv_data[i].ID;
                     frame.flag = recv_data[i].ExternFlag ? MSG_FLAG_EXT : 0;

@@ -71,11 +71,6 @@
 #define ERR_SEND_PARTIAL      0x00030006 //只发送了部分的CAN帧
 #define ERR_SEND_TOO_FAST     0x00030007 //数据发得太快，Socket缓冲区满了
 
-//函数调用返回状态值
-#define STATUS_OFFLINE 3
-#define STATUS_OK      1
-#define STATUS_ERR     0
-
 #define CMD_DESIP           0
 #define CMD_DESPORT         1
 #define CMD_CHGDESIPANDPORT 2
@@ -94,14 +89,14 @@
 
 typedef unsigned long  DWORD, ULONG;
 typedef int            INT;
-typedef void *         HANDLE;
+typedef void          *HANDLE;
 typedef unsigned char  BYTE;
 typedef unsigned short USHORT;
 typedef char           CHAR;
 typedef unsigned int   UINT;
 typedef unsigned char  UCHAR;
 typedef unsigned short UINT16;
-typedef void *         PVOID;
+typedef void          *PVOID;
 
 typedef struct tagRemoteClient
 {

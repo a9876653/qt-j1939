@@ -12,7 +12,9 @@ int j1939_can_write(uint32_t id, uint8_t *data, uint8_t len)
 CommJ1939::CommJ1939()
 {
     comm_thread = new MThreadPeriodTask(std::bind(&CommJ1939::poll, this));
-    can_dev     = new CtrlCan();
+    // can_dev     = new CtrlCan();
+    can_dev = new CanSocketClient();
+    // can_dev = new UdpCan();
     // can_dev = new ZlgCan();
     can_dev->moveToThread(comm_thread);
     this->moveToThread(comm_thread);
@@ -46,7 +48,7 @@ void CommJ1939::close_device()
 
 void CommJ1939::can_recv_task()
 {
-    CanBase::can_farme_t frame;
+    CanBase::can_frame_t frame;
     while (can_dev->recv_dequeue(frame))
     {
         j1939_receive_handle(&j1939_ins, frame.id, frame.data, frame.len);

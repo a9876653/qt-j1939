@@ -2,11 +2,16 @@ include($$PWD/zlgcan/zlgcan.pri)
 
 include($$PWD/controlcan/controlcan.pri)
 include($$PWD/j1939/j1939.pri)
+include($$PWD/udpcan/udpcan.pri)
 
 INCLUDEPATH += $$PWD
 INCLUDEPATH += $$PWD/j1939/include
 INCLUDEPATH += $$PWD/zlgcan
 INCLUDEPATH += $$PWD/controlcan
+INCLUDEPATH += $$PWD/udpcan
+
+include($$PWD/socketcan/socketcan.pri)
+INCLUDEPATH += $$PWD/socketcan
 
 HEADERS += \
     $$PWD/canbase.h \

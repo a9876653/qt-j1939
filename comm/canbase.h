@@ -21,6 +21,11 @@
 #define CAN_RECV_DATA_SIZE 100
 #define CAN_SEND_DATA_SIZE 100
 
+//函数调用返回状态值
+#define STATUS_OFFLINE 3
+#define STATUS_OK      1
+#define STATUS_ERR     0
+
 typedef enum
 {
     CAN_BAUDRATE_1000K = 0,
@@ -41,7 +46,7 @@ class CanBase : public QObject
 {
     Q_OBJECT
 public:
-    class can_farme_t
+    class can_frame_t
     {
     public:
         uint32_t id;
@@ -95,12 +100,32 @@ public:
             return 0;
         }
 
-        can_farme_t transmit_data;
+        can_frame_t transmit_data;
         memset(&transmit_data, 0, sizeof(transmit_data));
         transmit_data.id   = id;
         transmit_data.len  = len;
         transmit_data.flag = flag;
         memcpy(transmit_data.data, &array[0], len);
+        transmit_queue.enqueue(transmit_data);
+
+        return 1;
+    }
+    virtual uint transmit(can_frame_t transmit_data)
+    {
+        if (!is_open())
+        {
+            // CAN_DBG("CAN Device is close");
+            return 0;
+        }
+        if (transmit_data.len > CAN_MAX_DATA_LEN)
+        {
+            return 0;
+        }
+
+        if (transmit_queue.isFull())
+        {
+            return 0;
+        }
         transmit_queue.enqueue(transmit_data);
 
         return 1;
@@ -114,7 +139,7 @@ public:
     {
     }
 
-    bool transmit_dequeue(can_farme_t &transmit_data)
+    bool transmit_dequeue(can_frame_t &transmit_data)
     {
         if (transmit_queue.isEmpty())
         {
@@ -123,7 +148,17 @@ public:
         return transmit_queue.dequeue(transmit_data);
     }
 
-    bool recv_dequeue(can_farme_t &recv_data)
+    bool recv_enqueue(can_frame_t &recv_data)
+    {
+        if (recv_queue.isFull())
+        {
+            return false;
+        }
+        recv_queue.enqueue(recv_data);
+        return true;
+    }
+
+    bool recv_dequeue(can_frame_t &recv_data)
     {
         if (recv_queue.isEmpty())
         {
@@ -148,8 +183,8 @@ signals:
     void sig_close_device();
 
 public:
-    ThreadSafeQueue<can_farme_t> recv_queue;
+    ThreadSafeQueue<can_frame_t> recv_queue;
 
 private:
-    ThreadSafeQueue<can_farme_t> transmit_queue;
+    ThreadSafeQueue<can_frame_t> transmit_queue;
 };

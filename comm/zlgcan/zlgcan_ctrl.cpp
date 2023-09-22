@@ -137,7 +137,7 @@ bool ZlgCan::is_open()
 
 void ZlgCan::transmit_task()
 {
-    can_farme_t tx_data;
+    can_frame_t tx_data;
     uint        send_cnt = 0;
     while (transmit_dequeue(tx_data))
     {
@@ -174,7 +174,7 @@ void ZlgCan::receive_task()
             uint8_t dlc = recv_data[i].frame.can_dlc;
             if (dlc > 0 && dlc <= 8)
             {
-                can_farme_t frame;
+                can_frame_t frame;
                 uint32_t    id = recv_data[i].frame.can_id;
                 frame.id       = id;
                 frame.flag     = IS_EFF(id) ? MSG_FLAG_EXT : 0;

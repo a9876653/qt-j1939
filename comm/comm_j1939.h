@@ -4,9 +4,11 @@
 #include "j1939_config.h"
 #include "j1939_user_if.h"
 #include "zlgcan_ctrl.h"
+#include "udpcan.h"
 #include "singleton.h"
 #include "ctrlcan.h"
 #include "mthreadperiodtask.h"
+#include "cansocketclient.h"
 
 #define J1939_SRC_ADDR  0x7E // 默认源地址
 #define PGN_REG_NUM     4096 // 注册的PGN数（单帧），只接收
