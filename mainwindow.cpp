@@ -49,12 +49,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     comm_j1939_port_init(msgs->msgs_map);
     src_page_parse = new PageParse(ui->objAddrspinBox->value(), "./cfg/page_json");
-    ui->tabWidget->addTab(src_page_parse, "本地读取服务");
+    tabWidget      = new QTabWidget;
 
-    ui->tabWidget->addTab(new FrmGroupUpdate(), "从机升级");
-    ui->tabWidget->addTab(new EnetConfig(), "网卡配置");
+    tabWidget->addTab(src_page_parse, "本地读取服务");
 
-    ui->tabWidget->addTab(new frmBootloader, "固件升级");
+    tabWidget->addTab(new FrmGroupUpdate(), "从机升级");
+    tabWidget->addTab(new EnetConfig(), "网卡配置");
+
+    tabWidget->addTab(new frmBootloader, "固件升级");
+
+    ui->horizontalLayout->addWidget(tabWidget);
 
     connect(J1939Ins, &CommJ1939::sig_recv_pgn_handle, this, &MainWindow::slot_recv_pgn_handle, Qt::QueuedConnection);
     connect(J1939Ins, &CommJ1939::sig_open_finish, this, &MainWindow::slot_recv_comm_status, Qt::QueuedConnection);
@@ -158,7 +162,7 @@ void MainWindow::slot_recv_pgn_handle(uint32_t pgn, uint8_t src, QVector<uint8_t
     {
         Pages *page   = new Pages();
         page->can_dbc = new PageFileMsgDisplay(src);
-        ui->tabWidget->addTab(page->can_dbc, QString("CANDBC解析 %1").arg(src));
+        tabWidget->addTab(page->can_dbc, QString("CANDBC解析 %1").arg(src));
         // page->can_modbus = new PageParse(src);
         // ui->tabWidget->addTab(page->can_modbus, QString("MB协议解析 - %1").arg(src));
         src_page_map.insert(src, page);

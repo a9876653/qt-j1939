@@ -7,6 +7,7 @@ HEADERS += \
     $$PWD/mlabeltable.h \
     $$PWD/mqspinbox.h \
     $$PWD/mtableview.h \
+    $$PWD/mtabwidget.h \
     $$PWD/mvaluelabel.h \
     $$PWD/mvaluelabeltable.h \
     $$PWD/mwritereadtable.h \

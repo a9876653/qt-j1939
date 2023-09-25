@@ -18,6 +18,9 @@
 PageParse::PageParse(int src_addr, QString dir, QWidget *parent) : QWidget(parent), ui(new Ui::PageParse), src_addr(src_addr)
 {
     ui->setupUi(this);
+    tabWidget = new MTabWidget();
+    tabWidget->setTabPosition(QTabWidget::South); // 标题显示在下方
+
     data = new DataObjMap(src_addr);
     connect(this, &PageParse::sig_request_dst_read_reg, J1939DbIns, &CommJ1939Db::slot_request_dst_read_reg);
 
@@ -31,6 +34,9 @@ PageParse::PageParse(int src_addr, QString dir, QWidget *parent) : QWidget(paren
             load_json(info.fileName().replace(".json", ""), info.filePath());
         }
     }
+
+    ui->verticalLayout_2->addWidget(tabWidget);
+
     csv_header.append("时间");
     csv_header.append("时间UTC");
     for (DataObj *obj : save_obj_list)
@@ -101,7 +107,7 @@ bool PageParse::load_json(QString name, QString path)
     connect(page, &PageWidgetsCollect::sig_request_read_reg, this, &PageParse::slot_request_read_reg);
     page->json_items_handle(&jsonCfgDoc);
     save_obj_list.append(page->save_obj_list);
-    ui->tabWidget->addTab(page, name);
+    tabWidget->addTab(page, name);
     return true;
 }
 

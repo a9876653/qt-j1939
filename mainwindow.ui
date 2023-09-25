@@ -26,17 +26,19 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0" columnstretch="0,0,0,0,0,0">
     <property name="leftMargin">
-     <number>9</number>
+     <number>5</number>
+    </property>
+    <property name="topMargin">
+     <number>5</number>
     </property>
     <property name="rightMargin">
-     <number>9</number>
+     <number>5</number>
+    </property>
+    <property name="bottomMargin">
+     <number>5</number>
     </property>
     <item row="4" column="0" colspan="6">
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QTabWidget" name="tabWidget"/>
-      </item>
-     </layout>
+     <layout class="QHBoxLayout" name="horizontalLayout"/>
     </item>
     <item row="2" column="0">
      <layout class="QHBoxLayout" name="horizontalLayout_2">

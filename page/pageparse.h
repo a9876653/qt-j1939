@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "dataobjmap.h"
+#include "mtabwidget.h"
 
 namespace Ui
 {
@@ -28,6 +29,8 @@ private:
     Ui::PageParse *ui;
 
     int src_addr;
+
+    QTabWidget *tabWidget = nullptr;
 
     DataObjMap      *data = nullptr;
     QList<DataObj *> save_obj_list;

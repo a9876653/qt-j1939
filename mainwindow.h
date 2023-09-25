@@ -7,6 +7,7 @@
 #include "msg_signals.h"
 #include "pagefilemsgdisplay.h"
 #include "pageparse.h"
+#include "mtabwidget.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -44,6 +45,8 @@ private:
     bool device_status = false;
 
     MsgSignals *msgs = nullptr;
+
+    QTabWidget *tabWidget = nullptr;
 
     PageParse *src_page_parse = nullptr;
 
