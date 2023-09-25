@@ -20,7 +20,7 @@ public:
 
 signals:
     void sig_dbg_info(QString str);
-    void sig_app_info_update(app_info_str_t &str);
+    void sig_app_info_update(app_info_str_t str);
     void sig_update_failed();
 
 private:

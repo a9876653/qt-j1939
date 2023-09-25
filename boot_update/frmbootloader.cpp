@@ -151,7 +151,7 @@ void frmBootloader::on_getAppInfoPushButton_clicked()
     app_info_request();
 }
 
-void frmBootloader::slotAppInfoUpdata(app_info_str_t &str)
+void frmBootloader::slotAppInfoUpdata(app_info_str_t str)
 {
     ui->appNameTextEdit->setText(str.appName);
     ui->boardIdTextEdit->setText(str.boardId);

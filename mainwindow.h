@@ -36,6 +36,8 @@ private slots:
 
     void on_consoleBtn_clicked();
 
+    void on_autoReadCheckBox_stateChanged(int arg1);
+
 private:
     Ui::MainWindow *ui;
 

@@ -33,6 +33,7 @@ private:
 
 public:
     QList<DataObj *> save_obj_list;
+    static bool      auto_read_en;
 
 private:
     Ui::PageWidgetsCollect *ui;

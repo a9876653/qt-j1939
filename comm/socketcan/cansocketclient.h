@@ -5,6 +5,8 @@
 #include "cansocketserver.h"
 #include "mthread.h"
 #include "cansocketdef.h"
+#include "cansocketserver.h"
+#include "ctrlcandev.h"
 
 class CanSocketClient : public CanBase
 {
@@ -48,6 +50,10 @@ private:
     QTimer *wait_timer = nullptr;
 
     QLocalSocket *client = nullptr;
+
+    QMap<QString, CanSocketServer *> cansocket_dev_map;
+
+    QMap<int, CtrlCanDev *> can_dev_map;
 
 protected:
     void transmit_task();

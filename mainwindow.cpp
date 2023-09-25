@@ -13,6 +13,7 @@
 #include "mwritereadtable.h"
 #include "frmgroupupdate.h"
 #include "pageparse.h"
+#include "pagewidgetscollect.h"
 #include <Windows.h>
 #include <QDebug>
 
@@ -192,4 +193,10 @@ void MainWindow::on_consoleBtn_clicked()
         ::ShowWindow(::GetConsoleWindow(), SW_HIDE);
         console_is_show = false;
     }
+}
+
+void MainWindow::on_autoReadCheckBox_stateChanged(int arg1)
+{
+    (void)arg1;
+    PageWidgetsCollect::auto_read_en = ui->autoReadCheckBox->isChecked();
 }

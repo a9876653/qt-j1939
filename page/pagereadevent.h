@@ -51,7 +51,7 @@ private:
     int timeout_cnt = 0;
     int read_type   = 0;
 
-    const int read_timeout_ms = 500;
+    const int read_timeout_ms = 1500;
 
     QTimer read_timer;
 };

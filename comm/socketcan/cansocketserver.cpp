@@ -65,7 +65,7 @@ void CanSocketServer::slot_ready_read()
             {
                 can_dev->close_device();
                 socket_can->ack.cmd = socket_can->cmd;
-                socket_can->ack.ack = 1;
+                socket_can->ack.ack = 0;
                 recv_timer.stop();
                 respond_ack(s, socket_can);
             }

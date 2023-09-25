@@ -11,6 +11,8 @@
 #include "mwritereadtable.h"
 #include <QLayout>
 
+bool PageWidgetsCollect::auto_read_en = true;
+
 PageWidgetsCollect::PageWidgetsCollect(DataObjMap *data) : ui(new Ui::PageWidgetsCollect), data(data)
 {
     ui->setupUi(this);
@@ -50,6 +52,10 @@ void PageWidgetsCollect::auto_read_stop()
 void PageWidgetsCollect::slot_auto_read_timeout()
 {
     uint16_t map_count = reg_info_list.count();
+    if (!auto_read_en && is_auto_read) // 禁止自动读
+    {
+        return;
+    }
     if (map_count < 1 || (request_get_index >= map_count && !is_auto_read))
     {
         auto_read_stop();

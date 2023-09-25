@@ -123,7 +123,7 @@ void PageReadEvent::read_timeout()
 {
     event->request_event(read_type, read_index);
     timeout_cnt++;
-    if (timeout_cnt > 3)
+    if (timeout_cnt > 5)
     {
         stop_read();
     }
