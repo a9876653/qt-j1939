@@ -11,7 +11,7 @@ public:
     typedef std::function<void(void)> thread_task_t;
 
 public:
-    MThread(thread_task_t task = nullptr) : m_task(task)
+    MThread(thread_task_t task = nullptr, thread_task_t init = nullptr) : m_task(task), m_init(init)
     {
     }
     ~MThread()
@@ -43,6 +43,10 @@ public:
 private:
     void run() override
     {
+        if (m_init)
+        {
+            m_init();
+        }
         while (m_is_run)
         {
             if (m_task != nullptr)
@@ -54,6 +58,7 @@ private:
 
     bool          m_is_run = false;
     thread_task_t m_task   = nullptr;
+    thread_task_t m_init   = nullptr;
 };
 
 #endif // MTHREAD_H

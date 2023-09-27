@@ -12,8 +12,8 @@ int j1939_can_write(uint32_t id, uint8_t *data, uint8_t len)
 CommJ1939::CommJ1939()
 {
     comm_thread = new MThreadPeriodTask(std::bind(&CommJ1939::poll, this));
-    // can_dev     = new CtrlCan();
-    can_dev = new CanSocketClient();
+    can_dev     = new CtrlCan();
+    // can_dev = new CanSocketClient();
     // can_dev = new UdpCan();
     // can_dev = new ZlgCan();
     can_dev->moveToThread(comm_thread);

@@ -14,13 +14,23 @@ void j1939_err_handle(uint32_t pgn, uint8_t dst, uint8_t src)
     BOOT_PORT_DBG("dst %d src %d pgn %d tp err!", dst, src, pgn);
 }
 
+bool msg_is_for_me(uint8_t dst)
+{
+    return (dst == ADDRESS_GLOBAL) || J1939Ins->get_dst_addr() == dst;
+}
+
 void j1939_recv_cb(uint32_t pgn, uint8_t dst, uint8_t src, uint8_t *data, uint16_t len)
 {
     (void)dst;
     (void)len;
     (void)data;
+
     if (pgn == DB_FUNC_READ_HOLDING_REGISTER)
     {
+        if (!msg_is_for_me(src))
+        {
+            return;
+        }
         respond_read_reg_t *ptr = (respond_read_reg_t *)data;
         J1939DbIns->recv_read_reg_handle(src, ptr);
     }
