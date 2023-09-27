@@ -3,7 +3,11 @@
 CanSocketServer::CanSocketServer(QString name, CanBase *can) : dev_name(name), can_dev(can)
 {
     server = new QLocalServer();
-    server->listen(name);
+    // server->setMaxPendingConnections(16);
+    if (!server->listen(name))
+    {
+        qDebug() << "设备 " + name + "服务启动失败";
+    }
     connect(server, &QLocalServer::newConnection, this, &CanSocketServer::slot_new_connect);
     connect(&recv_timer, &QTimer::timeout, this, &CanSocketServer::slot_can_recv_timeout);
 }

@@ -6,6 +6,7 @@
 #include "ControlCAN.h"
 #include "ctrlcanchannel.h"
 #include "mthreadperiodtask.h"
+#include "cansocketserver.h"
 
 class CtrlCanDev : public QObject
 {
@@ -14,17 +15,40 @@ public:
     CtrlCanDev(int dev_index)
     {
         device_index = dev_index;
-        comm_thread  = new MThreadPeriodTask(std::bind(&CtrlCanDev::can_dev_task, this));
+        comm_thread  = new MThread(std::bind(&CtrlCanDev::can_dev_task, this), std::bind(&CtrlCanDev::init, this));
         this->moveToThread(comm_thread);
-        comm_thread->start(3);
+        comm_thread->start();
     }
     ~CtrlCanDev()
     {
         VCI_CloseDevice(dev_type, device_index);
     }
 
+    void init()
+    {
+        CtrlCanChannel *ch = nullptr;
+        for (int k = 0; k < 4; k++)
+        {
+            QString name = QString("/candev%1ch%2").arg(device_index).arg(k);
+            ch           = new CtrlCanChannel(device_index, k);
+            can_channel_map.insert(k, ch);
+            CanSocketServer *can = new CanSocketServer(name, ch);
+            cansocket_dev_map.insert(name, can);
+        }
+    }
+
     bool open_device(uint8_t ch_index, uint32_t baudrate)
     {
+        CtrlCanChannel *ch = nullptr;
+        if (can_channel_map.contains(ch_index))
+        {
+            ch = can_channel_map[ch_index];
+        }
+        else
+        {
+            qDebug("打开设备%d通道%d不存在", device_index, ch_index);
+            return false;
+        }
         if (!is_had_open())
         {
             // VCI_CloseDevice(dev_type, device_index);
@@ -34,17 +58,8 @@ public:
                 return false;
             }
         }
-        if (can_channel_map.contains(ch_index))
-        {
-            CtrlCanChannel *ch = can_channel_map[ch_index];
-            return ch->open_device(device_index, ch_index, baudrate);
-        }
-        else
-        {
-            CtrlCanChannel *ch = new CtrlCanChannel(device_index, ch_index);
-            can_channel_map.insert(ch_index, ch);
-            return ch->open_device(device_index, ch_index, baudrate);
-        }
+        is_open_ok = true;
+        return ch->open_device(device_index, ch_index, baudrate);
     }
 
     void close_device(uint8_t ch_index = 0xFF)
@@ -54,17 +69,23 @@ public:
             CtrlCanChannel *ch = can_channel_map[ch_index];
             return ch->close_device();
         }
-        if (is_all_closed())
+        if (is_open_ok && !is_had_open())
         {
             VCI_CloseDevice(dev_type, device_index);
+            is_open_ok = false;
         }
     }
 
     void check_close_device()
     {
-        if (is_all_closed())
+        if (is_open_ok && (!is_had_open() || is_had_err()))
         {
             VCI_CloseDevice(dev_type, device_index);
+            is_open_ok = false;
+        }
+        if (!is_open_ok && is_had_open() && is_had_err())
+        {
+            is_open_ok = VCI_OpenDevice(dev_type, device_index, 0) == STATUS_OK;
         }
     }
 
@@ -89,16 +110,16 @@ private:
         }
         return false;
     }
-    bool is_all_closed()
+    bool is_had_err()
     {
         foreach (CtrlCanChannel *ch, can_channel_map)
         {
-            if (ch->is_open())
+            if (ch->is_err())
             {
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     void can_dev_task()
@@ -107,15 +128,22 @@ private:
         {
             ch->can_task();
         }
+        check_close_device();
+        QThread::msleep(3);
     }
 
 public:
     QMap<int, CtrlCanChannel *> can_channel_map;
 
 private:
-    int                device_index = 0;
-    int                dev_type     = VCI_USBCAN2;
-    MThreadPeriodTask *comm_thread  = nullptr;
+    int device_index = 0;
+    int dev_type     = VCI_USBCAN2;
+
+    bool is_open_ok = false;
+
+    QMap<QString, CanSocketServer *> cansocket_dev_map;
+
+    MThread *comm_thread = nullptr;
 };
 
 #endif // CTRLCANDEV_H

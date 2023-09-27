@@ -18,12 +18,15 @@ signals:
 
 private:
     bool is_open();
+    bool socket_is_ok(QLocalSocket *socket);
     bool connect_server(uint8_t device_index, uint8_t ch_index);
     void disconnect_server();
 
     bool request_candev_ctrl(QLocalSocket *socket, uint8_t ctrl, uint32_t baudrate);
     int  request_candev_send(QLocalSocket *socket, socket_can_data_t data);
     void open_device();
+
+    void socket_close(QLocalSocket *socket);
 
     void wait_timer_start();
     void wait_timer_stop();

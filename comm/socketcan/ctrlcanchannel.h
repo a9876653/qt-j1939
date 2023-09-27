@@ -12,6 +12,7 @@ public:
     CtrlCanChannel(uint8_t device_index, uint8_t ch_index);
     ~CtrlCanChannel();
     bool is_open();
+    bool is_err();
 
 private slots:
     void slot_open_device(uint8_t device_index, uint8_t ch_index, uint32_t baudrate);
@@ -25,6 +26,7 @@ public:
 private:
     int  dev_type = VCI_USBCAN2;
     bool started  = false;
+    bool is_ok    = true;
 
     uint32_t u32_baudrate = 500000;
 

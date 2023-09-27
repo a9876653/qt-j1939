@@ -15,6 +15,32 @@ bool CanSocketClient::is_open()
     return started;
 }
 
+bool CanSocketClient::socket_is_ok(QLocalSocket *socket)
+{
+    if (socket == nullptr)
+    {
+        return false;
+    }
+    if (!socket->isValid())
+    {
+        return false;
+    }
+    if (!socket->isOpen())
+    {
+        return false;
+    }
+    return true;
+}
+
+void CanSocketClient::socket_close(QLocalSocket *socket)
+{
+    if (socket)
+    {
+        socket->disconnectFromServer();
+        socket->close();
+    }
+}
+
 void CanSocketClient::wait_timer_start()
 {
     if (wait_timer == nullptr)
@@ -22,11 +48,8 @@ void CanSocketClient::wait_timer_start()
         wait_timer = new QTimer();
         connect(wait_timer, &QTimer::timeout, this, &CanSocketClient::slot_wait_timeout);
     }
-    if (is_open())
-    {
-        wait_timer->setInterval(client_wait_timeout);
-        wait_timer->start();
-    }
+    wait_timer->setInterval(client_wait_timeout);
+    wait_timer->start();
 }
 void CanSocketClient::wait_timer_stop()
 {
@@ -55,7 +78,6 @@ void CanSocketClient::slot_ready_read_data()
         uint8_t           cmd        = socket_can->cmd;
         socket_can_ack_t *can_ack    = &socket_can->ack;
         int               num        = socket_can->data.frame_num;
-
         wait_timer_stop();
         switch (cmd)
         {
@@ -83,8 +105,6 @@ void CanSocketClient::slot_ready_read_data()
                 }
                 else if (can_ack->ack == 0)
                 {
-                    qDebug() << "设备 " << device_index << "通道 " << channel_index << "关闭成功";
-                    emit sig_open_finish(STATUS_OFFLINE);
                 }
             }
             else if (can_ack->cmd == SOCKET_CAN_CMD_DATA)
@@ -107,25 +127,31 @@ bool CanSocketClient::connect_server(uint8_t device_index, uint8_t ch_index)
         client = new QLocalSocket;
         connect(client, &QLocalSocket::readyRead, this, &CanSocketClient::slot_ready_read_data);
     }
-    client->close();
-    QString name = QString("/candev%1ch%2").arg(device_index).arg(ch_index);
+    else
+    {
+        delete client;
+        client = new QLocalSocket;
+        connect(client, &QLocalSocket::readyRead, this, &CanSocketClient::slot_ready_read_data);
+    }
+
+    QString name = QString("candev%1ch%2").arg(device_index).arg(ch_index);
     client->connectToServer(name);
     if (client->waitForConnected(client_wait_timeout))
     {
+        qDebug("Can设备%d通道%d连接成功", device_index, channel_index);
         return true;
     }
     else
     {
-        qDebug("找不到Can设备%d通道%d，重新创建", device_index, channel_index);
-        CtrlCanDev *dev = new CtrlCanDev(device_index);
-        can_dev_map.insert(device_index, dev);
-        for (int k = 0; k < 4; k++)
-        {
-            dev->open_device(k, u32_baudrate);
-            QString          name = QString("/candev%1ch%2").arg(device_index).arg(k);
-            CanSocketServer *can  = new CanSocketServer(name, dev->get_channel_ins(k));
-            cansocket_dev_map.insert(name, can);
-        }
+        //        CtrlCanDev *dev = nullptr;
+        //        if (!can_dev_map.contains(device_index))
+        //        {
+        //            qDebug("找不到Can设备%d通道%d，重新创建", device_index, channel_index);
+        //            dev = new CtrlCanDev(device_index);
+        //            can_dev_map.insert(device_index, dev);
+        //            QThread::msleep(1000);
+        //        }
+        socket_close(client);
         client->connectToServer(name);
         if (client->waitForConnected(client_wait_timeout))
         {
@@ -141,15 +167,16 @@ void CanSocketClient::disconnect_server()
 {
     if (client != nullptr)
     {
+        client->disconnectFromServer();
         client->close();
     }
 }
 
 bool CanSocketClient::request_candev_ctrl(QLocalSocket *socket, uint8_t ctrl, uint32_t baudrate)
 {
-    if (socket == nullptr || !socket->isValid())
+    if (!socket_is_ok(socket))
     {
-        socket->close();
+        socket_close(client);
         return false;
     }
     QByteArray    array(16, 0);
@@ -201,15 +228,16 @@ void CanSocketClient::slot_close_device()
 {
     started       = false;
     request_close = true;
-    wait_timer_stop();
     request_candev_ctrl(client, SOCKET_CAN_CHANNEL_CLOSE, u32_baudrate);
+    wait_timer_stop();
+    emit sig_open_finish(STATUS_OFFLINE);
 }
 
 int CanSocketClient::request_candev_send(QLocalSocket *socket, socket_can_data_t data)
 {
-    if (socket == nullptr || data.frame_num > SOCKET_CAN_FRAME_NUM_MAX || !socket->isValid())
+    if (!socket_is_ok(socket) || data.frame_num > SOCKET_CAN_FRAME_NUM_MAX)
     {
-        socket->close();
+        socket_close(client);
         return 0;
     }
     int           data_len = data.frame_num * sizeof(can_frame_t);
@@ -252,10 +280,6 @@ void CanSocketClient::transmit_task()
 
 void CanSocketClient::receive_task()
 {
-    foreach (CtrlCanDev *dev, can_dev_map)
-    {
-        dev->check_close_device();
-    }
     if (!is_open())
     {
         return;

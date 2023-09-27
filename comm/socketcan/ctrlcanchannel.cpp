@@ -23,10 +23,16 @@ bool CtrlCanChannel::is_open()
     return started;
 }
 
+bool CtrlCanChannel::is_err()
+{
+    return !is_ok;
+}
+
 void CtrlCanChannel::slot_open_device(uint8_t dev_index, uint8_t ch_index, uint32_t baudrate)
 {
     device_index  = dev_index;
     channel_index = ch_index;
+    started       = true;
 
     baudrate_map_t baudrate_temp = BAUDRATE_INIT(500000, 0x00, 0x1C);
     vci_config.AccCode           = 0;
@@ -49,6 +55,7 @@ void CtrlCanChannel::slot_open_device(uint8_t dev_index, uint8_t ch_index, uint3
     if (VCI_InitCAN(dev_type, device_index, channel_index, &vci_config) != STATUS_OK)
     {
         CANCTRL_DBG("设备%d通道%d初始化CAN失败!", device_index, channel_index);
+        is_ok = false;
         slot_close_device();
         return;
     }
@@ -56,13 +63,14 @@ void CtrlCanChannel::slot_open_device(uint8_t dev_index, uint8_t ch_index, uint3
     if (VCI_StartCAN(dev_type, device_index, channel_index) != STATUS_OK)
     {
         CANCTRL_DBG("设备%d通道%d启动CAN失败!", device_index, channel_index);
+        is_ok = false;
         slot_close_device();
         return;
     }
 
     CANCTRL_DBG("设备%d通道%d初始化成功波特率:%d", device_index, channel_index, baudrate);
+    is_ok = true;
 
-    started = true;
     emit sig_open_finish(STATUS_OK);
 }
 
@@ -79,6 +87,7 @@ void CtrlCanChannel::slot_restart_device()
         if (VCI_InitCAN(dev_type, device_index, channel_index, &vci_config) != STATUS_OK)
         {
             CANCTRL_DBG("设备%d通道%d重启,初始化CAN失败!", device_index, channel_index);
+            is_ok = false;
             return;
         }
     }
@@ -89,6 +98,7 @@ void CtrlCanChannel::slot_restart_device()
         if (VCI_ResetCAN(dev_type, device_index, channel_index) != STATUS_OK)
         {
             CANCTRL_DBG("设备%d通道%d重启, 复位CAN失败!", device_index, channel_index);
+            is_ok = false;
             return;
         }
     }
@@ -96,8 +106,10 @@ void CtrlCanChannel::slot_restart_device()
     if (VCI_StartCAN(dev_type, device_index, channel_index) != STATUS_OK)
     {
         CANCTRL_DBG("设备%d通道%d重启,启动CAN失败!", device_index, channel_index);
+        is_ok = false;
         return;
     }
+    is_ok = true;
     CANCTRL_DBG("设备%d通道%d重启成功", device_index, channel_index);
 }
 
