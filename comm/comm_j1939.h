@@ -54,6 +54,9 @@ signals:
     void sig_recv_pgn_handle(uint32_t pgn, uint8_t src, QVector<uint8_t> array);
     void sig_open_finish(int ret);
 
+public:
+    QMutex mutex;
+
 private:
     MThreadPeriodTask *comm_thread = nullptr;
 

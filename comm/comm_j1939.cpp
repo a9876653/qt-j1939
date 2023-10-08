@@ -74,7 +74,7 @@ void CommJ1939::poll(void)
 void CommJ1939::init()
 {
     memset(&j1939_ins, 0, sizeof(j1939_ins));
-    j1939_init(&j1939_ins, J1939_SRC_ADDR, PGN_REG_NUM, SESSION_REG_NUM, j1939_can_write);
+    j1939_init(&j1939_ins, J1939_SRC_ADDR, PGN_REG_NUM, SESSION_REG_NUM, j1939_can_write, NULL, NULL);
 }
 
 int CommJ1939::msg_send(uint32_t pgn, uint8_t priority, uint8_t dst, QVector<uint8_t> array, uint32_t timeout)

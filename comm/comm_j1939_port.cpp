@@ -6,6 +6,16 @@
 
 #define BOOT_PORT_DBG(x...) qDebug(x)
 
+void j1939_lock(void *locker)
+{
+    J1939Ins->mutex.lock();
+}
+
+void j1939_unlock(void *locker)
+{
+    J1939Ins->mutex.unlock();
+}
+
 void j1939_err_handle(uint32_t pgn, uint8_t dst, uint8_t src)
 {
     (void)pgn;
